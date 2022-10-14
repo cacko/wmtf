@@ -1,0 +1,51 @@
+# https://taskfile.dev
+
+version: '3'
+
+vars:
+  PROJECT: wmtf
+
+tasks:
+  default:
+    cmds:
+      - mamba run -n {{.PROJECT}} python -m {{.PROJECT}}
+    silent: true
+
+  push:
+    desc: commit and pushes current changes
+    cmds:
+      - git add .  || true
+      - git commit -am "$(curl -s https://commit.cacko.net/index.txt)" || true
+      - git push || true
+
+  
+  export:
+    desc: export env
+    cmds:
+      - mamba env export --no-builds  -n {{.PROJECT}} > environment.yml
+
+
+  build:
+    desc: build
+    cmds:
+      - rm -rf dist/*
+      - mamba run -n {{.PROJECT}} python setup.py bdist_wheel
+
+  install:
+    desc: install
+    cmds:
+      - task: build
+      - pip uninstall -y {{.PROJECT}}
+      - find dist -type f -name "*.whl" | head -n 1 | xargs pip install
+
+  publish:
+    desc: publish
+    cmds:
+      - scp dist/* muzak:/var/www/pypi/packages/{{.PROJECT}}
+
+  deploy:
+    desc: all
+    cmds:
+      - task: push
+      - task: build
+      - task: publish

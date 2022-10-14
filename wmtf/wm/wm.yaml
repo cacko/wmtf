@@ -1,0 +1,51 @@
+clock:
+  method: post
+  headers:
+    Cookie:
+      loggedInUserKey: ^user_id^
+  data:
+    XML_OBJ_^task_id^: TOGGLE_CLOCK
+  url: EditField
+  query:
+    sessp_filterParam_Username: ^username^
+    sessp_ReturnPage: ListTasks?sessp_filterParam_Username=^username^
+
+tasks:
+  method: get
+  headers:
+    Cookie:
+      loggedInUserKey: ^user_id^
+  url: ListTasks
+  query:
+    sessp_filterParam_Username: ^username^
+
+
+report:
+  method: post
+  headers:
+    Cookie:
+      loggedInUserKey: ^user_id^
+  url: Reports
+  data:
+    META_FIELD_YEAR_reportStartDate: `datetime|year`
+    META_FIELD_MONTH_reportStartDate:	`datetime|month`
+    META_FIELD_DAY_reportStartDate:	`datetime|day`
+    reportStartDate: `datetime|isoformat|+`
+    META_FIELD_YEAR_reportEndDate: `datetime|year`
+    META_FIELD_MONTH_reportEndDate:	`datetime|month`
+    META_FIELD_DAY_reportEndDate:	`datetime|day`
+    reportEndDate: `datetime|isoformat|+`
+    reportSortCriteria:	recHrsHoursWorked
+    itemId:	704589582
+    command: PersonDetails
+    reportSortDirection:	down
+    reportSortLastCriteria:	recHrsHoursWorked
+    isSortRequest: False
+    reportFilterNames0:	person
+    reportFilterValues0: ^username^
+    reportFilterNames1:	""
+    reportFilterValues1:	""
+    reportFilterNames2:	""
+    reportFilterValues2:	""
+    reportFilterNames3:	""
+    reportFilterValues3:	""
