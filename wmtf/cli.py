@@ -1,2 +1,5 @@
+from wmtf.wm.commands import Command
+
+
 def run():
-    print("run")
+    print(Command.login.data)
