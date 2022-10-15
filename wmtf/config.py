@@ -1,17 +1,24 @@
+from dataclasses import dataclass
 from pathlib import Path
-from wmtf import __name__
+from typing import Optional
+
 from appdir import get_app_dir
 from yaml import Loader, load
-from typing import Optional
-from dataclasses import dataclass
+
+from wmtf import __name__
 
 
 @dataclass
 class WMConfig:
-    
+    host: str
+    username: str
+    password: str
 
-
-
+@dataclass
+class JiraConfig:
+    host: str
+    username: str
+    password: str
 
 class app_config_meta(type):
     _instance = None
@@ -31,6 +38,14 @@ class app_config_meta(type):
     @property
     def cache_dir(cls):
         return cls.app_dir / "cache"
+    
+    @property
+    def wm_config(cls) -> WMConfig:
+        return WMConfig(**cls().getvar("wm"))
+
+    @property
+    def jira_config(cls) -> JiraConfig:
+        return JiraConfig(**cls().getvar("jira"))
 
 
 class app_config(object, metaclass=app_config_meta):
