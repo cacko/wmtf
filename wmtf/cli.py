@@ -1,5 +1,5 @@
-from wmtf.wm.commands import Command
+from wmtf.wm.client import Client
 
 
 def run():
-    print(Command.login.data)
+    print(Client.tasks())

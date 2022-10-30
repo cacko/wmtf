@@ -4,8 +4,9 @@ from typing import Any, Optional
 
 from pydantic import BaseModel, ConfigDict, Extra, Field
 from pydantic.dataclasses import dataclass
+from dataclasses import asdict
 from yaml import Loader, load
-
+from functools import reduce
 
 class Commands(Enum):
     CLOCK = "clock"
