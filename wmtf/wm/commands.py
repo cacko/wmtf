@@ -73,7 +73,6 @@ class CommandMeta(type):
 
     @property
     def login(cls) -> "Login":
-        print(cls.config.get(Commands.LOGIN.value))
         return Login(**cls.config.get(Commands.LOGIN.value))  # type: ignore
 
     @property

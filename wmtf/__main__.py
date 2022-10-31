@@ -1,3 +1,3 @@
-from wmtf.cli import run
+from wmtf.cli import cli
 
-run()
+cli()
