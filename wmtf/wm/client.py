@@ -5,7 +5,8 @@ from dataclasses import asdict
 from functools import reduce
 from requests import Response, Session
 from pathlib import Path
-from wmtf.wm.html.tasks import Tasks
+from wmtf.wm.html.tasks import Tasks as TasksParser
+from wmtf.wm.items.task import Task
 class ClientMeta(type):
     
     _instance: Optional['Client'] = None
@@ -32,13 +33,12 @@ class Client(object, metaclass=ClientMeta):
         res = self.__call(cmd, data=self.__populate(asdict(cmd.data)))
         return res.status_code == 200
     
-    def do_tasks(self):
+    def do_tasks(self) -> list[Task]:
         cmd = Command.tasks
         query = self.__populate(cmd.query)
         res = self.__call(cmd, params=query)
-        pth = Path('/Users/jago/Code/wmtf') / "tasks.html"
-        pth.write_bytes(res.content)
-        return True
+        parser = TasksParser(res.content)
+        return parser.parse()
     
     def __populate(self, data: dict[str, str], **kwds) -> dict[str, str]:
         values = {**asdict(self.__config), **kwds}
