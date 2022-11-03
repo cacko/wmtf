@@ -58,7 +58,7 @@ class CommandMeta(type):
     @property
     def config(cls) -> dict[str, dict]:
         if not cls._config:
-            cp = Path(__file__).parent / "wm.yaml"
+            cp = Path(__file__).parent.parent / "yaml" / "wm.yaml"
             cls._config = load(cp.read_text(), Loader=Loader)
         return cls._config
 
