@@ -6,6 +6,8 @@ from pydantic import BaseModel, ConfigDict, Extra, Field
 from pydantic.dataclasses import dataclass
 from yaml import Loader, load
 
+from wmtf.resources import wm as wm_resources
+
 
 class Commands(Enum):
     CLOCK = "clock"
@@ -58,7 +60,7 @@ class CommandMeta(type):
     @property
     def config(cls) -> dict[str, dict]:
         if not cls._config:
-            cp = Path(__file__).parent.parent / "yaml" / "wm.yaml"
+            cp = wm_resources
             cls._config = load(cp.read_text(), Loader=Loader)
         return cls._config
 

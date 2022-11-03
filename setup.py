@@ -9,8 +9,6 @@ from wmtf import __name__
 
 resources_path = Path(__file__).parent / "wmtf" / "resources"
 
-print(glob.glob(f"{resources_path.as_posix()}/*"))
-
 def version():
     if len(sys.argv) > 1 and sys.argv[1] == "bdist_wheel":
         init = Path(__file__).parent / __name__.lower() / "version.py"
@@ -62,10 +60,11 @@ setup(
         "requests-toolbelt>=0.10.0",
         "structlog>=22.1.0",
     ],
-    data_files=[('resources', glob.glob(f"{resources_path.as_posix()}/*"))],
     setup_requires=["wheel"],
     python_requires=">=3.10",
-    packages=find_packages(include=["wmtf", "wmtf.*"]),
+    packages=find_packages(where="wmtf"),
+    package_dir={"": "wmtf"},
+    package_data={"resources": ["*.yaml"]},
     entry_points="""
         [console_scripts]
         wmtf=wmtf.cli:cli
