@@ -7,6 +7,7 @@ vars:
 
 tasks:
   default:
+    dir: src/
     cmds:
       - mamba run --live-stream -n {{.PROJECT}} python -m {{.PROJECT}} {{.CLI_ARGS}}
     silent: true
@@ -23,7 +24,6 @@ tasks:
     desc: export env
     cmds:
       - mamba env export --no-builds  -n {{.PROJECT}} > environment.yml
-
 
   build:
     desc: build
