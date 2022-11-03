@@ -1,9 +1,10 @@
+import logging
 from dataclasses import asdict
 from datetime import datetime, timedelta
 from functools import reduce
-from typing import Any, Optional
-import logging
 from http.client import HTTPConnection
+from typing import Any, Optional
+
 from requests import Response, Session
 
 from wmtf.config import WMConfig, app_config
@@ -12,12 +13,12 @@ from wmtf.wm.html.report import Report as ReportParser
 from wmtf.wm.html.tasks import Tasks as TasksParser
 from wmtf.wm.items.task import Task
 
-HTTPConnection.debuglevel = 1
-logging.basicConfig() # you need to initialize logging, otherwise you will not see anything from requests
-logging.getLogger().setLevel(logging.DEBUG)
-requests_log = logging.getLogger("urllib3")
-requests_log.setLevel(logging.DEBUG)
-requests_log.propagate = True
+# HTTPConnection.debuglevel = 1
+# logging.basicConfig() # you need to initialize logging, otherwise you will not see anything from requests
+# logging.getLogger().setLevel(logging.DEBUG)
+# requests_log = logging.getLogger("urllib3")
+# requests_log.setLevel(logging.DEBUG)
+# requests_log.propagate = True
 
 
 
