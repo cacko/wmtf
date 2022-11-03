@@ -62,8 +62,8 @@ setup(
     ],
     setup_requires=["wheel"],
     python_requires=">=3.10",
-    packages=find_packages(where="wmtf"),
-    package_dir={"": "wmtf"},
+    packages=find_packages(include=["wmtf", "wmtf.*"]),
+    package_dir={"": "."},
     package_data={"resources": ["*.yaml"]},
     entry_points="""
         [console_scripts]
