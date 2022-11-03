@@ -1,6 +1,12 @@
 import click
 from click import Command
+from pyfiglet import Figlet
+
+from wmtf.tui.app import Tui
+from wmtf.ui.items import TaskItem
+from wmtf.ui.menu import Menu, MenuItem
 from wmtf.wm.client import Client
+from wmtf.wm.items.task import Task
 
 
 class WMTFCommand(click.Group):
@@ -15,18 +21,56 @@ def cli():
     pass
 
 
-@cli.command('tasks', short_help="My Tasks")
+@cli.command('quit')
+def quit():
+    """Quit."""
+    click.echo(click.style("Bye!", fg='blue'))
+    import sys
+    sys.exit(0)
+
+
+@cli.command('menu', short_help="Menu")
 @click.pass_context
-def tasks_list(ctx: click.Context):
-    """Shows a alabala menu."""
+def main_menu(ctx: click.Context):
+    """Shows a main menu."""
     try:
-        tasks = Client.tasks()
-        for task in tasks:
-            if task.isActive:
-                click.echo(click.style(f">> {task.clock_id}{task.clock.value}{task.summary}", fg='red'))
-            else:
-                click.echo(f"{task.clock_id}{task.clock.value}{task.summary}")
-    except FileNotFoundError:
-        pass
+        click.clear()
+        logo = Figlet(font="poison").renderText(text=f'wmtf')
+        click.echo(click.style(
+            logo, fg='green', bold=True))
+        menu_items = [
+            MenuItem(text="My Tasks", obj=cli_tasks),
+            MenuItem(text="My report", obj=cli_report),
+        ] + [MenuItem(text="Exit", obj=quit)]
+        with Menu(menu_items) as item:
+            match item.obj:
+                case Command():
+                    ctx.invoke(item.obj)
     except KeyboardInterrupt:
         click.echo(click.style("Bye!", fg='blue'))
+             
+             
+@cli.command('app', short_help="Start app")
+def cli_app():
+    Tui().run()
+
+
+@cli.command('tasks', short_help="My Tasks")
+@click.pass_context
+def cli_tasks(ctx: click.Context):
+    """List issues currently assigned to you and creates a branch from the name of it"""
+    menu_items = [
+        TaskItem(text=f"{task.summary}", obj=task)
+        for task in Client.tasks()
+    ] + [MenuItem(text="<< back", obj=main_menu)]
+    with Menu(menu_items, title="Select task") as item:
+        match item.obj:
+            case Command():
+                ctx.invoke(item.obj)
+            case Task():
+                print(item.obj)
+            
+@cli.command('report', short_help="My Report")
+@click.pass_context
+def cli_report(ctx: click.Context):
+    pass

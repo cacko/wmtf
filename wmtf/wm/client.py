@@ -1,12 +1,16 @@
-from typing import Any, Optional
-from wmtf.config import app_config, WMConfig
-from wmtf.wm.commands import Command, Method
 from dataclasses import asdict
 from functools import reduce
-from requests import Response, Session
 from pathlib import Path
+from typing import Any, Optional
+
+from requests import Response, Session
+
+from wmtf.config import WMConfig, app_config
+from wmtf.wm.commands import Command, Method
 from wmtf.wm.html.tasks import Tasks as TasksParser
 from wmtf.wm.items.task import Task
+
+
 class ClientMeta(type):
     
     _instance: Optional['Client'] = None
@@ -27,6 +31,10 @@ class Client(object, metaclass=ClientMeta):
     
     def __init__(self, *args, **kwargs) -> None:
         self.__config = app_config.wm_config
+        
+    def __del__(self):
+        if self.__session:
+            self.__session.close()
         
     def do_login(self):
         cmd = Command.login

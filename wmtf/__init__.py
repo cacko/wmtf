@@ -1,6 +1,7 @@
 import logging
-import structlog
 import os
+
+import structlog
 
 __name__ = "wmtf"
 

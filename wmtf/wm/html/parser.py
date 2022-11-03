@@ -1,9 +1,12 @@
-from bs4 import element, BeautifulSoup
-from urllib.parse import parse_qs, urlparse
-from wmtf.wm.items.task import ClockLocation
 import re
+from urllib.parse import parse_qs, urlparse
+
+from bs4 import BeautifulSoup, element
+
+from wmtf.wm.items.task import ClockLocation
 
 CLOCK_PATTERN = re.compile(r".+\((\w+)\)", re.MULTILINE)
+TAG_RE = re.compile(r'<[^>]+>')
 
 def extract_id_from_a(el: element.Tag):
     if el.name != "a":
@@ -21,6 +24,9 @@ def extract_clock(el: element.Tag) -> tuple[int, ClockLocation]:
     if matches := CLOCK_PATTERN.match(links[0].get_text()):
         return (id, ClockLocation(matches.group(1)))
     return (id, ClockLocation.OFF)
+
+def strip_tags(txt: str) -> str:
+    return TAG_RE.sub('', txt)
 
 class Parser(object):
 
