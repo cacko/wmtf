@@ -6,6 +6,7 @@ from pydantic import BaseModel, ConfigDict, Extra, Field
 from pydantic.dataclasses import dataclass
 from yaml import Loader, load
 
+
 class Commands(Enum):
     CLOCK = "clock"
     LOGIN = "login"
@@ -19,15 +20,9 @@ class Method(Enum):
 
 
 @dataclass
-class Headers:
-    Cookie: Optional[dict[str, str]]
-
-
-@dataclass
 class LoginData:
     userToLogin: str
     passwordToLogin: str
-
 
 class ReportData(BaseModel, extra=Extra.ignore):
     META_FIELD_YEAR_reportStartDate: str
@@ -39,12 +34,12 @@ class ReportData(BaseModel, extra=Extra.ignore):
     META_FIELD_DAY_reportEndDate: str
     reportEndDate: str
     reportSortCriteria: str
-    itemId: Optional[int]
-    command: str
+    itemId: int = Field(default=820370487)
+    command: str = Field(default="PersonDetails")
     reportSortDirection: str
     reportSortLastCriteria: str
     isSortRequest: bool = Field(default=False)
-    reportFilterNames0: str
+    reportFilterNames0: str = Field(default="person")
     reportFilterValues0: str
     reportFilterNames1: Optional[str]
     reportFilterValues1: Optional[str]
@@ -56,7 +51,7 @@ class ReportData(BaseModel, extra=Extra.ignore):
 
 class CommandMeta(type):
     _config: Optional[dict[str, dict]] = None
-    
+
     def __call__(self, *args: Any, **kwds: Any) -> Any:
         return super().__call__(*args, **kwds)
 
@@ -89,23 +84,22 @@ class Command(metaclass=CommandMeta):
     method: Method
     url: str
 
+
 @dataclass(config=ConfigDict(extra=Extra.ignore))
 class Clock(Command):
     data: dict[str, str]
-    headers: Headers
     query: dict[str, str]
 
 
 @dataclass(config=ConfigDict(extra=Extra.ignore))
 class Tasks(Command):
-    headers: Headers
     query: dict[str, str]
+
 
 @dataclass(config=ConfigDict(extra=Extra.ignore))
 class Login(Command):
     data: LoginData
 
-
+@dataclass(config=ConfigDict(extra=Extra.ignore))
 class Report(Command):
-    headers: Headers
     data: ReportData

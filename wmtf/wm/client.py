@@ -1,15 +1,66 @@
 from dataclasses import asdict
+from datetime import datetime, timedelta
 from functools import reduce
-from pathlib import Path
 from typing import Any, Optional
-
+import logging
+from http.client import HTTPConnection
 from requests import Response, Session
 
 from wmtf.config import WMConfig, app_config
 from wmtf.wm.commands import Command, Method
+from wmtf.wm.html.report import Report as ReportParser
 from wmtf.wm.html.tasks import Tasks as TasksParser
 from wmtf.wm.items.task import Task
 
+HTTPConnection.debuglevel = 1
+logging.basicConfig() # you need to initialize logging, otherwise you will not see anything from requests
+logging.getLogger().setLevel(logging.DEBUG)
+requests_log = logging.getLogger("urllib3")
+requests_log.setLevel(logging.DEBUG)
+requests_log.propagate = True
+
+
+
+class CommandData(dict):
+
+    __replacements: dict[str, str]
+
+    def __init__(self, data: dict[str, Any], replacements: dict[str, str]):
+        ndata = {}
+        self.__replacements = replacements
+        for k, v in data.items():
+            ndata[self.__replace_value(k)] = self.__replace_value(v)
+        super().__init__(ndata)
+
+    def __setitem__(self, __key: Any, __value: Any) -> None:
+        cval = super().__getitem__(__key)
+        if not cval.startswith("$"):
+            return super().__setitem__(__key, __value)
+        args = cval.lstrip("$").split("|")
+        value = __value
+        match args.pop(0):
+            case "datetime":
+                value = self.__get_datetime(__value, *args)
+        return super().__setitem__(__key, value)
+
+    def __get_datetime(self, __value: datetime, *params):
+        args = list(params)
+        to_call = args.pop(0)
+        if hasattr(__value, to_call):
+            if callable(getattr(__value, to_call)):
+                return getattr(__value, to_call)(*args)
+            else:
+                return getattr(__value, to_call)
+        return __value
+
+    def __replace_value(self, v: Any):
+        if not isinstance(v, str):
+            return v
+        return reduce(
+            lambda r, ck: r.replace(f"^{ck}^", str(self.__replacements[ck])),
+            self.__replacements.keys(),
+            v,
+        )
 
 class ClientMeta(type):
     
@@ -22,6 +73,17 @@ class ClientMeta(type):
     
     def tasks(cls):
         return cls().do_tasks()
+    
+    def clock_off(cls, clock_id: int):
+        return cls().do_clock_off(clock_id)
+    
+    def report(cls, start: Optional[datetime] = None, end: Optional[datetime] = None):
+        today = datetime.today()
+        if not start:
+            start = (today - timedelta(days=today.weekday())).replace(hour=0, minute=0, second=1)
+        if not end:
+            end = today.replace(hour=23, minute=59, second=58)
+        return cls().do_report(start, end)
 
     
 class Client(object, metaclass=ClientMeta):
@@ -41,6 +103,13 @@ class Client(object, metaclass=ClientMeta):
         res = self.__call(cmd, data=self.__populate(asdict(cmd.data)))
         return res.status_code == 200
     
+    def do_clock_off(self, clock_id) -> bool:
+        cmd = Command.clock
+        data = self.__populate(cmd.data, clock_id=clock_id)
+        query = self.__populate(cmd.query)
+        res = self.__call(cmd, data=data, params=query)
+        return res.status_code == 200
+    
     def do_tasks(self) -> list[Task]:
         cmd = Command.tasks
         query = self.__populate(cmd.query)
@@ -48,12 +117,29 @@ class Client(object, metaclass=ClientMeta):
         parser = TasksParser(res.content)
         return parser.parse()
     
-    def __populate(self, data: dict[str, str], **kwds) -> dict[str, str]:
-        values = {**asdict(self.__config), **kwds}
-        for k, v in data.items():
-            data[k] = reduce(lambda r,ck: r.replace(f'^{ck}^', values[ck]), values.keys(), v)   
-        return data
+    def do_report(self, start: datetime, end: datetime):
+        cmd = Command.report
+        data = self.__populate(cmd.data.dict())
+        data["META_FIELD_YEAR_reportStartDate"] = start
+        data["META_FIELD_MONTH_reportStartDate"] = start
+        data["META_FIELD_DAY_reportStartDate"] = start
+        data["reportStartDate"] = start
+        data["META_FIELD_YEAR_reportEndDate"] = end
+        data["META_FIELD_MONTH_reportEndDate"] = end
+        data["META_FIELD_DAY_reportEndDate"] = end
+        data["reportEndDate"] = end
+        # res = self.__call(cmd, data=data)
+        # content = res.content
+        from pathlib import Path
+        p = Path(__file__).parent / "report.html"
+        parser = ReportParser(p.read_bytes())
+        return parser.parse()
+        
     
+    def __populate(self, data: dict[str, str], **kwds) -> CommandData:
+        values = {**asdict(self.__config), **kwds}
+        return CommandData(data, values)
+        
     @property
     def session(self) -> Session:
         if not self.__session:
@@ -69,6 +155,4 @@ class Client(object, metaclass=ClientMeta):
             case Method.GET:
                 return self.session.get(url, **kwds)
             case _:
-                raise NotImplementedError
-                
-        
+                raise NotImplementedError     

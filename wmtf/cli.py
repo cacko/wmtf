@@ -10,7 +10,6 @@ from wmtf.wm.items.task import Task
 
 
 class WMTFCommand(click.Group):
-
     def list_commands(self, ctx: click.Context) -> list[str]:
         return list(self.commands)
 
@@ -21,23 +20,23 @@ def cli():
     pass
 
 
-@cli.command('quit')
+@cli.command("quit")
 def quit():
     """Quit."""
-    click.echo(click.style("Bye!", fg='blue'))
+    click.echo(click.style("Bye!", fg="blue"))
     import sys
+
     sys.exit(0)
 
 
-@cli.command('menu', short_help="Menu")
+@cli.command("menu", short_help="Menu")
 @click.pass_context
 def main_menu(ctx: click.Context):
     """Shows a main menu."""
     try:
         click.clear()
-        logo = Figlet(font="poison").renderText(text=f'wmtf')
-        click.echo(click.style(
-            logo, fg='green', bold=True))
+        logo = Figlet(font="poison").renderText(text=f"wmtf")
+        click.echo(click.style(logo, fg="green", bold=True))
         menu_items = [
             MenuItem(text="My Tasks", obj=cli_tasks),
             MenuItem(text="My report", obj=cli_report),
@@ -47,21 +46,20 @@ def main_menu(ctx: click.Context):
                 case Command():
                     ctx.invoke(item.obj)
     except KeyboardInterrupt:
-        click.echo(click.style("Bye!", fg='blue'))
-             
-             
-@cli.command('app', short_help="Start app")
+        click.echo(click.style("Bye!", fg="blue"))
+
+
+@cli.command("app", short_help="Start app")
 def cli_app():
     Tui().run()
 
 
-@cli.command('tasks', short_help="My Tasks")
+@cli.command("tasks", short_help="My Tasks")
 @click.pass_context
 def cli_tasks(ctx: click.Context):
     """List issues currently assigned to you and creates a branch from the name of it"""
     menu_items = [
-        TaskItem(text=f"{task.summary}", obj=task)
-        for task in Client.tasks()
+        TaskItem(text=f"{task.summary}", obj=task) for task in Client.tasks()
     ] + [MenuItem(text="<< back", obj=main_menu)]
     with Menu(menu_items, title="Select task") as item:
         match item.obj:
@@ -69,8 +67,28 @@ def cli_tasks(ctx: click.Context):
                 ctx.invoke(item.obj)
             case Task():
                 print(item.obj)
-            
-@cli.command('report', short_help="My Report")
+
+
+@cli.command("report", short_help="My Report")
 @click.pass_context
 def cli_report(ctx: click.Context):
-    pass
+    report = Client.report()
+
+
+@cli.command("clock-off", short_help="Clock off current active task")
+@click.pass_context
+def cli_clockoff(ctx: click.Context):
+    tasks = Client.tasks()
+    active_task = next(filter(lambda x: x.isActive, tasks), None)
+    if not active_task:
+        return click.echo(click.style(f"No task is currently active", fg="red"))
+
+    if active_task:
+        click.echo(f">> Trying to clock off task '{active_task.summary}'")
+        res = Client.clock_off(active_task.clock_id)
+        if res:
+            return click.echo(click.style(f"Clocked off", fg="green"))
+        else:
+            return click.echo(click.style(f"Clock failed", fg="red"))
+
+
