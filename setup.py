@@ -58,7 +58,7 @@ setup(
     python_requires=">=3.10",
     packages=find_packages(where="src"),
     package_dir={"": "src"},
-    package_data={"resources": ["*.yaml"]},
+    package_data={"resources": ["*"]},
     entry_points="""
         [console_scripts]
         wmtf=wmtf.cli:cli
