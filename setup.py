@@ -1,5 +1,6 @@
 import sys
 from pathlib import Path
+
 import semver
 from setuptools import find_packages, setup
 from setuptools.dist import Distribution as _Distribution
@@ -40,7 +41,6 @@ setup(
         "python-dateutil==2.8.2",
         "pytz-deprecation-shim>=0.1.0.post0",
         "questionary==1.10.0",
-        "rich>=12.6.0",
         "textual>=0.3.0",
         "tzlocal>=4.2",
         "click>=8.1.3",
