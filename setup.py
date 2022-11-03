@@ -57,7 +57,6 @@ setup(
         "requests>=2.28.1",
         "requests-oauthlib>=1.3.1",
         "requests-toolbelt>=0.10.0",
-        "sqlite>=3.39.4",
         "structlog>=22.1.0",
     ],
     setup_requires=["wheel"],
