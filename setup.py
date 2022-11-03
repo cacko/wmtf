@@ -1,25 +1,19 @@
 import sys
 from pathlib import Path
-import glob
 import semver
 from setuptools import find_packages, setup
 from setuptools.dist import Distribution as _Distribution
 
-from wmtf import __name__
-
-resources_path = Path(__file__).parent / "wmtf" / "resources"
+__name__ = "wmtf"
+vp = Path(__file__).parent / "version.txt"
+__version__ = semver.VersionInfo.parse(vp.read_text().strip())
 
 def version():
     if len(sys.argv) > 1 and sys.argv[1] == "bdist_wheel":
-        init = Path(__file__).parent / __name__.lower() / "version.py"
-        _, v = init.read_text().split(" = ")
-        cv = semver.VersionInfo.parse(v.strip('"'))
-        nv = f"{cv.bump_patch()}"
-        init.write_text(f'__version__ = "{nv}"')
+        nv = f"{__version__.bump_patch()}"
+        vp.write_text(f'{nv}')
         return nv
-    from wmtf.version import __version__
-
-    return __version__
+    return f"{__version__}"
 
 
 class Distribution(_Distribution):
@@ -62,8 +56,8 @@ setup(
     ],
     setup_requires=["wheel"],
     python_requires=">=3.10",
-    packages=find_packages(include=["wmtf", "wmtf.*"]),
-    package_dir={"": "."},
+    packages=find_packages(where="src"),
+    package_dir={"": "src"},
     package_data={"resources": ["*.yaml"]},
     entry_points="""
         [console_scripts]
