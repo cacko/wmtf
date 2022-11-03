@@ -9,7 +9,7 @@ from wmtf import __name__
 
 
 def version():
-    if len(sys.argv) > 1 and sys.argv[1] == "py2app":
+    if len(sys.argv) > 1 and sys.argv[1] == "bdist_wheel":
         init = Path(__file__).parent / __name__.lower() / "version.py"
         _, v = init.read_text().split(" = ")
         cv = semver.VersionInfo.parse(v.strip('"'))
