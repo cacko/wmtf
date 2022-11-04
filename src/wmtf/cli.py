@@ -8,7 +8,8 @@ from wmtf.ui.items import TaskItem
 from wmtf.ui.menu import Menu, MenuItem
 from wmtf.wm.client import Client
 from wmtf.wm.items.task import TaskInfo
-
+from crontab import CronTab
+from datetime import date
 
 class WMTFCommand(click.Group):
     def list_commands(self, ctx: click.Context) -> list[str]:
@@ -99,5 +100,14 @@ def cli_clockoff(ctx: click.Context):
             return click.echo(click.style(f"Clocked off", fg="green"))
         else:
             return click.echo(click.style(f"Clock failed", fg="red"))
+
+@cli.command("cron-clock-off", short_help="Schedule cron to clock off")
+@click.pass_context
+def cli_cron_clock_off(ctx: click.Context):
+    cron = CronTab()
+    job = cron.new(command='/home/users/alex.spasov/clock.sh')
+    job.schedule()
+    cron.write()
+
 
 
