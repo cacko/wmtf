@@ -13,6 +13,13 @@ tasks:
   query:
     sessp_filterParam_Username: ^username^
 
+task:
+  method: get
+  url: Browse
+  query:
+    itemId: ^task_id^
+    sessp_filterParam_Username: ^username^
+
 login:
   method: post
   url: Login

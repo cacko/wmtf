@@ -14,6 +14,7 @@ class Commands(Enum):
     LOGIN = "login"
     REPORT = "report"
     TASKS = "tasks"
+    TASK = "task"
 
 
 class Method(Enum):
@@ -76,6 +77,11 @@ class CommandMeta(type):
     def tasks(cls) -> "Tasks":
         return Tasks(**cls.config.get(Commands.TASKS.value))  # type: ignore
 
+
+    @property
+    def task(cls) -> "Task":
+        return Task(**cls.config.get(Commands.TASK.value))  # type: ignore
+
     @property
     def report(cls) -> "Report":
         return Report(**cls.config.get(Commands.REPORT.value))  # type: ignore
@@ -96,7 +102,11 @@ class Clock(Command):
 @dataclass(config=ConfigDict(extra=Extra.ignore))
 class Tasks(Command):
     query: dict[str, str]
+    
 
+@dataclass(config=ConfigDict(extra=Extra.ignore))
+class Task(Command):
+    query: dict[str, str]
 
 @dataclass(config=ConfigDict(extra=Extra.ignore))
 class Login(Command):

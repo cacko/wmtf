@@ -1,3 +1,4 @@
+import logging
 import click
 from click import Command
 from pyfiglet import Figlet
@@ -6,7 +7,7 @@ from wmtf.tui.app import Tui
 from wmtf.ui.items import TaskItem
 from wmtf.ui.menu import Menu, MenuItem
 from wmtf.wm.client import Client
-from wmtf.wm.items.task import Task
+from wmtf.wm.items.task import TaskInfo
 
 
 class WMTFCommand(click.Group):
@@ -62,11 +63,19 @@ def cli_tasks(ctx: click.Context):
         TaskItem(text=f"{task.summary}", obj=task) for task in Client.tasks()
     ] + [MenuItem(text="<< back", obj=main_menu)]
     with Menu(menu_items, title="Select task") as item:
+        logging.warning(item)
         match item.obj:
             case Command():
                 ctx.invoke(item.obj)
-            case Task():
-                print(item.obj)
+            case TaskInfo():
+                ctx.invoke(Command(name="task", params=[item.obj.id]))
+
+@cli.command("task", short_help="Open task")
+@click.pass_context
+@click.argument("task_id")
+def cli_task(ctx: click.Context, task_id: int):
+    task = Client.task(task_id)
+
 
 
 @cli.command("report", short_help="My Report")

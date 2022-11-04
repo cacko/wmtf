@@ -5,7 +5,7 @@ from prompt_toolkit.formatted_text import (FormattedText, PygmentsTokens,
 from pygments.token import Token
 
 from wmtf.ui.menu import MenuItem
-from wmtf.wm.items.task import ClockLocation, Task
+from wmtf.wm.items.task import ClockLocation, TaskInfo
 
 
 class ClockIcon(Enum):
@@ -26,7 +26,7 @@ class ClockIcon(Enum):
 
 
 class TaskItem(MenuItem):
-    obj: Task
+    obj: TaskInfo
 
     @property
     def display(self) -> FormattedText:

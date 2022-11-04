@@ -6,12 +6,13 @@ from http.client import HTTPConnection
 from typing import Any, Optional
 
 from requests import Response, Session
+from pathlib import Path
 
 from wmtf.config import WMConfig, app_config
 from wmtf.wm.commands import Command, Method
 from wmtf.wm.html.report import Report as ReportParser
-from wmtf.wm.html.tasks import Tasks as TasksParser
-from wmtf.wm.items.task import Task
+from wmtf.wm.html.tasks import Tasks as TasksParser, Task as TaskParser
+from wmtf.wm.items.task import Task, TaskInfo
 
 # HTTPConnection.debuglevel = 1
 # logging.basicConfig() # you need to initialize logging, otherwise you will not see anything from requests
@@ -72,8 +73,11 @@ class ClientMeta(type):
             cls._instance = type.__call__(cls, *args, **kwds)
         return cls._instance
     
-    def tasks(cls):
+    def tasks(cls) -> list[TaskInfo]:
         return cls().do_tasks()
+
+    def task(cls, task_id: int) -> list[Task]:
+        return cls().do_task(task_id)
     
     def clock_off(cls, clock_id: int):
         return cls().do_clock_off(clock_id)
@@ -111,12 +115,22 @@ class Client(object, metaclass=ClientMeta):
         res = self.__call(cmd, data=data, params=query)
         return res.status_code == 200
     
-    def do_tasks(self) -> list[Task]:
+    def do_tasks(self) -> list[TaskInfo]:
         cmd = Command.tasks
         query = self.__populate(cmd.query)
         res = self.__call(cmd, params=query)
         parser = TasksParser(res.content)
         return parser.parse()
+
+    def do_task(self, task_id: int) -> Task:
+        cmd = Command.task
+        query = self.__populate(cmd.query, task_id=task_id)
+        res = self.__call(cmd, params=query)
+        p = Path(__file__).parent / "task.html"
+        p.write_bytes(res.content)
+        raise NotImplementedError
+        # parser = TaskParser(res.content)
+        # return parser.parse()
     
     def do_report(self, start: datetime, end: datetime):
         cmd = Command.report
@@ -131,11 +145,10 @@ class Client(object, metaclass=ClientMeta):
         data["reportEndDate"] = end
         # res = self.__call(cmd, data=data)
         # content = res.content
-        from pathlib import Path
         p = Path(__file__).parent / "report.html"
         parser = ReportParser(p.read_bytes())
         return parser.parse()
-        
+
     
     def __populate(self, data: dict[str, str], **kwds) -> CommandData:
         values = {**asdict(self.__config), **kwds}

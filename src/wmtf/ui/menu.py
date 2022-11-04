@@ -68,7 +68,7 @@ class Menu(object, metaclass=MenuMeta):
         while not choice:
             try:
                 choice = select(message=self._title, choices=options, style=style).ask()
-                res = next(filter(lambda x: x.text == choice, self._items), None)
+                res = next(filter(lambda x: x.value == choice, self._items), None)
                 if res:
                     return res
                 raise NotImplementedError

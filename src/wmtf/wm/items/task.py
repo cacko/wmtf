@@ -9,7 +9,7 @@ class ClockLocation(Enum):
 
 
 @dataclass
-class Task:
+class TaskInfo:
     id: int
     summary: str
     clock_id: int
@@ -18,3 +18,7 @@ class Task:
     @property
     def isActive(self):
         return self.clock in [ClockLocation.HOME, ClockLocation.OFFICE]
+
+@dataclass
+class Task:
+    id: int
