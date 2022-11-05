@@ -1,4 +1,5 @@
 import re
+from typing import Optional
 from urllib.parse import parse_qs, urlparse
 
 from bs4 import BeautifulSoup, element
@@ -18,14 +19,18 @@ def extract_id_from_a(el: element.Tag):
     return int(itemId[0])
 
 
-def extract_clock(el: element.Tag) -> tuple[int, ClockLocation]:
-    links = el.find_all("a")
-    id = extract_id_from_a(links[0])
-    if len(links) == 2:
-        return (id, ClockLocation.OFF)
-    if matches := CLOCK_PATTERN.match(links[0].get_text()):
-        return (id, ClockLocation(matches.group(1)))
-    return (id, ClockLocation.OFF)
+def extract_id_from_url(url: Optional[str]):
+    if not url:
+        return 0
+    qs = urlparse(url).query
+    itemId = parse_qs(qs).get("itemId", [])
+    return int(itemId[0])
+
+
+def extract_clock(txt: str) -> ClockLocation:
+    if matches := CLOCK_PATTERN.match(txt):
+        return ClockLocation(matches.group(1))
+    return ClockLocation.OFF
 
 
 def strip_tags(txt: str) -> str:
@@ -41,10 +46,10 @@ class Parser(object):
         self.struct = BeautifulSoup(html, features="html.parser")
         self.__id = id
         self.init()
-        
+
     def init(self):
         pass
-        
+
     @property
     def id(self) -> int:
         return self.__id

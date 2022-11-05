@@ -69,6 +69,7 @@ def cli_tasks(ctx: click.Context):
             case TaskInfo():
                 ctx.forward(cli_task, task_id=item.obj.id)
 
+
 @cli.command("task", short_help="Open task")
 @click.pass_context
 @click.argument("task_id")
@@ -78,12 +79,9 @@ def cli_task(ctx: click.Context, task_id: int):
     from rich.console import Console
     from rich.markdown import Markdown
     from rich.padding import Padding
+
     console = Console()
-    parts = [
-        f"# {task.summary}",
-        task.description,
-        '---'
-    ]
+    parts = [f"# {task.summary}", task.description, "---"]
     if task.comments:
         for c in task.comments:
             parts.append(f"> **{c.author}**\n>\n> {c.comment}")
@@ -93,10 +91,6 @@ def cli_task(ctx: click.Context, task_id: int):
         if parent != ctx.find_root():
             click.clear()
             ctx.invoke(parent.command)
-            
-            
-
-
 
 
 @cli.command("report", short_help="My Report")
@@ -121,13 +115,11 @@ def cli_clockoff(ctx: click.Context):
         else:
             return click.echo(click.style(f"Clock failed", fg="red"))
 
+
 @cli.command("cron-clock-off", short_help="Schedule cron to clock off")
 @click.pass_context
 def cli_cron_clock_off(ctx: click.Context):
     cron = CronTab()
-    job = cron.new(command='/home/users/alex.spasov/clock.sh')
+    job = cron.new(command="/home/users/alex.spasov/clock.sh")
     job.schedule()
     cron.write()
-
-
-

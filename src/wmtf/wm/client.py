@@ -10,7 +10,7 @@ from wmtf.config import WMConfig, app_config
 from wmtf.wm.commands import Command, Method
 from wmtf.wm.html.report import Report as ReportParser
 from wmtf.wm.html.tasks import Task as TaskParser
-from wmtf.wm.html.tasks import Tasks as TasksParser
+from wmtf.wm.html.tasks import TaskList as TaskListParser
 from wmtf.wm.items.task import Task, TaskInfo
 
 
@@ -113,7 +113,8 @@ class Client(object, metaclass=ClientMeta):
         cmd = Command.tasks
         query = self.__populate(cmd.query)
         res = self.__call(cmd, params=query)
-        parser = TasksParser(res.content)
+        content = res.content
+        parser = TaskListParser(content)
         return parser.parse()
 
     def do_task(self, task_id: int) -> Task:
