@@ -1,6 +1,6 @@
-import logging
 import click
 from click import Command
+from crontab import CronTab
 from pyfiglet import Figlet
 
 from wmtf.tui.app import Tui
@@ -8,8 +8,7 @@ from wmtf.ui.items import TaskItem
 from wmtf.ui.menu import Menu, MenuItem
 from wmtf.wm.client import Client
 from wmtf.wm.items.task import TaskInfo
-from crontab import CronTab
-from datetime import date
+
 
 class WMTFCommand(click.Group):
     def list_commands(self, ctx: click.Context) -> list[str]:
@@ -64,18 +63,39 @@ def cli_tasks(ctx: click.Context):
         TaskItem(text=f"{task.summary}", obj=task) for task in Client.tasks()
     ] + [MenuItem(text="<< back", obj=main_menu)]
     with Menu(menu_items, title="Select task") as item:
-        logging.warning(item)
         match item.obj:
             case Command():
                 ctx.invoke(item.obj)
             case TaskInfo():
-                ctx.invoke(Command(name="task", params=[item.obj.id]))
+                ctx.forward(cli_task, task_id=item.obj.id)
 
 @cli.command("task", short_help="Open task")
 @click.pass_context
 @click.argument("task_id")
 def cli_task(ctx: click.Context, task_id: int):
     task = Client.task(task_id)
+    click.clear()
+    from rich.console import Console
+    from rich.markdown import Markdown
+    from rich.padding import Padding
+    console = Console()
+    parts = [
+        f"# {task.summary}",
+        task.description,
+        '---'
+    ]
+    if task.comments:
+        for c in task.comments:
+            parts.append(f"> **{c.author}**\n>\n> {c.comment}")
+    console.print(Markdown("\n\n".join(parts)))
+    click.pause()
+    if parent := ctx.parent:
+        if parent != ctx.find_root():
+            click.clear()
+            ctx.invoke(parent.command)
+            
+            
+
 
 
 

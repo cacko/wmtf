@@ -3,9 +3,8 @@ from typing import Any, Optional, Type
 
 # from confluent_kafka import KafkaException
 from textual.app import App, ComposeResult
-
-from wmtf.tui.widgets.footer import Footer
-from wmtf.tui.widgets.header import Header
+from textual.widgets import Header, Footer
+from textual.containers import Container, Vertical
 
 # from kaskade import logger
 # from kaskade.config import Config
@@ -26,6 +25,7 @@ from wmtf.tui.widgets.header import Header
 
 
 class Tui(App):
+    
     # __topic: Optional[Topic] = None
     # show_help = Reactive(False)
     # error = Reactive("")
@@ -64,7 +64,12 @@ class Tui(App):
         # )
         
     def compose(self) -> ComposeResult:
-        yield Header()
+        self.title = "Work Manager"
+        yield Header(show_clock=True)
+        # yield Container(
+        #     Vertical(DirectoryTree(path), id="tree-view"),
+        #     Vertical(Static(id="code", expand=True), id="code-view"),
+        # )
         yield Footer()
 
     # def background_execution(self, refresh_rate: float) -> None:

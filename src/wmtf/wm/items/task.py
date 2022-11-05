@@ -1,5 +1,8 @@
 from dataclasses import dataclass
+from datetime import datetime
 from enum import Enum
+from typing import Optional
+
 
 class ClockLocation(Enum):
     HOME = "home"
@@ -20,5 +23,16 @@ class TaskInfo:
         return self.clock in [ClockLocation.HOME, ClockLocation.OFFICE]
 
 @dataclass
+class TaskComment:
+    date: str
+    author: str
+    comment: str
+
+@dataclass
 class Task:
     id: int
+    summary: str
+    description: str
+    assignee: str
+    comments: Optional[list[TaskComment]] = None
+    

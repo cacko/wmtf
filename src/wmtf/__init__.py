@@ -1,5 +1,6 @@
 import logging
 import os
+from http.client import HTTPConnection
 
 import structlog
 
@@ -25,5 +26,10 @@ handler = logging.StreamHandler()
 handler.setFormatter(formatter)
 root_logger = logging.getLogger()
 root_logger.addHandler(handler)
-root_logger.setLevel(
-    getattr(logging, os.environ.get("WMTF_LOG_LEVEL", "INFO")))
+root_logger.setLevel(getattr(logging, os.environ.get("WMTF_LOG_LEVEL", "INFO")))
+
+if root_logger.getEffectiveLevel() == logging.DEBUG:
+    HTTPConnection.debuglevel = 1
+    requests_log = logging.getLogger("urllib3")
+    requests_log.setLevel(logging.DEBUG)
+    requests_log.propagate = True

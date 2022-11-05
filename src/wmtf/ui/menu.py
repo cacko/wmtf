@@ -71,10 +71,10 @@ class Menu(object, metaclass=MenuMeta):
                 res = next(filter(lambda x: x.value == choice, self._items), None)
                 if res:
                     return res
-                raise NotImplementedError
+                raise KeyboardInterrupt
             except FunctionalityNotAvailable:
                 raise NotImplementedError
-        raise NotImplementedError
+        raise KeyboardInterrupt
 
     def __exit__(self, type, value, traceback):
         pass

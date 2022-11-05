@@ -1,26 +1,17 @@
-import logging
 from dataclasses import asdict
 from datetime import datetime, timedelta
 from functools import reduce
-from http.client import HTTPConnection
+from pathlib import Path
 from typing import Any, Optional
 
 from requests import Response, Session
-from pathlib import Path
 
 from wmtf.config import WMConfig, app_config
 from wmtf.wm.commands import Command, Method
 from wmtf.wm.html.report import Report as ReportParser
-from wmtf.wm.html.tasks import Tasks as TasksParser, Task as TaskParser
+from wmtf.wm.html.tasks import Task as TaskParser
+from wmtf.wm.html.tasks import Tasks as TasksParser
 from wmtf.wm.items.task import Task, TaskInfo
-
-# HTTPConnection.debuglevel = 1
-# logging.basicConfig() # you need to initialize logging, otherwise you will not see anything from requests
-# logging.getLogger().setLevel(logging.DEBUG)
-# requests_log = logging.getLogger("urllib3")
-# requests_log.setLevel(logging.DEBUG)
-# requests_log.propagate = True
-
 
 
 class CommandData(dict):
@@ -64,57 +55,60 @@ class CommandData(dict):
             v,
         )
 
+
 class ClientMeta(type):
-    
-    _instance: Optional['Client'] = None
-    
+
+    _instance: Optional["Client"] = None
+
     def __call__(cls, *args: Any, **kwds: Any):
         if not cls._instance:
             cls._instance = type.__call__(cls, *args, **kwds)
         return cls._instance
-    
+
     def tasks(cls) -> list[TaskInfo]:
         return cls().do_tasks()
 
-    def task(cls, task_id: int) -> list[Task]:
+    def task(cls, task_id: int) -> Task:
         return cls().do_task(task_id)
-    
+
     def clock_off(cls, clock_id: int):
         return cls().do_clock_off(clock_id)
-    
+
     def report(cls, start: Optional[datetime] = None, end: Optional[datetime] = None):
         today = datetime.today()
         if not start:
-            start = (today - timedelta(days=today.weekday())).replace(hour=0, minute=0, second=1)
+            start = (today - timedelta(days=today.weekday())).replace(
+                hour=0, minute=0, second=1
+            )
         if not end:
             end = today.replace(hour=23, minute=59, second=58)
         return cls().do_report(start, end)
 
-    
+
 class Client(object, metaclass=ClientMeta):
-    
+
     __config: WMConfig
     __session: Optional[Session] = None
-    
+
     def __init__(self, *args, **kwargs) -> None:
         self.__config = app_config.wm_config
-        
+
     def __del__(self):
         if self.__session:
             self.__session.close()
-        
+
     def do_login(self):
         cmd = Command.login
         res = self.__call(cmd, data=self.__populate(asdict(cmd.data)))
         return res.status_code == 200
-    
+
     def do_clock_off(self, clock_id) -> bool:
         cmd = Command.clock
         data = self.__populate(cmd.data, clock_id=clock_id)
         query = self.__populate(cmd.query)
         res = self.__call(cmd, data=data, params=query)
         return res.status_code == 200
-    
+
     def do_tasks(self) -> list[TaskInfo]:
         cmd = Command.tasks
         query = self.__populate(cmd.query)
@@ -125,13 +119,13 @@ class Client(object, metaclass=ClientMeta):
     def do_task(self, task_id: int) -> Task:
         cmd = Command.task
         query = self.__populate(cmd.query, task_id=task_id)
-        res = self.__call(cmd, params=query)
+        # res = self.__call(cmd, params=query)
+        # content = res.content
         p = Path(__file__).parent / "task.html"
-        p.write_bytes(res.content)
-        raise NotImplementedError
-        # parser = TaskParser(res.content)
-        # return parser.parse()
-    
+        content = p.read_bytes()
+        parser = TaskParser(content, id=task_id)
+        return parser.parse()
+
     def do_report(self, start: datetime, end: datetime):
         cmd = Command.report
         data = self.__populate(cmd.data.dict())
@@ -149,24 +143,23 @@ class Client(object, metaclass=ClientMeta):
         parser = ReportParser(p.read_bytes())
         return parser.parse()
 
-    
     def __populate(self, data: dict[str, str], **kwds) -> CommandData:
         values = {**asdict(self.__config), **kwds}
         return CommandData(data, values)
-        
+
     @property
     def session(self) -> Session:
         if not self.__session:
             self.__session = Session()
             self.do_login()
         return self.__session
-    
-    def __call(self, cmd: Command,  **kwds) -> Response:
-        url = f'{app_config.wm_config.host}/{cmd.url}'
-        match(cmd.method):
+
+    def __call(self, cmd: Command, **kwds) -> Response:
+        url = f"{app_config.wm_config.host}/{cmd.url}"
+        match (cmd.method):
             case Method.POST:
                 return self.session.post(url, **kwds)
             case Method.GET:
                 return self.session.get(url, **kwds)
             case _:
-                raise NotImplementedError     
+                raise NotImplementedError
