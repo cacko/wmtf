@@ -3,8 +3,8 @@ from typing import Optional
 
 import pandas as pd
 
-from wmtf.wm.items.task import Task as TaskItem
-from wmtf.wm.items.task import TaskComment, TaskInfo
+from wmtf.wm.models import Task as TaskItem
+from wmtf.wm.models import TaskComment, TaskInfo
 
 from .parser import Parser, extract_clock, extract_id_from_url, strip_tags
 

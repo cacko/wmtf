@@ -4,7 +4,7 @@ from urllib.parse import parse_qs, urlparse
 
 from bs4 import BeautifulSoup, element
 
-from wmtf.wm.items.task import ClockLocation
+from wmtf.wm.models import ClockLocation
 
 CLOCK_PATTERN = re.compile(r".+\((\w+)\)", re.MULTILINE)
 TAG_RE = re.compile(r"<[^>]+>")

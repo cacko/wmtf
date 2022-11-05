@@ -2,12 +2,16 @@ import click
 from click import Command
 from crontab import CronTab
 from pyfiglet import Figlet
+from rich import print
+from rich.console import Console
+from rich.markdown import Markdown
+from rich.panel import Panel
 
 from wmtf.tui.app import Tui
 from wmtf.ui.items import TaskItem
 from wmtf.ui.menu import Menu, MenuItem
 from wmtf.wm.client import Client
-from wmtf.wm.items.task import TaskInfo
+from wmtf.wm.models import TaskInfo
 
 
 class WMTFCommand(click.Group):
@@ -76,10 +80,6 @@ def cli_tasks(ctx: click.Context):
 def cli_task(ctx: click.Context, task_id: int):
     task = Client.task(task_id)
     click.clear()
-    from rich.console import Console
-    from rich.markdown import Markdown
-    from rich.padding import Padding
-
     console = Console()
     parts = [f"# {task.summary}", task.description, "---"]
     if task.comments:
@@ -96,8 +96,25 @@ def cli_task(ctx: click.Context, task_id: int):
 @cli.command("report", short_help="My Report")
 @click.pass_context
 def cli_report(ctx: click.Context):
-    report = Client.report()
-
+    days = Client.report()
+    click.clear()
+    parts = []
+    for day in days:
+        parts = []
+        for task in day.tasks:
+            parts.append(
+                f"- {task.clock_start.strftime('%H:%M')} - {task.clock_end.strftime('%H:%M')} [{task.clock.value}] **{task.summary}** "
+            )
+        print(Panel(
+            Markdown("\n\n".join(parts)), 
+            title=f"{day.day.strftime('%A %d %b')}", 
+            width=70
+            ))
+    click.pause()
+    if parent := ctx.parent:
+        if parent != ctx.find_root():
+            click.clear()
+            ctx.invoke(parent.command)
 
 @cli.command("clock-off", short_help="Clock off current active task")
 @click.pass_context

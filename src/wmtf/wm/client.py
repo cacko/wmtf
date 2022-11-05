@@ -1,7 +1,6 @@
 from dataclasses import asdict
 from datetime import datetime, timedelta
 from functools import reduce
-from pathlib import Path
 from typing import Any, Optional
 
 from requests import Response, Session
@@ -11,7 +10,7 @@ from wmtf.wm.commands import Command, Method
 from wmtf.wm.html.report import Report as ReportParser
 from wmtf.wm.html.tasks import Task as TaskParser
 from wmtf.wm.html.tasks import TaskList as TaskListParser
-from wmtf.wm.items.task import Task, TaskInfo
+from wmtf.wm.models import ReportDay, Task, TaskInfo
 
 
 class CommandData(dict):
@@ -125,7 +124,7 @@ class Client(object, metaclass=ClientMeta):
         parser = TaskParser(content, id=task_id)
         return parser.parse()
 
-    def do_report(self, start: datetime, end: datetime):
+    def do_report(self, start: datetime, end: datetime) -> list[ReportDay]:
         cmd = Command.report
         data = self.__populate(cmd.data.dict())
         data["META_FIELD_YEAR_reportStartDate"] = start
@@ -136,10 +135,9 @@ class Client(object, metaclass=ClientMeta):
         data["META_FIELD_MONTH_reportEndDate"] = end
         data["META_FIELD_DAY_reportEndDate"] = end
         data["reportEndDate"] = end
-        # res = self.__call(cmd, data=data)
-        # content = res.content
-        p = Path(__file__).parent / "report.html"
-        parser = ReportParser(p.read_bytes())
+        res = self.__call(cmd, data=data)
+        content = res.content
+        parser = ReportParser(content)
         return parser.parse()
 
     def __populate(self, data: dict[str, str], **kwds) -> CommandData:

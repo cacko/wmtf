@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import date, datetime, timedelta
 from enum import Enum
 from typing import Optional
 
@@ -9,6 +9,21 @@ class ClockLocation(Enum):
     OFFICE = "office"
     OFF = "off"
     
+@dataclass
+class ReportTask:
+    id: int
+    clock: ClockLocation
+    clock_time: timedelta
+    clock_start: datetime
+    clock_end: datetime
+    summary: str
+    
+
+@dataclass
+class ReportDay:
+    day: date
+    total_work: timedelta
+    tasks: list[ReportTask]
 
 
 @dataclass
