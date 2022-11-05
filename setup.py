@@ -55,7 +55,8 @@ setup(
         "structlog>=22.1.0",
         "tabulate>=0.9.0",
         "pandas>=1.5.1",
-        "html5lib>=1.1"
+        "html5lib>=1.1",
+        "python-crontab>=2.6.0"
         
     ],
     setup_requires=["wheel"],
