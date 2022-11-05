@@ -12,24 +12,34 @@ dependencies:
   - charset-normalizer=2.1.1
   - click=8.1.3
   - colorama=0.4.5
-  - cryptography=38.0.2
+  - cryptography=38.0.3
   - dbus=1.13.6
   - defusedxml=0.7.1
   - expat=2.5.0
   - flake8=5.0.4
   - gettext=0.21.1
+  - icu=70.1
   - idna=3.4
   - importlib-metadata=4.11.4
   - jaraco.classes=3.2.2
   - jeepney=0.8.0
   - jira=3.4.1
   - keyring=23.9.3
+  - libcxx=14.0.6
+  - libffi=3.4.2
+  - libglib=2.74.1
+  - libiconv=1.17
+  - libsqlite=3.39.4
+  - libxml2=2.10.3
+  - libxslt=1.1.37
+  - libzlib=1.2.13
+  - lxml=4.9.1
   - mccabe=0.7.0
   - more-itertools=8.14.0
   - mypy_extensions=0.4.3
   - ncurses=6.3
   - oauthlib=3.2.1
-  - openssl=1.1.1q
+  - openssl=3.0.7
   - packaging=21.3
   - pathspec=0.10.1
   - pcre2=10.37
@@ -76,15 +86,19 @@ dependencies:
     - corethread==0.1.3
     - dataclasses-json==0.5.7
     - deprecated==1.2.13
+    - html5lib==1.1
     - marshmallow==3.18.0
     - marshmallow-enum==1.5.1
     - nanoid==2.0.0
+    - numpy==1.23.4
+    - pandas==1.5.1
     - pillow==9.2.0
     - prompt-toolkit==3.0.31
     - pyfiglet==0.8.post1
     - pygments==2.13.0
     - python-crontab==2.6.0
     - python-dateutil==2.8.2
+    - pytz==2022.6
     - pytz-deprecation-shim==0.1.0.post0
     - questionary==1.10.0
     - random-user-agent==1.0.1
@@ -92,10 +106,12 @@ dependencies:
     - rich==12.6.0
     - six==1.16.0
     - soupsieve==2.3.2.post1
+    - tabulate==0.9.0
     - textual==0.3.0
     - typing-inspect==0.8.0
     - tzdata==2022.6
     - tzlocal==4.2
     - wcwidth==0.2.5
+    - webencodings==0.5.1
     - wrapt==1.14.1
-prefix: /home/users/alex.spasov/miniforge3/envs/wmtf
+prefix: /Users/jago/miniforge3/envs/global/envs/wmtf

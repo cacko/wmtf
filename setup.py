@@ -53,6 +53,10 @@ setup(
         "requests-oauthlib>=1.3.1",
         "requests-toolbelt>=0.10.0",
         "structlog>=22.1.0",
+        "tabulate>=0.9.0",
+        "pandas>=1.5.1",
+        "html5lib>=1.1"
+        
     ],
     setup_requires=["wheel"],
     python_requires=">=3.10",
