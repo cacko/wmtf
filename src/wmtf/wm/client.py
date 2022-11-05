@@ -119,10 +119,8 @@ class Client(object, metaclass=ClientMeta):
     def do_task(self, task_id: int) -> Task:
         cmd = Command.task
         query = self.__populate(cmd.query, task_id=task_id)
-        # res = self.__call(cmd, params=query)
-        # content = res.content
-        p = Path(__file__).parent / "task.html"
-        content = p.read_bytes()
+        res = self.__call(cmd, params=query)
+        content = res.content
         parser = TaskParser(content, id=task_id)
         return parser.parse()
 
