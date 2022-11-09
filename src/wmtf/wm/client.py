@@ -7,6 +7,7 @@ from typing import Any, Optional
 from requests import Response, Session
 
 from wmtf.config import WMConfig, app_config
+from wmtf.core.ua import UA
 from wmtf.wm.commands import Command, Method
 from wmtf.wm.html.report import Report as ReportParser
 from wmtf.wm.html.tasks import Task as TaskParser
@@ -89,6 +90,7 @@ class Client(object, metaclass=ClientMeta):
 
     __config: WMConfig
     __session: Optional[Session] = None
+    __user_agent: Optional[str] = None
 
     def __init__(self, *args, **kwargs) -> None:
         self.__config = app_config.wm_config
@@ -153,13 +155,25 @@ class Client(object, metaclass=ClientMeta):
             self.__session = Session()
             self.do_login()
         return self.__session
+    
+    @property
+    def headers(self):
+        if not self.__user_agent:
+            self.__user_agent = UA.random
+        return {
+            "User-Agent": self.__user_agent
+        }
 
     def __call(self, cmd: Command, **kwds) -> Response:
         url = f"{app_config.wm_config.host}/{cmd.url}"
+        kw = {
+            "headers": self.headers,
+            **kwds
+        }
         match (cmd.method):
             case Method.POST:
-                return self.session.post(url, **kwds)
+                return self.session.post(url, **kw)
             case Method.GET:
-                return self.session.get(url, **kwds)
+                return self.session.get(url, **kw)
             case _:
                 raise NotImplementedError
