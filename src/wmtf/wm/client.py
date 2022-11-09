@@ -1,8 +1,9 @@
 from dataclasses import asdict
 from datetime import datetime, timedelta
 from functools import reduce
-from typing import Any, Optional
 from pathlib import Path
+from typing import Any, Optional
+
 from requests import Response, Session
 
 from wmtf.config import WMConfig, app_config
