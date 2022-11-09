@@ -36,6 +36,8 @@ def extract_clock(txt: str) -> ClockLocation:
 def strip_tags(txt: str) -> str:
     return TAG_RE.sub("", txt)
 
+class ParserError(Exception):
+    pass
 
 class Parser(object):
 
@@ -45,6 +47,7 @@ class Parser(object):
     def __init__(self, html: bytes, id: int = 0) -> None:
         self.struct = BeautifulSoup(html, features="html.parser")
         self.__id = id
+        self.handle_error()
         self.init()
 
     def init(self):
@@ -53,6 +56,11 @@ class Parser(object):
     @property
     def id(self) -> int:
         return self.__id
+    
+    def handle_error(self):
+        error = self.struct.select('font[color="red"][size="+2"]')
+        if len(error):
+            raise ParserError(error[0].get_text().strip())
 
     def to_element(self, code: str):
         return BeautifulSoup(code, features="html.parser")

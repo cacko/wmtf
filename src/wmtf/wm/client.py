@@ -2,7 +2,7 @@ from dataclasses import asdict
 from datetime import datetime, timedelta
 from functools import reduce
 from typing import Any, Optional
-
+from pathlib import Path
 from requests import Response, Session
 
 from wmtf.config import WMConfig, app_config
@@ -137,6 +137,8 @@ class Client(object, metaclass=ClientMeta):
         data["reportEndDate"] = end
         res = self.__call(cmd, data=data)
         content = res.content
+        with (Path(__file__).parent / "report.html") as fp:
+            fp.write_bytes(content)
         parser = ReportParser(content)
         return parser.parse()
 

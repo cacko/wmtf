@@ -11,6 +11,7 @@ from wmtf.tui.app import Tui
 from wmtf.ui.items import TaskItem
 from wmtf.ui.menu import Menu, MenuItem
 from wmtf.wm.client import Client
+from wmtf.wm.html.parser import ParserError
 from wmtf.wm.models import TaskInfo
 
 
@@ -40,7 +41,7 @@ def main_menu(ctx: click.Context):
     """Shows a main menu."""
     try:
         click.clear()
-        logo = Figlet(font="poison").renderText(text=f"wmtf")
+        logo = Figlet(font="Bloody", width=120).renderText(text=f"work manager")
         click.echo(click.style(logo, fg="green", bold=True))
         menu_items = [
             MenuItem(text="My Tasks", obj=cli_tasks),
@@ -53,7 +54,6 @@ def main_menu(ctx: click.Context):
     except KeyboardInterrupt:
         click.echo(click.style("Bye!", fg="blue"))
 
-
 @cli.command("app", short_help="Start app")
 def cli_app():
     Tui().run()
@@ -63,29 +63,35 @@ def cli_app():
 @click.pass_context
 def cli_tasks(ctx: click.Context):
     """List issues currently assigned to you and creates a branch from the name of it"""
-    menu_items = [
-        TaskItem(text=f"{task.summary}", obj=task) for task in Client.tasks()
-    ] + [MenuItem(text="<< back", obj=main_menu)]
-    with Menu(menu_items, title="Select task") as item:
-        match item.obj:
-            case Command():
-                ctx.invoke(item.obj)
-            case TaskInfo():
-                ctx.forward(cli_task, task_id=item.obj.id)
+    try:
+        menu_items = [
+            TaskItem(text=f"{task.summary}", obj=task) for task in Client.tasks()
+        ] + [MenuItem(text="<< back", obj=main_menu)]
+        with Menu(menu_items, title="Select task") as item:
+            match item.obj:
+                case Command():
+                    ctx.invoke(item.obj)
+                case TaskInfo():
+                    ctx.forward(cli_task, task_id=item.obj.id)
+    except ParserError as e:
+        click.echo(click.style(e, fg="red"))
 
 
 @cli.command("task", short_help="Open task")
 @click.pass_context
 @click.argument("task_id")
 def cli_task(ctx: click.Context, task_id: int):
-    task = Client.task(task_id)
-    click.clear()
-    console = Console()
-    parts = [f"# {task.summary}", task.description, "---"]
-    if task.comments:
-        for c in task.comments:
-            parts.append(f"> **{c.author}**\n>\n> {c.comment}")
-    console.print(Markdown("\n\n".join(parts)))
+    try:
+        task = Client.task(task_id)
+        click.clear()
+        console = Console()
+        parts = [f"# {task.summary}", task.description, "---"]
+        if task.comments:
+            for c in task.comments:
+                parts.append(f"> **{c.author}**\n>\n> {c.comment}")
+        console.print(Markdown("\n\n".join(parts)))
+    except ParserError as e:
+        click.echo(click.style(e, fg="red"))
     click.pause()
     if parent := ctx.parent:
         if parent != ctx.find_root():
@@ -96,20 +102,23 @@ def cli_task(ctx: click.Context, task_id: int):
 @cli.command("report", short_help="My Report")
 @click.pass_context
 def cli_report(ctx: click.Context):
-    days = Client.report()
-    click.clear()
-    parts = []
-    for day in days:
+    try:
+        days = Client.report()
+        click.clear()
         parts = []
-        for task in day.tasks:
-            parts.append(
-                f"- {task.clock_start.strftime('%H:%M')} - {task.clock_end.strftime('%H:%M')} [{task.clock.value}] **{task.summary}** "
-            )
-        print(Panel(
-            Markdown("\n\n".join(parts)), 
-            title=f"{day.day.strftime('%A %d %b')}", 
-            width=70
-            ))
+        for day in days:
+            parts = []
+            for task in day.tasks:
+                parts.append(
+                    f"- {task.clock_start.strftime('%H:%M')} - {task.clock_end.strftime('%H:%M')} [{task.clock.value}] **{task.summary}** "
+                )
+            print(Panel(
+                Markdown("\n\n".join(parts)), 
+                title=f"{day.day.strftime('%A %d %b')}", 
+                width=70
+                ))
+    except ParserError as e:
+        click.echo(click.style(e, fg="red"))
     click.pause()
     if parent := ctx.parent:
         if parent != ctx.find_root():
