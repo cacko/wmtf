@@ -41,11 +41,11 @@ def main_menu(ctx: click.Context):
     """Shows a main menu."""
     try:
         click.clear()
-        logo = Figlet(font="Bloody", width=120).renderText(text=f"work manager")
+        logo = Figlet(width=120).renderText(text=f"work manager")
         click.echo(click.style(logo, fg="green", bold=True))
         menu_items = [
             MenuItem(text="My Tasks", obj=cli_tasks),
-            MenuItem(text="My report", obj=cli_report),
+            MenuItem(text="My Report", obj=cli_report),
         ] + [MenuItem(text="Exit", obj=quit)]
         with Menu(menu_items) as item:
             match item.obj:
