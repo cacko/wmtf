@@ -57,7 +57,8 @@ setup(
         "pandas>=1.5.1",
         "html5lib>=1.1",
         "python-crontab>=2.6.0",
-        "random-user-agent>=1.0.1"
+        "random-user-agent>=1.0.1",
+        "progressor>=1.0.14",
         
     ],
     setup_requires=["wheel"],

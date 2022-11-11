@@ -10,7 +10,6 @@ class ActiveTask(Widget):
     task: Reactive[str] = Reactive("")
     
     def on_mount(self) -> None:
-        print("on mount")
         tasks = Client.tasks()
         active_task = next(filter(lambda x: x.isActive, tasks), None)
         if active_task:

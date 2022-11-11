@@ -80,7 +80,6 @@ class HtmlReportTask(object, metaclass=HtmlReportMeta):
     def do_process(self, row: PageElement):
         match row:
             case element.Tag():
-                print(row, row.name)
                 match row.name:
                     case "br":
                         raise StopIteration

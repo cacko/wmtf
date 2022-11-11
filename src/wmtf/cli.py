@@ -6,13 +6,17 @@ from rich import print
 from rich.console import Console
 from rich.markdown import Markdown
 from rich.panel import Panel
-
 from wmtf.tui.app import Tui
 from wmtf.ui.items import TaskItem
 from wmtf.ui.menu import Menu, MenuItem
 from wmtf.wm.client import Client
 from wmtf.wm.html.parser import ParserError
 from wmtf.wm.models import TaskInfo
+from progressor import Spinner
+
+def banner(txt: str, fg: str = "green", bold=True):
+    logo = Figlet(width=120).renderText(text=txt)
+    click.echo(click.style(logo, fg=fg, bold=bold))
 
 
 class WMTFCommand(click.Group):
@@ -41,8 +45,7 @@ def main_menu(ctx: click.Context):
     """Shows a main menu."""
     try:
         click.clear()
-        logo = Figlet(width=120).renderText(text=f"work manager")
-        click.echo(click.style(logo, fg="green", bold=True))
+        banner(txt="work manager")
         menu_items = [
             MenuItem(text="My Tasks", obj=cli_tasks),
             MenuItem(text="My Report", obj=cli_report),
@@ -54,6 +57,7 @@ def main_menu(ctx: click.Context):
     except KeyboardInterrupt:
         click.echo(click.style("Bye!", fg="blue"))
 
+
 @cli.command("app", short_help="Start app")
 def cli_app():
     Tui().run()
@@ -64,6 +68,8 @@ def cli_app():
 def cli_tasks(ctx: click.Context):
     """List issues currently assigned to you and creates a branch from the name of it"""
     try:
+        click.clear()
+        banner(txt="my tasks", fg='blue')
         menu_items = [
             TaskItem(text=f"{task.summary}", obj=task) for task in Client.tasks()
         ] + [MenuItem(text="<< back", obj=main_menu)]
@@ -103,8 +109,11 @@ def cli_task(ctx: click.Context, task_id: int):
 @click.pass_context
 def cli_report(ctx: click.Context):
     try:
-        days = Client.report()
+        days = None
+        with Spinner("Loading"):
+            days = Client.report()
         click.clear()
+        banner(txt="my report", fg='red')
         parts = []
         for day in days:
             parts = []
@@ -112,11 +121,13 @@ def cli_report(ctx: click.Context):
                 parts.append(
                     f"- {task.clock_start.strftime('%H:%M')} - {task.clock_end.strftime('%H:%M')} [{task.clock.value}] **{task.summary}** "
                 )
-            print(Panel(
-                Markdown("\n\n".join(parts)), 
-                title=f"{day.day.strftime('%A %d %b')}", 
-                width=70
-                ))
+            print(
+                Panel(
+                    Markdown("\n\n".join(parts)),
+                    title=f"{day.day.strftime('%A %d %b')}",
+                    width=70,
+                )
+            )
     except ParserError as e:
         click.echo(click.style(e, fg="red"))
     click.pause()
@@ -124,6 +135,7 @@ def cli_report(ctx: click.Context):
         if parent != ctx.find_root():
             click.clear()
             ctx.invoke(parent.command)
+
 
 @cli.command("clock-off", short_help="Clock off current active task")
 @click.pass_context

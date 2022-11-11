@@ -93,6 +93,7 @@ dependencies:
     - numpy==1.23.4
     - pandas==1.5.1
     - pillow==9.2.0
+    - progressor==1.0.14
     - prompt-toolkit==3.0.31
     - pyfiglet==0.8.post1
     - pygments==2.13.0
