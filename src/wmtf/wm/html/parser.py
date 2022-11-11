@@ -47,9 +47,8 @@ class Parser(object):
     def __init__(self, html: bytes, id: int = 0) -> None:
         self.struct = BeautifulSoup(html, features="html.parser")
         self.__id = id
-        # self.handle_error()
+        self.handle_error()
         self.init()
-
 
     def init(self):
         pass
@@ -60,8 +59,10 @@ class Parser(object):
     
     def handle_error(self):
         error = self.struct.select('font[color="red"][size="+2"]')
-        if len(error):
-            raise ParserError(error[0].get_text().strip())
+        if not len(error):
+            return
+        if error_msg := error[0].get_text().strip():
+            raise ParserError(error_msg)
 
     def to_element(self, code: str):
         return BeautifulSoup(code, features="html.parser")

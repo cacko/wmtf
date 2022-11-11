@@ -1,4 +1,3 @@
-from dataclasses import dataclass, asdict
 from pathlib import Path
 from typing import Optional
 
@@ -6,20 +5,22 @@ from appdir import get_app_dir
 from yaml import Loader, load, dump
 
 
-from pydantic import BaseModel, ConfigDict, Extra, Field
-from pydantic.dataclasses import dataclass
+from pydantic import BaseModel, Extra, Field
 
 from wmtf import __name__
+
 
 class WMConfig(BaseModel, extra=Extra.ignore):
     host: str = Field(default="https://workmanager.travelfusion.com")
     username: str = Field(default="")
     password: str = Field(default="")
 
+
 class JiraConfig(BaseModel, extra=Extra.ignore):
     host: str = Field(default="https://newsupport.travelfusion.com")
     username: str = Field(default="")
     password: str = Field(default="")
+
 
 class app_config_meta(type):
     _instance = None
@@ -46,7 +47,7 @@ class app_config_meta(type):
     @property
     def cache_dir(cls):
         return cls.app_dir / "cache"
-    
+
     @property
     def wm_config(cls) -> WMConfig:
         return WMConfig(**cls().getvar("wm"))
@@ -55,7 +56,10 @@ class app_config_meta(type):
     def jira_config(cls) -> JiraConfig:
         return JiraConfig(**cls().getvar("jira"))
 
-    
+    @property
+    def is_new(cls) -> bool:
+        wm_config = cls.wm_config
+        return not all([len(wm_config.username) > 0, len(wm_config.password) > 0])
 
 
 class app_config(object, metaclass=app_config_meta):
@@ -69,13 +73,11 @@ class app_config(object, metaclass=app_config_meta):
 
     def init(self):
         with open(__class__.app_config, "w") as fp:
-            data = {
-                "wm": WMConfig().dict(),
-                "jira": JiraConfig().dict()
-            }
+            data = {"wm": WMConfig().dict(), "jira": JiraConfig().dict()}
             dump(data, fp)
 
     def getvar(self, var, *args, **kwargs):
+        assert isinstance(self._config, dict)
         return self._config.get(var, *args, *kwargs)
 
     def __save(self):
@@ -83,8 +85,9 @@ class app_config(object, metaclass=app_config_meta):
             dump(self._config, fp)
 
     def setvar(self, var, value, *args, **kwargs):
+        assert isinstance(self._config, dict)
         section, key = var.split(".")
-        assert(section)
-        assert(key)
+        assert section
+        assert key
         self._config[section][key] = value
         self.__save()

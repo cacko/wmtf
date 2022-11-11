@@ -12,6 +12,7 @@ from wmtf.core.ua import UA
 from wmtf.wm.commands import Command, Method
 from wmtf.wm.html.report import Report as ReportParser
 from wmtf.wm.html.report import ReportId as ReportIdParser
+from wmtf.wm.html.login import Login as LoginParser
 from wmtf.wm.html.tasks import Task as TaskParser
 from wmtf.wm.html.tasks import TaskList as TaskListParser
 from wmtf.wm.models import ReportDay, Task, TaskInfo
@@ -76,6 +77,9 @@ class ClientMeta(type):
 
     def clock_off(cls, clock_id: int):
         return cls().do_clock_off(clock_id)
+    
+    def validate_setup(cls) -> bool:
+        return cls().do_login()
 
     def report(cls, start: Optional[datetime] = None, end: Optional[datetime] = None):
         today = datetime.today()
@@ -90,12 +94,12 @@ class ClientMeta(type):
 
 class Client(object, metaclass=ClientMeta):
 
-    __config: WMConfig
     __session: Optional[Session] = None
     __user_agent: Optional[str] = None
 
-    def __init__(self, *args, **kwargs) -> None:
-        self.__config = app_config.wm_config
+    @property
+    def config(self) -> WMConfig:
+        return app_config.wm_config
 
     def __del__(self):
         if self.__session:
@@ -104,6 +108,8 @@ class Client(object, metaclass=ClientMeta):
     def do_login(self):
         cmd = Command.login
         res = self.__call(cmd, data=self.__populate(asdict(cmd.data)))
+        parser = LoginParser(res.content)
+        parser.parse()
         return res.status_code == 200
 
     def do_clock_off(self, clock_id) -> bool:
@@ -152,7 +158,7 @@ class Client(object, metaclass=ClientMeta):
         return parser.parse()
 
     def __populate(self, data: dict[str, str], **kwds) -> CommandData:
-        values = {**self.__config.dict(), **kwds}
+        values = {**self.config.dict(), **kwds}
         return CommandData(data, values)
 
     @property

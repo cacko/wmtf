@@ -7,19 +7,45 @@ from rich.console import Console
 from rich.markdown import Markdown
 from rich.panel import Panel
 from wmtf.tui.app import Tui
-from wmtf.ui.items import TaskItem
-from wmtf.ui.menu import Menu, MenuItem
+from wmtf.ui.items import TaskItem, MenuItem
+from wmtf.ui.menu import Menu
 from wmtf.wm.client import Client
 from wmtf.wm.html.parser import ParserError
+from wmtf.wm.html.login import LoginError
 from wmtf.wm.models import TaskInfo
 from progressor import Spinner
 from wmtf.config import app_config
 import questionary
 
+
 def banner(txt: str, fg: str = "green", bold=True):
     logo = Figlet(width=120).renderText(text=txt)
     click.echo(click.style(logo, fg=fg, bold=bold))
 
+def validate_credentials() -> bool:
+    questions = [
+        {
+            "type": "text",
+            "name": "wm.username",
+            "message": "Username:",
+            "validate": lambda x: len(x.strip()) > 0,
+        },
+        {
+            "type": "password",
+            "name": "wm.password",
+            "message": "Password:",
+            "validate": lambda x: len(x.strip()) > 0,
+        },
+    ]
+    for k, v in questionary.prompt(questions).items():
+        app_config.set(k, v)
+    try:
+        Client.validate_setup()
+        click.echo(click.style(f"Credentials are valid", fg="green"))
+        return True
+    except LoginError as e:
+        click.echo(click.style(e, fg="red"))
+    return False
 
 class WMTFCommand(click.Group):
     def list_commands(self, ctx: click.Context) -> list[str]:
@@ -51,7 +77,7 @@ def main_menu(ctx: click.Context):
         menu_items = [
             MenuItem(text="My Tasks", obj=cli_tasks),
             MenuItem(text="My Report", obj=cli_report),
-            MenuItem(text="Settings", obj=cli_settings)
+            MenuItem(text="Settings", obj=cli_settings),
         ] + [MenuItem(text="Exit", obj=quit)]
         with Menu(menu_items) as item:
             match item.obj:
@@ -65,17 +91,18 @@ def main_menu(ctx: click.Context):
 def cli_app():
     Tui().run()
 
+
 @cli.command("settings", short_help="App settings")
 @click.pass_context
 def cli_settings(ctx: click.Context):
     """Set usernames and passwords"""
     try:
         click.clear()
-        banner(txt="settings", fg='yellow')
+        banner(txt="settings", fg="yellow")
         menu_items = [
-            MenuItem(text=f"{txt}", obj=task) for txt,task in [
-                ("Username", cli_set_username),
-                ("Password", cli_set_password),
+            MenuItem(text=f"{txt}", obj=task)
+            for txt, task in [
+                ("Credentials", cli_credentials),
             ]
         ] + [MenuItem(text="<< back", obj=main_menu)]
         with Menu(menu_items, title="Select task") as item:
@@ -87,25 +114,20 @@ def cli_settings(ctx: click.Context):
     except ParserError as e:
         click.echo(click.style(e, fg="red"))
 
-@cli.command("set-username", short_help="Set username")
-@click.pass_context
-def cli_set_username(ctx: click.Context):
-    value = questionary.text("WM Username:").ask()
-    app_config.set("wm.username", value)
-    if parent := ctx.parent:
-        if parent != ctx.find_root():
-            click.clear()
-            ctx.invoke(parent.command)   
 
-@cli.command("set-password", short_help="Set password")
+@cli.command("credentials", short_help="Set credentials")
 @click.pass_context
-def cli_set_password(ctx: click.Context):
-    value = questionary.password("WM Password:").ask()
-    app_config.set("wm.password", value)
+def cli_credentials(ctx: click.Context):
+    click.clear()
+    banner(txt="credentials", fg="magenta")
+    valid = validate_credentials()
+    click.pause()
     if parent := ctx.parent:
         if parent != ctx.find_root():
             click.clear()
-            ctx.invoke(parent.command)   
+            ctx.invoke(parent.command)
+        else:
+            return valid
 
 
 @cli.command("tasks", short_help="My Tasks")
@@ -114,10 +136,10 @@ def cli_tasks(ctx: click.Context):
     """List issues currently assigned to you and creates a branch from the name of it"""
     try:
         click.clear()
-        banner(txt="my tasks", fg='blue')
+        banner(txt="my tasks", fg="blue")
         menu_items = [
             TaskItem(text=f"{task.summary}", obj=task) for task in Client.tasks()
-        ] + [MenuItem(text="<< back", obj=main_menu)]
+        ] + [questionary.Separator(), MenuItem(text="back", obj=main_menu)]
         with Menu(menu_items, title="Select task") as item:
             match item.obj:
                 case Command():
@@ -158,7 +180,7 @@ def cli_report(ctx: click.Context):
         with Spinner("Loading"):
             days = Client.report()
         click.clear()
-        banner(txt="my report", fg='red')
+        banner(txt="my report", fg="red")
         parts = []
         for day in days:
             parts = []
