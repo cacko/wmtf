@@ -124,7 +124,7 @@ def cli_report(ctx: click.Context):
             print(
                 Panel(
                     Markdown("\n\n".join(parts)),
-                    title=f"{day.day.strftime('%A %d %b')}",
+                    title=f"{day.day.strftime('%A %d %b')} / {day.total_display}",
                     width=70,
                 )
             )

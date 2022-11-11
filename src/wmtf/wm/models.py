@@ -39,6 +39,10 @@ class ReportDay:
     total_work: timedelta
     tasks: list[ReportTask]
 
+    @property
+    def total_display(self) -> str:
+        return ":".join(str(self.total_work).split(":")[:2])
+
 
 @dataclass
 class TaskInfo:
