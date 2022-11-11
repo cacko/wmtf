@@ -119,7 +119,7 @@ def cli_report(ctx: click.Context):
             parts = []
             for task in day.tasks:
                 parts.append(
-                    f"- {task.clock_start.strftime('%H:%M')} - {task.clock_end.strftime('%H:%M')} [{task.clock.value}] **{task.summary}** "
+                    f"- {task.clock_start.strftime('%H:%M')} - {task.clock_end.strftime('%H:%M')} {task.clock.icon.value} **{task.summary}** "
                 )
             print(
                 Panel(

@@ -3,11 +3,25 @@ from datetime import date, datetime, timedelta
 from enum import Enum
 from typing import Optional
 
+class ClockIcon(Enum):
+    HOME = "🏠"
+    OFFICE = "🏢"
+    OFF = ""
 
 class ClockLocation(Enum):
     HOME = "home"
     OFFICE = "office"
     OFF = "off"
+
+    @property
+    def icon(self) -> ClockIcon:
+        match self:
+            case self.HOME:
+                return ClockIcon.HOME
+            case self.OFFICE:
+                return ClockIcon.OFFICE
+            case _:
+                return ClockIcon.OFF
     
 @dataclass
 class ReportTask:

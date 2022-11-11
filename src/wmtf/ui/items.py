@@ -5,13 +5,8 @@ from prompt_toolkit.formatted_text import (FormattedText, PygmentsTokens,
 from pygments.token import Token
 
 from wmtf.ui.menu import MenuItem
-from wmtf.wm.models import ClockLocation, TaskInfo
+from wmtf.wm.models import ClockIcon, TaskInfo
 
-
-class ClockIcon(Enum):
-    HOME = "🏠"
-    OFFICE = "🏢"
-    OFF = ""
 
 
 # text = [
@@ -47,10 +42,4 @@ class TaskItem(MenuItem):
 
     @property
     def clock_icon(self) -> ClockIcon:
-        match self.obj.clock:
-            case ClockLocation.HOME:
-                return ClockIcon.HOME
-            case ClockLocation.OFFICE:
-                return ClockIcon.OFFICE
-            case _:
-                return ClockIcon.OFF
+        return self.obj.clock.icon

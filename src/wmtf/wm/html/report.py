@@ -4,7 +4,6 @@ from datetime import date, datetime, time, timedelta
 from typing import Any, Generator, Iterable, Optional
 
 from bs4 import PageElement, element
-
 from wmtf.config import app_config
 from wmtf.wm.models import ClockLocation, ReportDay, ReportTask
 
@@ -86,6 +85,9 @@ class HtmlReportTask(object, metaclass=HtmlReportMeta):
                     case "a":
                         self.__id = extract_id_from_a(row)
                         self.__description = strip_tags(row.get_text().strip())
+                    case "b":
+                        if fnt := row.find("font", attrs={"color": "green"}):
+                            self.__clock = ClockLocation(fnt.get_text().strip().lower())
             case element.NavigableString():
                 txt = row.get_text().strip()
                 if wtm := self.__WORKTIME_RE.search(txt):

@@ -2,6 +2,8 @@ name: wmtf
 channels:
   - conda-forge
 dependencies:
+  - _libgcc_mutex=0.1
+  - _openmp_mutex=4.5
   - black=22.10.0
   - blinker=1.5
   - brotlipy=0.7.0
@@ -11,7 +13,7 @@ dependencies:
   - cffi=1.15.1
   - charset-normalizer=2.1.1
   - click=8.1.3
-  - colorama=0.4.5
+  - colorama=0.4.6
   - cryptography=38.0.3
   - dbus=1.13.6
   - defusedxml=0.7.1
@@ -20,99 +22,96 @@ dependencies:
   - gettext=0.21.1
   - icu=70.1
   - idna=3.4
-  - importlib-metadata=4.11.4
-  - jaraco.classes=3.2.2
+  - importlib_metadata=5.0.0
+  - jaraco.classes=3.2.3
   - jeepney=0.8.0
   - jira=3.4.1
-  - keyring=23.9.3
+  - keyring=23.11.0
+  - ld_impl_linux-64=2.39
   - libcxx=14.0.6
+  - libcxxabi=14.0.6
   - libffi=3.4.2
+  - libgcc-ng=12.2.0
   - libglib=2.74.1
+  - libgomp=12.2.0
   - libiconv=1.17
+  - libnsl=2.0.0
   - libsqlite=3.39.4
+  - libstdcxx-ng=12.2.0
+  - libuuid=2.32.1
   - libxml2=2.10.3
   - libxslt=1.1.37
   - libzlib=1.2.13
   - lxml=4.9.1
   - mccabe=0.7.0
-  - more-itertools=8.14.0
+  - more-itertools=9.0.0
   - mypy_extensions=0.4.3
   - ncurses=6.3
-  - oauthlib=3.2.1
+  - oauthlib=3.2.2
   - openssl=3.0.7
   - packaging=21.3
   - pathspec=0.10.1
-  - pcre2=10.37
+  - pcre2=10.40
   - peewee=3.15.3
-  - pip=22.2.2
+  - pip=22.3.1
   - platformdirs=2.5.2
   - pycodestyle=2.9.1
   - pycparser=2.21
   - pydantic=1.10.2
   - pyflakes=2.5.0
-  - pyjwt=2.5.0
+  - pyjwt=2.6.0
   - pyopenssl=22.1.0
   - pyparsing=3.0.9
   - pysocks=1.7.1
   - pytermgui=6.4.0
-  - python=3.10.6
-  - python_abi=3.10
+  - python=3.11.0
+  - python_abi=3.11
   - pyyaml=6.0
   - readline=8.1.2
   - requests=2.28.1
   - requests-oauthlib=1.3.1
-  - requests-toolbelt=0.10.0
+  - requests-toolbelt=0.10.1
+  - secretstorage=3.3.3
   - semver=2.13.0
-  - setuptools=65.4.1
+  - setuptools=65.5.1
   - sqlite=3.39.4
   - structlog=22.1.0
   - tk=8.6.12
   - tomli=2.0.1
   - typing-extensions=4.4.0
   - typing_extensions=4.4.0
+  - tzdata=2022f
   - urllib3=1.26.11
-  - wheel=0.37.1
+  - wheel=0.38.4
   - xz=5.2.6
   - yaml=0.2.5
-  - zipp=3.9.0
+  - zipp=3.10.0
   - pip:
     - appdir==0.3.5
     - appdirs==1.4.4
-    - arrow==1.2.3
-    - async-timeout==4.0.2
     - beautifulsoup4==4.11.1
-    - cachable==0.3.30
+    - bs4==0.0.1
     - commonmark==0.9.1
     - corethread==0.1.3
-    - dataclasses-json==0.5.7
-    - deprecated==1.2.13
     - html5lib==1.1
-    - marshmallow==3.18.0
-    - marshmallow-enum==1.5.1
+    - importlib-metadata==4.13.0
     - nanoid==2.0.0
     - numpy==1.23.4
     - pandas==1.5.1
-    - pillow==9.2.0
     - progressor==1.0.14
-    - prompt-toolkit==3.0.31
+    - prompt-toolkit==3.0.32
     - pyfiglet==0.8.post1
     - pygments==2.13.0
     - python-crontab==2.6.0
     - python-dateutil==2.8.2
     - pytz==2022.6
-    - pytz-deprecation-shim==0.1.0.post0
     - questionary==1.10.0
     - random-user-agent==1.0.1
-    - redis==4.3.4
     - rich==12.6.0
     - six==1.16.0
     - soupsieve==2.3.2.post1
     - tabulate==0.9.0
-    - textual==0.3.0
-    - typing-inspect==0.8.0
-    - tzdata==2022.6
-    - tzlocal==4.2
+    - textual==0.4.0
     - wcwidth==0.2.5
     - webencodings==0.5.1
-    - wrapt==1.14.1
-prefix: /Users/jago/miniforge3/envs/global/envs/wmtf
+prefix: /home/users/alex.spasov/miniforge3/envs/wmtf
