@@ -73,7 +73,7 @@ class HtmlReportTask(object, metaclass=HtmlReportMeta):
         self.__start = datetime.combine(self.__day, time(0, 0))
         self.__end = datetime.combine(self.__day, time(0, 0))
         self.__description = ""
-        
+
     def is_valid(self):
         return self.__id > 0
 
@@ -132,7 +132,7 @@ class HtmlReportDay(object, metaclass=HtmlReportMeta):
         self.__tasks = []
         self.__rows = []
         self.__last_tag = ""
-        
+
     def is_valid(self):
         return self.__date is not None
 
@@ -209,3 +209,10 @@ class Report(Parser):
                     if row.name == "p":
                         return HtmlContainer(row)
         raise NotImplementedError
+
+
+class ReportId(Parser):
+    def parse(self) -> int:
+        el = self.struct.find("input", {"id": "reportForm.itemId"})
+        assert isinstance(el, element.Tag)
+        return int(el.attrs.get("value", "0"))

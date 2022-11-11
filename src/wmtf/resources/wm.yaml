@@ -27,6 +27,10 @@ login:
     userToLogin: ^username^
     passwordToLogin: ^password^
 
+report_id:
+  method: get
+  url: Reports
+
 report:
   method: post
   url: Reports
@@ -40,7 +44,7 @@ report:
     META_FIELD_DAY_reportEndDate: $datetime|strftime|%d
     reportEndDate: $datetime|strftime|%Y-%m-%d %H:%M:%S
     reportSortCriteria: recHrsHoursWorked
-    itemId: 820370487
+    itemId: ^item_id^
     command: PersonDetails
     reportSortDirection: down
     reportSortLastCriteria: recHrsHoursWorked

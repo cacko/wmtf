@@ -13,6 +13,7 @@ class Commands(Enum):
     CLOCK = "clock"
     LOGIN = "login"
     REPORT = "report"
+    REPORT_ID = "report_id"
     TASKS = "tasks"
     TASK = "task"
 
@@ -37,7 +38,7 @@ class ReportData(BaseModel, extra=Extra.ignore):
     META_FIELD_DAY_reportEndDate: str
     reportEndDate: str
     reportSortCriteria: str
-    itemId: int = Field(default=820370487)
+    itemId: str = Field(default="820370487")
     command: str = Field(default="PersonDetails")
     reportSortDirection: str
     reportSortLastCriteria: str
@@ -85,6 +86,10 @@ class CommandMeta(type):
     @property
     def report(cls) -> "Report":
         return Report(**cls.config.get(Commands.REPORT.value))  # type: ignore
+    
+    @property
+    def report_id(cls) -> 'ReportId':
+        return ReportId(**cls.config.get(Commands.REPORT_ID.value))  # type: ignore
 
 
 @dataclass(config=ConfigDict(extra=Extra.ignore))
@@ -115,3 +120,8 @@ class Login(Command):
 @dataclass(config=ConfigDict(extra=Extra.ignore))
 class Report(Command):
     data: ReportData
+    
+
+@dataclass(config=ConfigDict(extra=Extra.ignore))
+class ReportId(Command):
+    pass    

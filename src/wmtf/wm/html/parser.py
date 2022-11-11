@@ -47,8 +47,9 @@ class Parser(object):
     def __init__(self, html: bytes, id: int = 0) -> None:
         self.struct = BeautifulSoup(html, features="html.parser")
         self.__id = id
-        self.handle_error()
+        # self.handle_error()
         self.init()
+
 
     def init(self):
         pass

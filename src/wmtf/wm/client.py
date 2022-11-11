@@ -1,3 +1,4 @@
+import logging
 from dataclasses import asdict
 from datetime import datetime, timedelta
 from functools import reduce
@@ -10,6 +11,7 @@ from wmtf.config import WMConfig, app_config
 from wmtf.core.ua import UA
 from wmtf.wm.commands import Command, Method
 from wmtf.wm.html.report import Report as ReportParser
+from wmtf.wm.html.report import ReportId as ReportIdParser
 from wmtf.wm.html.tasks import Task as TaskParser
 from wmtf.wm.html.tasks import TaskList as TaskListParser
 from wmtf.wm.models import ReportDay, Task, TaskInfo
@@ -128,6 +130,11 @@ class Client(object, metaclass=ClientMeta):
         return parser.parse()
 
     def do_report(self, start: datetime, end: datetime) -> list[ReportDay]:
+        cmd = Command.report_id
+        res = self.__call(cmd)
+        content = res.content
+        parser = ReportIdParser(content)
+        item_id = parser.parse()
         cmd = Command.report
         data = self.__populate(cmd.data.dict())
         data["META_FIELD_YEAR_reportStartDate"] = start
@@ -138,10 +145,9 @@ class Client(object, metaclass=ClientMeta):
         data["META_FIELD_MONTH_reportEndDate"] = end
         data["META_FIELD_DAY_reportEndDate"] = end
         data["reportEndDate"] = end
+        data["itemId"] = item_id
         res = self.__call(cmd, data=data)
         content = res.content
-        with (Path(__file__).parent / "report.html") as fp:
-            fp.write_bytes(content)
         parser = ReportParser(content)
         return parser.parse()
 
