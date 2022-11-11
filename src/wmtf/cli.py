@@ -1,21 +1,22 @@
 import click
+import questionary
 from click import Command
 from crontab import CronTab
+from progressor import Spinner
 from pyfiglet import Figlet
 from rich import print
 from rich.console import Console
 from rich.markdown import Markdown
 from rich.panel import Panel
+
+from wmtf.config import app_config
 from wmtf.tui.app import Tui
-from wmtf.ui.items import TaskItem, MenuItem
+from wmtf.ui.items import MenuItem, TaskItem
 from wmtf.ui.menu import Menu
 from wmtf.wm.client import Client
-from wmtf.wm.html.parser import ParserError
 from wmtf.wm.html.login import LoginError
+from wmtf.wm.html.parser import ParserError
 from wmtf.wm.models import TaskInfo
-from progressor import Spinner
-from wmtf.config import app_config
-import questionary
 
 
 def banner(txt: str, fg: str = "green", bold=True):
@@ -140,7 +141,7 @@ def cli_tasks(ctx: click.Context):
         menu_items = [
             TaskItem(text=f"{task.summary}", obj=task) for task in Client.tasks()
         ] + [questionary.Separator(), MenuItem(text="back", obj=main_menu)]
-        with Menu(menu_items, title="Select task") as item:
+        with Menu(menu_items, title="Select task") as item:  # type: ignore
             match item.obj:
                 case Command():
                     ctx.invoke(item.obj)
