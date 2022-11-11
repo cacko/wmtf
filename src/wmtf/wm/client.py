@@ -152,7 +152,7 @@ class Client(object, metaclass=ClientMeta):
         return parser.parse()
 
     def __populate(self, data: dict[str, str], **kwds) -> CommandData:
-        values = {**asdict(self.__config), **kwds}
+        values = {**self.__config.dict(), **kwds}
         return CommandData(data, values)
 
     @property

@@ -1,24 +1,25 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict
 from pathlib import Path
 from typing import Optional
 
 from appdir import get_app_dir
-from yaml import Loader, load
+from yaml import Loader, load, dump
+
+
+from pydantic import BaseModel, ConfigDict, Extra, Field
+from pydantic.dataclasses import dataclass
 
 from wmtf import __name__
 
+class WMConfig(BaseModel, extra=Extra.ignore):
+    host: str = Field(default="https://workmanager.travelfusion.com")
+    username: str = Field(default="")
+    password: str = Field(default="")
 
-@dataclass
-class WMConfig:
-    host: str
-    username: str
-    password: str
-
-@dataclass
-class JiraConfig:
-    host: str
-    username: str
-    password: str
+class JiraConfig(BaseModel, extra=Extra.ignore):
+    host: str = Field(default="https://newsupport.travelfusion.com")
+    username: str = Field(default="")
+    password: str = Field(default="")
 
 class app_config_meta(type):
     _instance = None
@@ -31,9 +32,16 @@ class app_config_meta(type):
     def get(cls, var, *args, **kwargs):
         return cls().getvar(var, *args, **kwargs)
 
+    def set(cls, var, value, *args, **kwargs):
+        return cls().setvar(var, value, *args, **kwargs)
+
     @property
     def app_dir(cls):
         return Path(get_app_dir(__name__)).expanduser()
+
+    @property
+    def app_config(cls) -> Path:
+        return cls.app_dir / "config.yaml"
 
     @property
     def cache_dir(cls):
@@ -47,15 +55,36 @@ class app_config_meta(type):
     def jira_config(cls) -> JiraConfig:
         return JiraConfig(**cls().getvar("jira"))
 
+    
+
 
 class app_config(object, metaclass=app_config_meta):
 
     _config: Optional[dict] = None
 
     def __init__(self) -> None:
-        pth = __class__.app_dir / "config.yaml"
-        self._config = load(pth.read_text(), Loader=Loader)
+        if not __class__.app_config.exists():
+            self.init()
+        self._config = load(__class__.app_config.read_text(), Loader=Loader)
+
+    def init(self):
+        with open(__class__.app_config, "w") as fp:
+            data = {
+                "wm": WMConfig().dict(),
+                "jira": JiraConfig().dict()
+            }
+            dump(data, fp)
 
     def getvar(self, var, *args, **kwargs):
-        if self._config:
-            return self._config.get(var, *args, *kwargs)
+        return self._config.get(var, *args, *kwargs)
+
+    def __save(self):
+        with open(__class__.app_config, "w") as fp:
+            dump(self._config, fp)
+
+    def setvar(self, var, value, *args, **kwargs):
+        section, key = var.split(".")
+        assert(section)
+        assert(key)
+        self._config[section][key] = value
+        self.__save()

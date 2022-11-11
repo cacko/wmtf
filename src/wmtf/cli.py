@@ -13,6 +13,8 @@ from wmtf.wm.client import Client
 from wmtf.wm.html.parser import ParserError
 from wmtf.wm.models import TaskInfo
 from progressor import Spinner
+from wmtf.config import app_config
+import questionary
 
 def banner(txt: str, fg: str = "green", bold=True):
     logo = Figlet(width=120).renderText(text=txt)
@@ -49,6 +51,7 @@ def main_menu(ctx: click.Context):
         menu_items = [
             MenuItem(text="My Tasks", obj=cli_tasks),
             MenuItem(text="My Report", obj=cli_report),
+            MenuItem(text="Settings", obj=cli_settings)
         ] + [MenuItem(text="Exit", obj=quit)]
         with Menu(menu_items) as item:
             match item.obj:
@@ -61,6 +64,48 @@ def main_menu(ctx: click.Context):
 @cli.command("app", short_help="Start app")
 def cli_app():
     Tui().run()
+
+@cli.command("settings", short_help="App settings")
+@click.pass_context
+def cli_settings(ctx: click.Context):
+    """Set usernames and passwords"""
+    try:
+        click.clear()
+        banner(txt="settings", fg='yellow')
+        menu_items = [
+            MenuItem(text=f"{txt}", obj=task) for txt,task in [
+                ("Username", cli_set_username),
+                ("Password", cli_set_password),
+            ]
+        ] + [MenuItem(text="<< back", obj=main_menu)]
+        with Menu(menu_items, title="Select task") as item:
+            match item.obj:
+                case Command():
+                    ctx.invoke(item.obj)
+                case TaskInfo():
+                    ctx.forward(cli_task, task_id=item.obj.id)
+    except ParserError as e:
+        click.echo(click.style(e, fg="red"))
+
+@cli.command("set-username", short_help="Set username")
+@click.pass_context
+def cli_set_username(ctx: click.Context):
+    value = questionary.text("WM Username:").ask()
+    app_config.set("wm.username", value)
+    if parent := ctx.parent:
+        if parent != ctx.find_root():
+            click.clear()
+            ctx.invoke(parent.command)   
+
+@cli.command("set-password", short_help="Set password")
+@click.pass_context
+def cli_set_password(ctx: click.Context):
+    value = questionary.password("WM Password:").ask()
+    app_config.set("wm.password", value)
+    if parent := ctx.parent:
+        if parent != ctx.find_root():
+            click.clear()
+            ctx.invoke(parent.command)   
 
 
 @cli.command("tasks", short_help="My Tasks")
