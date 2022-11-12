@@ -1,10 +1,12 @@
 # from threading import Event, Thread
 from typing import Any, Optional, Type
 
-# from confluent_kafka import KafkaException
 from textual.app import App, ComposeResult
 from textual.widgets import Header, Footer
 from textual.containers import Container, Vertical
+from textual import events
+from .widgets.tasks import Tasks as WidgetTasks
+from textual.binding import Binding
 
 # from kaskade import logger
 # from kaskade.config import Config
@@ -26,6 +28,12 @@ from textual.containers import Container, Vertical
 
 class Tui(App):
     
+    BINDINGS = [
+        ("t", "toggle_tasks", "Show Tasks"),
+        ("r", "toggle_report", "Show Report"),
+        ("u", "reload", "Refresh"),
+        ("q", "quit", "Quit"),
+    ]
     # __topic: Optional[Topic] = None
     # show_help = Reactive(False)
     # error = Reactive("")
@@ -66,11 +74,14 @@ class Tui(App):
     def compose(self) -> ComposeResult:
         self.title = "Work Manager"
         yield Header(show_clock=True)
-        # yield Container(
-        #     Vertical(DirectoryTree(path), id="tree-view"),
-        #     Vertical(Static(id="code", expand=True), id="code-view"),
-        # )
+        yield Container(
+            Vertical(WidgetTasks(), id="tree-view"),
+            # Vertical(Static(id="code", expand=True), id="code-view"),
+        )
         yield Footer()
+        
+    def on_mount(self, event: events.Mount) -> None:
+        self.query_one(WidgetTasks).focus()
 
     # def background_execution(self, refresh_rate: float) -> None:
     #     self.background_lock = Event()
@@ -258,3 +269,12 @@ class Tui(App):
     #         await focused.focus()
     #     else:
     #         await self.action_change_focus(key)
+
+    def action_toggle_tasks(self) -> None:
+        self.query_one(WidgetTasks).focus()
+
+    def action_toggle_report(self) -> None:
+        print("show report")
+        
+    def action_reload(self) -> None:
+        print("reload ")

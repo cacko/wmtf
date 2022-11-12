@@ -54,6 +54,9 @@ class TaskInfo:
     @property
     def isActive(self):
         return self.clock in [ClockLocation.HOME, ClockLocation.OFFICE]
+    
+    def __str__(self) -> str:
+        return self.summary
 
 @dataclass
 class TaskComment:
