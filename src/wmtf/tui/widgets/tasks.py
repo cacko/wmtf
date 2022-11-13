@@ -7,7 +7,7 @@ from textual import events
 from textual.app import ComposeResult
 from textual.widget import Widget
 from textual.keys import Keys
-
+from wmtf.core.events import LoadTask
 
 class TaskWidget(Static):
 
@@ -36,6 +36,13 @@ class TaskWidget(Static):
         if self.scrollable_list:
             self.scrollable_list.previous()
             self.update(self.scrollable_list)
+            
+    def load(self):
+        if self.scrollable_list:
+            selected = self.scrollable_list.selected
+            assert(isinstance(selected, TaskInfo))
+            assert(isinstance(selected.id, int))
+            LoadTask().set(payload=selected.id)
 
 
 class Tasks(Widget, can_focus=True):
@@ -50,16 +57,11 @@ class Tasks(Widget, can_focus=True):
             case Keys.Down:
                 self.wdg.next()
             case Keys.Enter:
-                pass
+                self.wdg.load()
+
 
     def on_focus(self, event: events.Focus) -> None:
         self.has_focus = True
 
     def on_blur(self, event: events.Blur) -> None:
         self.has_focus = False
-
-    def on_enter(self, event: events.Enter) -> None:
-        self.mouse_over = True
-
-    def on_leave(self, event: events.Leave) -> None:
-        self.mouse_over = False

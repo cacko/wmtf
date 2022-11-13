@@ -13,3 +13,7 @@ Screen {
     width: 1fr;
     padding: 1;
 }
+
+.hidden {
+    visibility: hidden;
+}

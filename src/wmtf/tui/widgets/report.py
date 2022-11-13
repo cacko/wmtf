@@ -7,7 +7,6 @@ from textual.app import ComposeResult
 from textual.widget import Widget
 from wmtf.tui.renderables.report import Report as ReportRenderable
 from corethread import StoppableThread
-from rich.spinner import Spinner
 from rich.text import Text
 
 class ReportService(StoppableThread):
