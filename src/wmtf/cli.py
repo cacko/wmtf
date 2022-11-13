@@ -17,11 +17,13 @@ from wmtf.wm.client import Client
 from wmtf.wm.html.login import LoginError
 from wmtf.wm.html.parser import ParserError
 from wmtf.wm.models import TaskInfo
+from wmtf.tui.renderables.report import Report as ReportRenderable
 
 
 def banner(txt: str, fg: str = "green", bold=True):
     logo = Figlet(width=120).renderText(text=txt)
     click.echo(click.style(logo, fg=fg, bold=bold))
+
 
 def validate_credentials() -> bool:
     questions = [
@@ -48,15 +50,12 @@ def validate_credentials() -> bool:
         click.echo(click.style(e, fg="red"))
     return False
 
-class WMTFCommand(click.Group):
-    def list_commands(self, ctx: click.Context) -> list[str]:
-        return list(self.commands)
 
-
-@click.group(cls=WMTFCommand)
-def cli():
-    """This script showcases different terminal UI helpers in Click."""
-    pass
+@click.group(invoke_without_command=True)
+@click.pass_context
+def cli(ctx: click.Context):
+    if ctx.invoked_subcommand is None:
+        Tui().run()
 
 
 @cli.command("quit")
@@ -64,7 +63,6 @@ def quit():
     """Quit."""
     click.echo(click.style("Bye!", fg="blue"))
     import sys
-
     sys.exit(0)
 
 
@@ -86,11 +84,6 @@ def main_menu(ctx: click.Context):
                     ctx.invoke(item.obj)
     except KeyboardInterrupt:
         click.echo(click.style("Bye!", fg="blue"))
-
-
-@cli.command("app", short_help="Start app")
-def cli_app():
-    Tui().run()
 
 
 @cli.command("settings", short_help="App settings")
@@ -182,20 +175,7 @@ def cli_report(ctx: click.Context):
             days = Client.report()
         click.clear()
         banner(txt="my report", fg="red")
-        parts = []
-        for day in days:
-            parts = []
-            for task in day.tasks:
-                parts.append(
-                    f"- {task.clock_start.strftime('%H:%M')} - {task.clock_end.strftime('%H:%M')} {task.clock.icon.value} **{task.summary}** "
-                )
-            print(
-                Panel(
-                    Markdown("\n\n".join(parts)),
-                    title=f"{day.day.strftime('%A %d %b')} / {day.total_display}",
-                    width=70,
-                )
-            )
+        print(ReportRenderable(days))
     except ParserError as e:
         click.echo(click.style(e, fg="red"))
     click.pause()

@@ -1,6 +1,7 @@
 #appname {
     dock: top;
     height: auto;
+    padding: 0 1 0 1;
 }
 
 Screen {
@@ -10,5 +11,5 @@ Screen {
 .box {
     height: 100%;
     width: 1fr;
-    border: solid green;
+    padding: 1;
 }
