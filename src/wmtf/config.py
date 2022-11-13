@@ -12,14 +12,14 @@ from wmtf import __name__
 
 class WMConfig(BaseModel, extra=Extra.ignore):
     host: str = Field(default="https://workmanager.travelfusion.com")
-    username: str = Field(default="")
-    password: str = Field(default="")
+    username: Optional[str] = Field(default="")
+    password: Optional[str] = Field(default="")
 
 
 class JiraConfig(BaseModel, extra=Extra.ignore):
     host: str = Field(default="https://newsupport.travelfusion.com")
-    username: str = Field(default="")
-    password: str = Field(default="")
+    username: Optional[str] = Field(default="")
+    password: Optional[str] = Field(default="")
 
 
 class app_config_meta(type):
@@ -59,7 +59,7 @@ class app_config_meta(type):
     @property
     def is_new(cls) -> bool:
         wm_config = cls.wm_config
-        return not all([len(wm_config.username) > 0, len(wm_config.password) > 0])
+        return not all([wm_config.username, wm_config.password])
 
 
 class app_config(object, metaclass=app_config_meta):
