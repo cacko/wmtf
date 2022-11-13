@@ -1,6 +1,7 @@
 from typing import Generic, List, Optional, TypeVar
 
 from rich.text import Text
+from rich.panel import Panel
 
 from .symbols import RIGHT_TRIANGLE
 
@@ -29,7 +30,7 @@ class ScrollableList(Generic[T]):
         if selected is not None:
             self.selected = selected
 
-    def __rich__(self) -> Text:
+    def __rich__(self):
         content = Text(overflow="ellipsis", no_wrap=True)
         for index in range(self.start_rendering, self.end_rendering):
             item = self.list[index]
@@ -47,7 +48,7 @@ class ScrollableList(Generic[T]):
                 content.append(" ")
                 content.append(string_item)
             content.append("\n")
-        return content
+        return Panel(content, title="My Tasks")
 
     @property
     def selected(self) -> Optional[T]:

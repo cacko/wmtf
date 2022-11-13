@@ -1,0 +1,14 @@
+#appname {
+    dock: top;
+    height: auto;
+}
+
+Screen {
+    layout: horizontal;
+}
+
+.box {
+    height: 100%;
+    width: 1fr;
+    border: solid green;
+}

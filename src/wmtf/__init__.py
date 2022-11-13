@@ -3,6 +3,9 @@ import os
 from http.client import HTTPConnection
 
 import structlog
+from pathlib import Path
+
+RESOURCES_PATH = Path(__file__).parent / "resources"
 
 __name__ = "wmtf"
 
