@@ -24,15 +24,25 @@ class ReportWidget(Static):
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-    
-    def on_mount(self) -> None:
+        
+    def load(self):
         self.update(Text("Loading"))
         t = ReportService(self.update)
-        t.start()
-            
+        t.start()      
+    
+    def on_mount(self) -> None:
+        self.load()
 
-class Report(Widget, can_focus=True):
+class Report(Widget):
     def compose(self) -> ComposeResult:
         self.wdg = ReportWidget(expand=True)
         yield self.wdg
+
+    def load(self):
+        self.wdg.load()
         
+    def hide(self):
+        self.add_class("hidden")
+        
+    def unhide(self):
+        self.remove_class("hidden")

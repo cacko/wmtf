@@ -7,12 +7,11 @@ from textual import events
 from textual.app import ComposeResult
 from textual.widget import Widget
 from textual.keys import Keys
-from wmtf.core.events import LoadTask
-
-class TaskWidget(Static):
+from textual.message import Message, MessageTarget
+class TasksWidget(Static):
 
     scrollable_list: Optional[ScrollableList[TaskInfo]] = None
-
+    
     @property
     def max_renderables_len(self) -> int:
         height: int = self.size.height
@@ -42,12 +41,17 @@ class TaskWidget(Static):
             selected = self.scrollable_list.selected
             assert(isinstance(selected, TaskInfo))
             assert(isinstance(selected.id, int))
-            LoadTask().set(payload=selected.id)
-
+            return selected
 
 class Tasks(Widget, can_focus=True):
+    
+    class Selected(Message):
+        def __init__(self, sender: MessageTarget, task: TaskInfo) -> None:
+            self.task = task
+            super().__init__(sender)
+    
     def compose(self) -> ComposeResult:
-        self.wdg = TaskWidget()
+        self.wdg = TasksWidget()
         yield self.wdg
 
     def on_key(self, event: events.Key) -> None:
@@ -57,8 +61,8 @@ class Tasks(Widget, can_focus=True):
             case Keys.Down:
                 self.wdg.next()
             case Keys.Enter:
-                self.wdg.load()
-
+                if selected := self.wdg.load():
+                    self.emit_no_wait(self.Selected(self, selected))
 
     def on_focus(self, event: events.Focus) -> None:
         self.has_focus = True

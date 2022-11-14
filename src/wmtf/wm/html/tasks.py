@@ -52,13 +52,16 @@ class Task(Parser):
         )
 
     def __get_comments(self) -> Optional[list[TaskComment]]:
-        df = pd.read_html(self.struct.prettify(), match="Comment")[3]
-        df.columns = df.iloc[0]
-        return [
-            TaskComment(
-                author=r["Who"],
-                comment=r["Comment"].replace("<br>", "\n>"),
-                date=r["Date"],
-            )
-            for _, r in df.drop([0, 1]).iterrows()
-        ]
+        try:
+            df = pd.read_html(self.struct.prettify(), match="Comment")[3]
+            df.columns = df.iloc[0]
+            return [
+                TaskComment(
+                    author=r["Who"],
+                    comment=r["Comment"].replace("<br>", "\n>"),
+                    date=r["Date"],
+                )
+                for _, r in df.drop([0, 1]).iterrows()
+            ]
+        except IndexError:
+            pass
