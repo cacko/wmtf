@@ -48,7 +48,7 @@ class ScrollableList(Generic[T]):
                 content.append(" ")
                 content.append(string_item)
             content.append("\n")
-        return Panel(content, title="My Tasks")
+        return Panel(content, title="My Tasks", title_align="left", padding=(1,1))
 
     @property
     def selected(self) -> Optional[T]:
@@ -109,4 +109,3 @@ class ScrollableList(Generic[T]):
 
     def next(self) -> None:
         self.pointer += 1
-

@@ -15,8 +15,14 @@ class Task(Generic[T]):
         self.task = wrapped
 
     def __rich_console__(self, console: Console, options: ConsoleOptions) -> RenderResult:
-        parts = [f"# {self.task.summary}", self.task.description, "---"]
+        parts = [f"## {self.task.summary}", self.task.description]
         if self.task.comments:
+            parts.append("## Comments")
             for c in self.task.comments:
                 parts.append(f"> **{c.author}**\n>\n> {c.comment}")
-        yield Markdown("\n\n".join(parts)) 
+        yield Panel(
+            Markdown("\n\n".join(parts)),
+            title="Task",
+            title_align="left",
+            padding=1
+        )

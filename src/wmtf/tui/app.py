@@ -42,4 +42,3 @@ class Tui(App):
         task_widget.load(message.task.id)
         task_widget.unhide()
         self.query_one(WidgetReport).hide()
-
