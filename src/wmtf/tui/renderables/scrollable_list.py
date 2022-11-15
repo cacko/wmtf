@@ -1,11 +1,11 @@
 from typing import Generic, List, Optional, TypeVar
-
+from wmtf.wm.models import TaskInfo, Task
 from rich.text import Text
 from rich.panel import Panel
 
 from .symbols import RIGHT_TRIANGLE
 
-T = TypeVar("T")
+T = TypeVar("T", TaskInfo, Task)
 
 
 class ScrollableList(Generic[T]):
@@ -35,18 +35,18 @@ class ScrollableList(Generic[T]):
         for index in range(self.start_rendering, self.end_rendering):
             item = self.list[index]
             string_index = str(index + 1)
-            string_item = str(item)
+            string_item = f"{item.clock.icon.value} {item.summary}" if item.isActive else str(item) 
             if self.selected == item:
                 content.append(RIGHT_TRIANGLE, "green bold")
                 content.append(" ")
                 content.append(string_index, "bright_magenta bold")
                 content.append(" ")
-                content.append(string_item, "green bold")
+                content.append(string_item, "green bold")       
             else:
                 content.append("  ")
                 content.append(string_index, "bright_magenta")
                 content.append(" ")
-                content.append(string_item)
+                content.append(string_item, "red bold" if item.isActive else None)
             content.append("\n")
         return Panel(content, title="My Tasks", title_align="left", padding=(1,1))
 

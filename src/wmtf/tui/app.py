@@ -18,6 +18,18 @@ class Tui(App):
         ("q", "quit", "Quit"),
     ]
 
+    @property
+    def widget_task(self) -> WidgetTask:
+        return self.query_one(WidgetTask)
+
+    @property
+    def widget_tasks(self) -> WidgetTasks:
+        return self.query_one(WidgetTasks)
+
+    @property
+    def widget_report(self) -> WidgetReport:
+        return self.query_one(WidgetReport)
+
     def compose(self) -> ComposeResult:
         self.title = "Work Manager"
         yield Header(show_clock=True)
@@ -28,17 +40,18 @@ class Tui(App):
         yield Footer()
 
     def on_mount(self, event: events.Mount) -> None:
-        self.query_one(WidgetTasks).focus()
+        self.widget_tasks.focus()
 
     def action_toggle_views(self) -> None:
-        self.query_one(WidgetTask).toggle_class("hidden")
-        self.query_one(WidgetReport).toggle_class("hidden")
+        self.widget_task.toggle_class("hidden")
+        self.widget_report.toggle_class("hidden")
 
     def action_reload(self) -> None:
-        print("reload")
+        self.widget_task.hide()
+        self.widget_report.unhide()
+        self.widget_report.load()
         
     def on_tasks_selected(self, message: WidgetTasks.Selected) -> None:
-        task_widget = self.query_one(WidgetTask)
-        task_widget.load(message.task.id)
-        task_widget.unhide()
-        self.query_one(WidgetReport).hide()
+        self.widget_task.load(message.task.id)
+        self.widget_task.unhide()
+        self.widget_report.hide()

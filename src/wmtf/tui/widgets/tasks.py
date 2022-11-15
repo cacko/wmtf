@@ -2,16 +2,19 @@ from wmtf.tui.renderables.scrollable_list import ScrollableList
 from textual.widgets import Static
 from wmtf.wm.client import Client
 from wmtf.wm.models import TaskInfo
+from rich.panel import Panel
 from typing import Optional
 from textual import events
 from textual.app import ComposeResult
 from textual.widget import Widget
 from textual.keys import Keys
 from textual.message import Message, MessageTarget
+
+
 class TasksWidget(Static):
 
     scrollable_list: Optional[ScrollableList[TaskInfo]] = None
-    
+
     @property
     def max_renderables_len(self) -> int:
         height: int = self.size.height
@@ -26,6 +29,7 @@ class TasksWidget(Static):
         )
         self.update(self.scrollable_list)
 
+
     def next(self):
         if self.scrollable_list:
             self.scrollable_list.next()
@@ -35,21 +39,21 @@ class TasksWidget(Static):
         if self.scrollable_list:
             self.scrollable_list.previous()
             self.update(self.scrollable_list)
-            
+
     def load(self):
         if self.scrollable_list:
             selected = self.scrollable_list.selected
-            assert(isinstance(selected, TaskInfo))
-            assert(isinstance(selected.id, int))
+            assert isinstance(selected, TaskInfo)
+            assert isinstance(selected.id, int)
             return selected
 
+
 class Tasks(Widget, can_focus=True):
-    
     class Selected(Message):
         def __init__(self, sender: MessageTarget, task: TaskInfo) -> None:
             self.task = task
             super().__init__(sender)
-    
+
     def compose(self) -> ComposeResult:
         self.wdg = TasksWidget()
         yield self.wdg
