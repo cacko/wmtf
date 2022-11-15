@@ -8,7 +8,6 @@
     width: 1fr;
 }
 
-
 #content {
     layout: horizontal;
     padding: 1 1 1 0;
@@ -17,6 +16,7 @@
 #content .box {
     height: 100%;
     width: 1fr;
+    scrollbar-gutter: stable;
 }
 
 #content .scroll {
