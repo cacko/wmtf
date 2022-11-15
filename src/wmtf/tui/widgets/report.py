@@ -1,12 +1,12 @@
-from textual.widgets import Static
 from wmtf.wm.client import Client
+from wmtf.wm.models import ReportDay
 from textual.app import ComposeResult
-from textual.widget import Widget
 from wmtf.tui.renderables.report import Report as ReportRenderable
 from corethread import StoppableThread
-from rich.text import Text
 from rich.spinner import Spinner
-from rich.panel import Panel
+from rich.text import Text
+from .types import Focusable, Box
+from typing import Optional
 
 
 class ReportService(StoppableThread):
@@ -16,34 +16,46 @@ class ReportService(StoppableThread):
 
     def run(self) -> None:
         days = Client.report()
-        self.__callback(
-            Panel(ReportRenderable(days), title="Report", title_align="left", padding=1)
-        )
+        self.__callback(days)
 
 
-class ReportWidget(Static):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+class ReportWidget(Box):
+
+    __report: Optional[list[ReportDay]] = None
+
+    @property
+    def title(self):
+        return "Report"
 
     def load(self):
-        self.update(
-            Panel(
-                Spinner("bouncingBall", "Loading"),
-                title="Report",
-                title_align="left",
-                padding=1,
-            )
-        )
-        t = ReportService(self.update)
+        self.update(self.get_panel(Spinner("bouncingBall", "Loading")))
+        t = ReportService(self.update_report)
         t.start()
 
     def on_mount(self) -> None:
         self.load()
 
+    def update_report(self, report: list[ReportDay]):
+        self.__report = report
+        self.update(self.render())
 
-class Report(Widget):
+    def render(self):
+        return self.get_panel(
+            ReportRenderable(self.__report) if self.__report else Text("Not found")
+        )
+
+
+class Report(Focusable):
+
+    __wdg: Optional[ReportWidget] = None
+
+    @property
+    def wdg(self) -> ReportWidget:
+        if not self.__wdg:
+            self.__wdg = ReportWidget(expand=True)
+        return self.__wdg
+
     def compose(self) -> ComposeResult:
-        self.wdg = ReportWidget(expand=True)
         yield self.wdg
 
     def load(self):

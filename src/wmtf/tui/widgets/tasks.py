@@ -60,10 +60,6 @@ class Tasks(Focusable):
         def __init__(self, sender: MessageTarget, task: TaskInfo) -> None:
             self.task = task
             super().__init__(sender)
-            
-    class Tab(Message):
-        def __init__(self, sender: MessageTarget):
-            super().__init__(sender)
 
     @property
     def wdg(self) -> TasksWidget:
@@ -85,5 +81,3 @@ class Tasks(Focusable):
             case Keys.Enter:
                 if selected := self.wdg.load():
                     self.emit_no_wait(self.Selected(self, selected))
-            # case Keys.Tab:
-

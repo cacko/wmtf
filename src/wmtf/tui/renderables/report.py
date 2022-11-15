@@ -1,6 +1,5 @@
 from typing import Generic, List, TypeVar
 from wmtf.wm.models import ReportDay
-from rich.panel import Panel
 from rich.markdown import Markdown
 from rich.console import Console, ConsoleOptions, RenderResult
 

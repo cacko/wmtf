@@ -1,6 +1,3 @@
-
-
-
 from textual.widgets import Static
 from textual.widget import Widget
 from textual.app import ComposeResult

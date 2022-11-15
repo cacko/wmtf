@@ -7,7 +7,6 @@ from textual import events
 from typing import Optional
 from rich.text import Text
 from .types import Box, Focusable
-from textual.message import Message, MessageTarget
 
 
 class TaskWidget(Box):
@@ -35,10 +34,6 @@ class Task(Focusable):
 
     __wdg: Optional[TaskWidget] = None
     
-    class Tab(Message):
-        def __init__(self, sender: MessageTarget):
-            super().__init__(sender)
-
     @property
     def wdg(self) -> TaskWidget:
         if not self.__wdg:
@@ -53,11 +48,11 @@ class Task(Focusable):
                 self.scroll_up()
             case Keys.Down:
                 self.scroll_down()
-            # case Keys.Tab:
-            #     self.emit_no_wait(self.Tab(self))
 
     def compose(self) -> ComposeResult:
         yield self.wdg
+        
+
 
     def load(self, task_id: int):
         self.wdg.load(task_id)

@@ -5,7 +5,8 @@ from textual.containers import Container
 from .widgets.tasks import Tasks as WidgetTasks
 from .widgets.report import Report as WidgetReport
 from .widgets.task import Task as WidgetTask
-from .widgets.app_name import AppName as WidgetAppName
+from .widgets.types import Focusable
+
 from wmtf import RESOURCES_PATH
 
 
@@ -32,6 +33,7 @@ class Tui(App):
         return self.query_one(WidgetReport)
 
     def compose(self) -> ComposeResult:
+        self._bindings.bind("tab", "switch_view", show=False, universal=True)
         self.title = "Work Manager"
         yield Header(show_clock=True)
         yield Container(
@@ -43,7 +45,7 @@ class Tui(App):
         yield Footer()
 
     def on_mount(self, event: events.Mount) -> None:
-        self.widget_tasks.focus()
+        Focusable.next().focus()
 
     def action_toggle_views(self) -> None:
         self.widget_task.toggle_class("hidden")
@@ -54,14 +56,12 @@ class Tui(App):
         self.widget_report.unhide()
         self.widget_report.load()
 
+    def action_switch_view(self):
+        nxt = Focusable.next()
+        if nxt:
+            nxt.focus()
+
     def on_tasks_selected(self, message: WidgetTasks.Selected) -> None:
         self.widget_task.load(message.task.id)
         self.widget_task.unhide()
         self.widget_report.hide()
-
-    def on_tasks_tab(self, message: WidgetTasks.Tab):
-        if not self.widget_task.has_class("hidden"):
-            self.widget_task.focus()
-
-    def on_task_tab(self, mesaage: WidgetTask.Tab):
-        self.widget_tasks.focus()

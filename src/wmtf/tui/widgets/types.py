@@ -3,19 +3,17 @@ from rich.panel import Panel
 from rich.align import AlignMethod
 from rich.console import RenderableType
 from textual import events
-from textual.keys import Keys
 from textual.widget import Widget
-from rich.box import ROUNDED, DOUBLE
+from rich.box import DOUBLE, SQUARE
 from textual.reactive import reactive
 from typing import Optional
-from textual.message import Message, MessageTarget
 from textual import events
 from textual.widget import Widget
 
 
 class Box(Static):
 
-    box = reactive(ROUNDED)
+    box = reactive(SQUARE)
 
     @property
     def title(self):
@@ -51,15 +49,35 @@ class Box(Static):
 
 
 class Focusable(Widget, can_focus=True):
+
+    __instances: list["Focusable"] = []
+    __idx = -1
+
+    def __init__(
+        self,
+        *children: Widget,
+        name: str | None = None,
+        id: str | None = None,
+        classes: str | None = None
+    ) -> None:
+        super().__init__(*children, name=name, id=id, classes=classes)
+        __class__.__instances.append(self)
+
+    @classmethod
+    def next(cls) -> "Focusable":
+        visible = list(filter(lambda x: not x.has_class("hidden"), cls.__instances))
+        idx = cls.__idx + 1
+        if idx >= len(visible):
+            idx = 0
+        cls.__idx = idx
+        return visible[cls.__idx]
+
     @property
     def wdg(self) -> Box:
         raise NotImplementedError
-    
-    def key_tab(self):
-        self.emit_no_wait(self.Tab(self))        
 
     def on_focus(self, event: events.Focus) -> None:
         self.wdg.box = DOUBLE
 
     def on_blur(self, event: events.Blur) -> None:
-        self.wdg.box = ROUNDED
+        self.wdg.box = SQUARE
