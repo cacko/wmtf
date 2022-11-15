@@ -1,24 +1,24 @@
-from textual.widgets import Static
 from wmtf.wm.client import Client
 from textual.app import ComposeResult
-from textual.widget import Widget
 from wmtf.tui.renderables.task import Task as TaskRenderable
-from wmtf.wm.models import TaskInfo
+from wmtf.wm.models import Task as TaskModel
 from textual.keys import Keys
-from textual.message import Message, MessageTarget
 from textual import events
-from textual.reactive import reactive
 from typing import Optional
-from rich.panel import Panel
-from rich.box import ROUNDED, DOUBLE
+from rich.text import Text
+from .types import Box, Focusable
+from textual.message import Message, MessageTarget
 
 
-class TaskWidget(Static):
-    task: Optional[TaskInfo] = None
-    box = reactive(ROUNDED)
+class TaskWidget(Box):
+    task: Optional[TaskModel] = None
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+    @property
+    def title(self):
+        return "Task"
 
     def load(self, id: int):
         self.update("Loading...")
@@ -26,21 +26,24 @@ class TaskWidget(Static):
         self.update(self.render())
 
     def render(self):
-        if self.task:
-            return Panel(
-                TaskRenderable(self.task),
-                title="Task",
-                title_align="left",
-                padding=1,
-                box=self.box,
-                expand=True,  
-            )
+        return self.get_panel(
+            TaskRenderable(self.task) if self.task else Text("Not found")
+        )
 
 
-class Task(Widget, can_focus=True):
+class Task(Focusable):
+
+    __wdg: Optional[TaskWidget] = None
+    
     class Tab(Message):
         def __init__(self, sender: MessageTarget):
             super().__init__(sender)
+
+    @property
+    def wdg(self) -> TaskWidget:
+        if not self.__wdg:
+            self.__wdg = TaskWidget()
+        return self.__wdg
 
     def on_key(self, event: events.Key) -> None:
         if not self.has_focus:
@@ -50,11 +53,10 @@ class Task(Widget, can_focus=True):
                 self.scroll_up()
             case Keys.Down:
                 self.scroll_down()
-            case Keys.Tab:
-                self.emit_no_wait(self.Tab(self))
+            # case Keys.Tab:
+            #     self.emit_no_wait(self.Tab(self))
 
     def compose(self) -> ComposeResult:
-        self.wdg = TaskWidget(expand=True)
         yield self.wdg
 
     def load(self, task_id: int):
@@ -65,9 +67,3 @@ class Task(Widget, can_focus=True):
 
     def unhide(self):
         self.remove_class("hidden")
-
-    def on_focus(self, event: events.Focus) -> None:
-        self.wdg.box = DOUBLE
-
-    def on_blur(self, event: events.Blur) -> None:
-        self.wdg.box = ROUNDED

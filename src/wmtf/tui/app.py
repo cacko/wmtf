@@ -63,5 +63,5 @@ class Tui(App):
         if not self.widget_task.has_class("hidden"):
             self.widget_task.focus()
 
-    def on_task_tab(self):
+    def on_task_tab(self, mesaage: WidgetTask.Tab):
         self.widget_tasks.focus()

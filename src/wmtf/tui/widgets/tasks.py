@@ -1,76 +1,77 @@
-from wmtf.tui.renderables.scrollable_list import ScrollableList
-from textual.widgets import Static
+from wmtf.tui.renderables.task_list import TaskList
 from wmtf.wm.client import Client
 from wmtf.wm.models import TaskInfo
-from rich.panel import Panel
 from typing import Optional
 from textual import events
 from textual.app import ComposeResult
-from textual.widget import Widget
-from textual.keys import Keys
 from textual.message import Message, MessageTarget
-from rich.box import ROUNDED, DOUBLE
-from textual.reactive import reactive
+from textual.keys import Keys
+from .types import Box, Focusable
 
 
-class TasksWidget(Static):
+class TasksWidget(Box):
 
-    scrollable_list: Optional[ScrollableList[TaskInfo]] = None
-    box = reactive(ROUNDED)
+    task_list: Optional[TaskList] = None
 
     @property
     def max_renderables_len(self) -> int:
         height: int = self.size.height
         return height - 2
 
+    @property
+    def title(self):
+        return "My Tasks"
+
     def on_mount(self) -> None:
         tasks = Client.tasks()
-        self.scrollable_list = ScrollableList(
+        self.task_list = TaskList(
             tasks,
             max_len=self.max_renderables_len,
-            selected=self.scrollable_list.selected if self.scrollable_list else None,
+            selected=self.task_list.selected if self.task_list else None,
         )
         self.update(self.render())
 
     def render(self):
-        return Panel(
-            self.scrollable_list,
-            title="My Tasks",
-            title_align="left",
-            padding=1,
-            box=self.box,
-        )
+        return self.get_panel(self.task_list)
 
     def next(self):
-        if self.scrollable_list:
-            self.scrollable_list.next()
+        if self.task_list:
+            self.task_list.next()
             self.update(self.render())
 
     def previous(self):
-        if self.scrollable_list:
-            self.scrollable_list.previous()
+        if self.task_list:
+            self.task_list.previous()
             self.update(self.render())
 
     def load(self):
-        if self.scrollable_list:
-            selected = self.scrollable_list.selected
+        if self.task_list:
+            selected = self.task_list.selected
             assert isinstance(selected, TaskInfo)
             assert isinstance(selected.id, int)
             return selected
 
 
-class Tasks(Widget, can_focus=True):
+class Tasks(Focusable):
+
+    __wdg: Optional[TasksWidget] = None
+
     class Selected(Message):
         def __init__(self, sender: MessageTarget, task: TaskInfo) -> None:
             self.task = task
             super().__init__(sender)
-
+            
     class Tab(Message):
         def __init__(self, sender: MessageTarget):
             super().__init__(sender)
 
+    @property
+    def wdg(self) -> TasksWidget:
+        if not self.__wdg:
+            self.__wdg = TasksWidget()
+        return self.__wdg
+
     def compose(self) -> ComposeResult:
-        self.wdg = TasksWidget()
         yield self.wdg
 
     def on_key(self, event: events.Key) -> None:
@@ -84,13 +85,5 @@ class Tasks(Widget, can_focus=True):
             case Keys.Enter:
                 if selected := self.wdg.load():
                     self.emit_no_wait(self.Selected(self, selected))
-            case Keys.Tab:
-                self.emit_no_wait(self.Tab(self))
+            # case Keys.Tab:
 
-    def on_focus(self, event: events.Focus) -> None:
-        self.has_focus = True
-        self.wdg.box = DOUBLE
-
-    def on_blur(self, event: events.Blur) -> None:
-        self.has_focus = False
-        self.wdg.box = ROUNDED

@@ -1,22 +1,20 @@
-from typing import Generic, List, Optional, TypeVar
-from wmtf.wm.models import TaskInfo, Task
+from typing import List, Optional
+from wmtf.wm.models import TaskInfo
 from rich.text import Text
-from rich.panel import Panel
+from rich.console import RichCast
 
 from .symbols import RIGHT_TRIANGLE
 
-T = TypeVar("T", TaskInfo, Task)
 
-
-class ScrollableList(Generic[T]):
+class TaskList(RichCast):
     __pointer: int = -1
 
     def __init__(
         self,
-        wrapped: List[T],
+        wrapped: List[TaskInfo],
         max_len: int = -1,
         pointer: int = -1,
-        selected: Optional[T] = None,
+        selected: Optional[TaskInfo] = None,
     ) -> None:
         self.list = wrapped if wrapped else []
         self.max_len = (
@@ -35,13 +33,17 @@ class ScrollableList(Generic[T]):
         for index in range(self.start_rendering, self.end_rendering):
             item = self.list[index]
             string_index = str(index + 1)
-            string_item = f"{item.clock.icon.value} {item.summary}" if item.isActive else str(item) 
+            string_item = (
+                f"{item.clock.icon.value} {item.summary}"
+                if item.isActive
+                else str(item)
+            )
             if self.selected == item:
                 content.append(RIGHT_TRIANGLE, "green bold")
                 content.append(" ")
                 content.append(string_index, "bright_magenta bold")
                 content.append(" ")
-                content.append(string_item, "green bold")       
+                content.append(string_item, "green bold")
             else:
                 content.append("  ")
                 content.append(string_index, "bright_magenta")
@@ -51,14 +53,14 @@ class ScrollableList(Generic[T]):
         return content
 
     @property
-    def selected(self) -> Optional[T]:
+    def selected(self) -> Optional[TaskInfo]:
         if self.pointer < 0 or self.pointer >= len(self.list):
             return None
 
         return self.list[self.pointer]
 
     @selected.setter
-    def selected(self, selected: Optional[T]) -> None:
+    def selected(self, selected: Optional[TaskInfo]) -> None:
         if selected is None:
             self.reset()
             return
@@ -71,7 +73,7 @@ class ScrollableList(Generic[T]):
     def __str__(self) -> str:
         return str(self.renderables())
 
-    def renderables(self) -> List[T]:
+    def renderables(self) -> List[TaskInfo]:
         return self.list[self.start_rendering : self.end_rendering]
 
     def reset(self) -> None:
