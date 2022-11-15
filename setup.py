@@ -41,7 +41,7 @@ setup(
         "python-dateutil==2.8.2",
         "pytz-deprecation-shim>=0.1.0.post0",
         "questionary==1.10.0",
-        "textual>=0.3.0",
+        "textual>=0.4.0",
         "tzlocal>=4.2",
         "click>=8.1.3",
         "colorama>=0.4.5",

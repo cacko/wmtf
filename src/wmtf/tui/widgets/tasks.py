@@ -9,11 +9,14 @@ from textual.app import ComposeResult
 from textual.widget import Widget
 from textual.keys import Keys
 from textual.message import Message, MessageTarget
+from rich.box import ROUNDED, DOUBLE
+from textual.reactive import reactive
 
 
 class TasksWidget(Static):
 
     scrollable_list: Optional[ScrollableList[TaskInfo]] = None
+    box = reactive(ROUNDED)
 
     @property
     def max_renderables_len(self) -> int:
@@ -27,18 +30,26 @@ class TasksWidget(Static):
             max_len=self.max_renderables_len,
             selected=self.scrollable_list.selected if self.scrollable_list else None,
         )
-        self.update(self.scrollable_list)
+        self.update(self.render())
 
+    def render(self):
+        return Panel(
+            self.scrollable_list,
+            title="My Tasks",
+            title_align="left",
+            padding=1,
+            box=self.box,
+        )
 
     def next(self):
         if self.scrollable_list:
             self.scrollable_list.next()
-            self.update(self.scrollable_list)
+            self.update(self.render())
 
     def previous(self):
         if self.scrollable_list:
             self.scrollable_list.previous()
-            self.update(self.scrollable_list)
+            self.update(self.render())
 
     def load(self):
         if self.scrollable_list:
@@ -54,6 +65,10 @@ class Tasks(Widget, can_focus=True):
             self.task = task
             super().__init__(sender)
 
+    class Tab(Message):
+        def __init__(self, sender: MessageTarget):
+            super().__init__(sender)
+
     def compose(self) -> ComposeResult:
         self.wdg = TasksWidget()
         yield self.wdg
@@ -67,9 +82,13 @@ class Tasks(Widget, can_focus=True):
             case Keys.Enter:
                 if selected := self.wdg.load():
                     self.emit_no_wait(self.Selected(self, selected))
+            case Keys.Tab:
+                self.emit_no_wait(self.Tab(self))
 
     def on_focus(self, event: events.Focus) -> None:
         self.has_focus = True
+        self.wdg.box = DOUBLE
 
     def on_blur(self, event: events.Blur) -> None:
         self.has_focus = False
+        self.wdg.box = ROUNDED

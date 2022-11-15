@@ -20,9 +20,4 @@ class Task(Generic[T]):
             parts.append("## Comments")
             for c in self.task.comments:
                 parts.append(f"> **{c.author}**\n>\n> {c.comment}")
-        yield Panel(
-            Markdown("\n\n".join(parts)),
-            title="Task",
-            title_align="left",
-            padding=1
-        )
+        yield Markdown("\n\n".join(parts))

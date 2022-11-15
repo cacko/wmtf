@@ -1,6 +1,7 @@
 from textual.app import App, ComposeResult
 from textual.widgets import Header, Footer
 from textual import events
+from textual.containers import Container
 from .widgets.tasks import Tasks as WidgetTasks
 from .widgets.report import Report as WidgetReport
 from .widgets.task import Task as WidgetTask
@@ -33,10 +34,12 @@ class Tui(App):
     def compose(self) -> ComposeResult:
         self.title = "Work Manager"
         yield Header(show_clock=True)
-        yield WidgetAppName(id="appname")
-        yield WidgetTasks(id="tasks", classes="box")
-        yield WidgetReport(id="report", classes="box")
-        yield WidgetTask(id="task", classes="box hidden")
+        yield Container(
+            WidgetTasks(id="tasks", classes="box"),
+            WidgetReport(id="report", classes="box"),
+            WidgetTask(id="task", classes="box hidden"),
+            id="content",
+        )
         yield Footer()
 
     def on_mount(self, event: events.Mount) -> None:
@@ -50,8 +53,15 @@ class Tui(App):
         self.widget_task.hide()
         self.widget_report.unhide()
         self.widget_report.load()
-        
+
     def on_tasks_selected(self, message: WidgetTasks.Selected) -> None:
         self.widget_task.load(message.task.id)
         self.widget_task.unhide()
         self.widget_report.hide()
+
+    def on_tasks_tab(self, message: WidgetTasks.Tab):
+        if not self.widget_task.has_class("hidden"):
+            self.widget_task.focus()
+
+    def on_task_tab(self):
+        self.widget_tasks.focus()

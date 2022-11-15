@@ -48,7 +48,7 @@ class ScrollableList(Generic[T]):
                 content.append(" ")
                 content.append(string_item, "red bold" if item.isActive else None)
             content.append("\n")
-        return Panel(content, title="My Tasks", title_align="left", padding=(1,1))
+        return content
 
     @property
     def selected(self) -> Optional[T]:

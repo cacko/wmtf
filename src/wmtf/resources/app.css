@@ -1,20 +1,30 @@
-#appname {
-    dock: top;
+#root {
+    layout: vertical;
+    overflow: hidden;
+}
+
+#root .box {
     height: auto;
-    padding: 0 1 0 1;
+    width: 1fr;
 }
 
-Screen {
+
+#content {
     layout: horizontal;
+    overflow: hidden;
+    padding: 1 1 1 0;
 }
 
-.box {
+#content .box {
     height: 100%;
     width: 1fr;
-    padding: 1;
 }
 
-.hidden {
+#content .scroll {
+    overflow: scroll;
+}
+
+#content .hidden {
     visibility: hidden;
     width: 0;
 }
