@@ -74,6 +74,8 @@ class Tasks(Widget, can_focus=True):
         yield self.wdg
 
     def on_key(self, event: events.Key) -> None:
+        if not self.has_focus:
+            return
         match event.key:
             case Keys.Up:
                 self.wdg.previous()

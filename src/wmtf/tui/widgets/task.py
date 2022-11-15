@@ -43,11 +43,13 @@ class Task(Widget, can_focus=True):
             super().__init__(sender)
 
     def on_key(self, event: events.Key) -> None:
+        if not self.has_focus:
+            return
         match event.key:
             case Keys.Up:
-                self.scroll_down()
-            case Keys.Down:
                 self.scroll_up()
+            case Keys.Down:
+                self.scroll_down()
             case Keys.Tab:
                 self.emit_no_wait(self.Tab(self))
 
