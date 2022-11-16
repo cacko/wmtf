@@ -1,5 +1,5 @@
 from textual.app import App, ComposeResult
-from textual.widgets import Header, Footer
+from textual.widgets import Header, Footer, Static
 from textual import events
 from textual.containers import Container
 from .widgets.tasks import Tasks as WidgetTasks
@@ -7,6 +7,7 @@ from .widgets.report import Report as WidgetReport
 from .widgets.task import Task as WidgetTask
 from .widgets.app_name import AppName as WidgetAppName
 from .widgets.app_location import AppLocation as WidgetAppLocation
+from .widgets.app_user import AppUser as WidgetAppUser
 from .widgets.types import Focusable
 from wmtf.wm.models import ClockLocation
 from wmtf.config import app_config
@@ -51,8 +52,13 @@ class Tui(App):
 
         yield Container(
             WidgetAppName(id="app_name", classes="box"),
-            WidgetAppLocation(id="app_location", classes="box"),
-            id="info",
+            Container(
+                WidgetAppLocation(id="app_location", classes="box"),
+                WidgetAppUser(id="app_user", classes="box"),
+                id="status_info",
+                classes="box",
+            ),
+            id="heading",
         )
         yield Container(
             WidgetTasks(id="tasks", classes="box"),

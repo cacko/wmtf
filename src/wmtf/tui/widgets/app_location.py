@@ -4,6 +4,7 @@ from textual.app import ComposeResult
 from textual.reactive import reactive
 from rich.text import Text
 from wmtf.config import app_config
+from wmtf.wm.models import ClockLocation
 
 
 class AppLocationWidget(Static):
@@ -22,12 +23,15 @@ class AppLocationWidget(Static):
         self.update(self.render())
 
     def render(self):
-        return Text(self.location)
+        location = ClockLocation(self.location)
+        return Text.from_markup(
+            f"location: {location.icon.value} [green]{self.location.upper()}[/]"
+        )
 
 
 class AppLocation(Widget):
     def compose(self) -> ComposeResult:
-        self.wdg = AppLocationWidget(expand=True)
+        self.wdg = AppLocationWidget()
         yield self.wdg
 
     def location(self, val):

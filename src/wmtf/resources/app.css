@@ -3,14 +3,26 @@ Screen {
     layout: vertical;
 }
 
-#info {
+#heading {
     layout: horizontal;
     height: 6;
 }
 
-#info .box {
-    height: auto;
+#heading>.box {
+    height: 100%;
     width: 1fr;
+}
+
+#status_info {
+    padding: 1;
+    layout: grid;
+    grid-size: 3;
+    align: left middle;
+}
+
+#status_info>.box {
+    height: 100%;
+    align: left middle;
 }
 
 #content {
@@ -18,7 +30,7 @@ Screen {
     padding: 1 1 1 0;
 }
 
-#content .box {
+#content>.box {
     height: 100%;
     width: 1fr;
     scrollbar-gutter: stable;
