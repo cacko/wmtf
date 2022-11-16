@@ -1,6 +1,6 @@
 from wmtf.wm.models import Task as TaskModel
-from rich.markdown import Markdown
 from rich.console import Console, ConsoleOptions, RenderResult, ConsoleRenderable
+from .markdown import Markdown
 
 
 class Task(ConsoleRenderable):

@@ -3,7 +3,7 @@ from wmtf.wm.models import ReportDay
 from textual.app import ComposeResult
 from wmtf.tui.renderables.report import Report as ReportRenderable
 from corethread import StoppableThread
-from rich.spinner import Spinner
+from rich.status import Status
 from rich.text import Text
 from .types import Focusable, Box
 from typing import Optional
@@ -21,28 +21,38 @@ class ReportService(StoppableThread):
 
 class ReportWidget(Box):
 
-    __report: Optional[list[ReportDay]] = None
+    __report: Optional[list[ReportDay] | Status] = None
 
     @property
     def title(self):
         return "Report"
 
     def load(self):
-        self.update(self.get_panel(Spinner("bouncingBall", "Loading")))
+        self.__report = Status("Loading", spinner="bouncingBall")
+        self.__report.start()
+        self.update_timer.resume()
+        self.update(self.render())
         t = ReportService(self.update_report)
         t.start()
 
     def on_mount(self) -> None:
+        self.update_timer = self.set_interval(1 / 60, self.refresh, pause=True)
         self.load()
 
     def update_report(self, report: list[ReportDay]):
+        if isinstance(self.__report, Status):
+            self.__report.stop()
+            self.update_timer.pause()
         self.__report = report
         self.update(self.render())
 
     def render(self):
-        return self.get_panel(
-            ReportRenderable(self.__report) if self.__report else Text("Not found")
-        )
+        if isinstance(self.__report, Status):
+            return self.get_panel(self.__report)
+        elif isinstance(self.__report, list):
+            return self.get_panel(ReportRenderable(self.__report))
+        else:
+            return self.get_panel(Text("NOT FOUND"))
 
 
 class Report(Focusable):
