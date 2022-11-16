@@ -25,7 +25,7 @@ class AppLocationWidget(Static):
     def render(self):
         location = ClockLocation(self.location)
         return Text.from_markup(
-            f"location: {location.icon.value} [green]{self.location.upper()}[/]"
+            f"{location.icon.value} [green]{self.location.upper()}[/]"
         )
 
 

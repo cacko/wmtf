@@ -14,14 +14,14 @@ Screen {
 }
 
 #status_info {
-    padding: 1;
-    layout: grid;
-    grid-size: 3;
+    padding: 2 0 0 0;
+    layout: vertical;
     align: left middle;
+
 }
 
 #status_info>.box {
-    height: 100%;
+    height: 1fr;
     align: left middle;
 }
 

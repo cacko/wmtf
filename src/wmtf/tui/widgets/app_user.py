@@ -10,7 +10,7 @@ class AppUserWidget(Static):
         self.update(self.render())
 
     def render(self):
-        return Text.from_markup(f"username: [yellow]{app_config.wm_config.username}[/]")
+        return Text.from_markup(f"[yellow]{app_config.wm_config.username}[/]")
 
 
 class AppUser(Widget):

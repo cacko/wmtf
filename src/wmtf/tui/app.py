@@ -8,6 +8,7 @@ from .widgets.task import Task as WidgetTask
 from .widgets.app_name import AppName as WidgetAppName
 from .widgets.app_location import AppLocation as WidgetAppLocation
 from .widgets.app_user import AppUser as WidgetAppUser
+from .widgets.active_task import ActiveTask as WidgetActiveTask
 from .widgets.types import Focusable
 from wmtf.wm.models import ClockLocation
 from wmtf.config import app_config
@@ -54,7 +55,7 @@ class Tui(App):
             WidgetAppName(id="app_name", classes="box"),
             Container(
                 WidgetAppLocation(id="app_location", classes="box"),
-                WidgetAppUser(id="app_user", classes="box"),
+                WidgetActiveTask(id="active_task", classes="box"),
                 id="status_info",
                 classes="box",
             ),

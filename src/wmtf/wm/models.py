@@ -50,10 +50,20 @@ class TaskInfo:
     summary: str
     clock_id: int
     clock: ClockLocation
+    clock_start: Optional[datetime] = None
 
     @property
     def isActive(self):
         return self.clock in [ClockLocation.HOME, ClockLocation.OFFICE]
+    
+    @property
+    def work_display(self) -> str:
+        if not self.isActive:
+            return ""
+        if not self.clock_start:
+            return ""
+        df = datetime.now() - self.clock_start
+        return str(df).split(".")[0]
     
     def __str__(self) -> str:
         return self.summary

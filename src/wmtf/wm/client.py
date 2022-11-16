@@ -73,6 +73,10 @@ class ClientMeta(type):
     def task(cls, task_id: int) -> Task:
         return cls().do_task(task_id)
 
+    @property
+    def active_task(cls) -> Optional[TaskInfo]:
+        return cls().get_active_task()
+
     def clock_off(cls, clock_id: int):
         return cls().do_clock_off(clock_id)
 
@@ -97,10 +101,19 @@ class Client(object, metaclass=ClientMeta):
 
     __session: Optional[Session] = None
     __user_agent: Optional[str] = None
+    __active_task: Optional[TaskInfo] = None
 
     @property
     def config(self) -> WMConfig:
         return app_config.wm_config
+
+    def get_active_task(self) -> Optional[TaskInfo]:
+        return self.__active_task
+
+    def __update_active_task(self):
+        tasks = self.do_tasks()
+        active = next(filter(lambda x: x.isActive, tasks), None)
+        self.__active_task = active
 
     def __del__(self):
         if self.__session:
@@ -114,18 +127,26 @@ class Client(object, metaclass=ClientMeta):
         return res.status_code == 200
 
     def do_clock(self, clock_id: int, location: str) -> bool:
+        if self.__active_task:
+            return self.do_clock_off(clock_id=clock_id)
         cmd = Command.clock
         data = self.__populate(cmd.data, clock_id=clock_id, location=location)
         query = self.__populate(cmd.query)
         res = self.__call(cmd, data=data, params=query)
-        return res.status_code == 200
+        result = res.status_code == 200
+        if result:
+            self.__update_active_task()
+        return result
 
     def do_clock_off(self, clock_id) -> bool:
         cmd = Command.clock
         data = self.__populate(cmd.data, clock_id=clock_id)
         query = self.__populate(cmd.query)
         res = self.__call(cmd, data=data, params=query)
-        return res.status_code == 200
+        result = res.status_code == 200
+        if result:
+            self.__active_task = None
+        return result
 
     def do_tasks(self) -> list[TaskInfo]:
         cmd = Command.tasks
@@ -133,7 +154,13 @@ class Client(object, metaclass=ClientMeta):
         res = self.__call(cmd, params=query)
         content = res.content
         parser = TaskListParser(content)
-        return parser.parse()
+        tasks = parser.parse()
+        if tasks:
+            active = next(filter(lambda x: x.isActive, tasks), None)
+            self.__active_task = active
+        else:
+            self.__active_task = None
+        return tasks
 
     def do_task(self, task_id: int) -> Task:
         cmd = Command.task

@@ -1,12 +1,14 @@
 import re
 from typing import Optional
 from urllib.parse import parse_qs, urlparse
+from datetime import datetime
 
 from bs4 import BeautifulSoup, element
 
 from wmtf.wm.models import ClockLocation
 
 CLOCK_PATTERN = re.compile(r".+\((\w+)\)", re.MULTILINE)
+CLOCK_START_PATTERN = re.compile(r"([123]\d?)/(1[012]?)\s+([01]\d):([012345]\d)", re.MULTILINE)
 TAG_RE = re.compile(r"<[^>]+>")
 
 
@@ -31,6 +33,18 @@ def extract_clock(txt: str) -> ClockLocation:
     if matches := CLOCK_PATTERN.match(txt):
         return ClockLocation(matches.group(1))
     return ClockLocation.OFF
+
+def extract_clock_start(text: str) -> Optional[datetime]:
+    if matches := CLOCK_START_PATTERN.search(text):
+        day, month, hour, minute = map(int, matches.groups())
+        return datetime(
+            year=datetime.now().year,
+            month=month,
+            day=day,
+            hour=hour,
+            minute=minute,
+        )
+    return None
 
 
 def strip_tags(txt: str) -> str:

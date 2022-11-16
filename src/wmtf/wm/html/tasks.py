@@ -6,7 +6,13 @@ import pandas as pd
 from wmtf.wm.models import Task as TaskItem
 from wmtf.wm.models import TaskComment, TaskInfo
 
-from .parser import Parser, extract_clock, extract_id_from_url, strip_tags
+from .parser import (
+    Parser,
+    extract_clock,
+    extract_id_from_url,
+    strip_tags,
+    extract_clock_start,
+)
 
 
 class TaskList(Parser):
@@ -29,6 +35,7 @@ class TaskList(Parser):
                 clock_id=extract_id_from_url(r["CLOCK"][1]),
                 clock=extract_clock(r["CLOCK"][0]),
                 summary=strip_tags(r["Summary"][0]),
+                clock_start=extract_clock_start(r["CLOCK"][0]),
             )
             for _, r in dfd.iterrows()
         ]
