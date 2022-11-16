@@ -2,7 +2,7 @@ clock:
   method: post
   data:
     XML_OBJ_^clock_id^: TOGGLE_CLOCK
-    ClockLocation: ^clock_location^
+    ClockLocation: ^location^
   url: EditField
   query:
     sessp_filterParam_Username: ^username^

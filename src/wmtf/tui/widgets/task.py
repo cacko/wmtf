@@ -7,6 +7,7 @@ from textual import events
 from typing import Optional
 from rich.text import Text
 from .types import Box, Focusable
+from wmtf.config import app_config
 
 
 class TaskWidget(Box):
@@ -24,10 +25,6 @@ class TaskWidget(Box):
         self.task = Client.task(id)
         self.update(self.render())
         
-    def clock(self):
-        assert(self.task)
-        
-
     def render(self):
         return self.get_panel(
             TaskRenderable(self.task) if self.task else Text("Not found")
@@ -58,9 +55,6 @@ class Task(Focusable):
         
     def load(self, task_id: int):
         self.wdg.load(task_id)
-        
-    def clock(self):
-        self.wdg.clock()
 
     def hide(self):
         self.add_class("hidden")

@@ -87,7 +87,8 @@ class Tui(App):
             nxt.focus()
 
     def action_clock(self):
-        self.widget_task.clock()
+        if self.widget_tasks.clock():
+            self.action_reload()
 
     def action_toggle_location(self):
         self.widget_location.location(

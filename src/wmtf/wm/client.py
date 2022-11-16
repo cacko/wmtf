@@ -1,8 +1,6 @@
-import logging
 from dataclasses import asdict
 from datetime import datetime, timedelta
 from functools import reduce
-from pathlib import Path
 from typing import Any, Optional
 
 from requests import Response, Session
@@ -15,7 +13,7 @@ from wmtf.wm.html.report import ReportId as ReportIdParser
 from wmtf.wm.html.login import Login as LoginParser
 from wmtf.wm.html.tasks import Task as TaskParser
 from wmtf.wm.html.tasks import TaskList as TaskListParser
-from wmtf.wm.models import ReportDay, Task, TaskInfo
+from wmtf.wm.models import ReportDay, Task, TaskInfo, ClockLocation
 
 
 class CommandData(dict):
@@ -77,7 +75,10 @@ class ClientMeta(type):
 
     def clock_off(cls, clock_id: int):
         return cls().do_clock_off(clock_id)
-    
+
+    def clock(cls, clock_id: int, location: ClockLocation):
+        return cls().do_clock(clock_id, location.value)
+
     def validate_setup(cls) -> bool:
         return cls().do_login()
 
@@ -110,6 +111,13 @@ class Client(object, metaclass=ClientMeta):
         res = self.__call(cmd, data=self.__populate(asdict(cmd.data)))
         parser = LoginParser(res.content)
         parser.parse()
+        return res.status_code == 200
+
+    def do_clock(self, clock_id: int, location: str) -> bool:
+        cmd = Command.clock
+        data = self.__populate(cmd.data, clock_id=clock_id, location=location)
+        query = self.__populate(cmd.query)
+        res = self.__call(cmd, data=data, params=query)
         return res.status_code == 200
 
     def do_clock_off(self, clock_id) -> bool:
@@ -167,21 +175,16 @@ class Client(object, metaclass=ClientMeta):
             self.__session = Session()
             self.do_login()
         return self.__session
-    
+
     @property
     def headers(self):
         if not self.__user_agent:
             self.__user_agent = UA.random
-        return {
-            "User-Agent": self.__user_agent
-        }
+        return {"User-Agent": self.__user_agent}
 
     def __call(self, cmd: Command, **kwds) -> Response:
         url = f"{app_config.wm_config.host}/{cmd.url}"
-        kw = {
-            "headers": self.headers,
-            **kwds
-        }
+        kw = {"headers": self.headers, **kwds}
         match (cmd.method):
             case Method.POST:
                 return self.session.post(url, **kw)

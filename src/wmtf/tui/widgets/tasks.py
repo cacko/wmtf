@@ -1,12 +1,13 @@
 from wmtf.tui.renderables.task_list import TaskList
 from wmtf.wm.client import Client
-from wmtf.wm.models import TaskInfo
+from wmtf.wm.models import TaskInfo, ClockLocation
 from typing import Optional
 from textual import events
 from textual.app import ComposeResult
 from textual.message import Message, MessageTarget
 from textual.keys import Keys
 from .types import Box, Focusable
+from wmtf.config import app_config
 
 
 class TasksWidget(Box):
@@ -51,6 +52,15 @@ class TasksWidget(Box):
             assert isinstance(selected.id, int)
             return selected
 
+    def clock(self) -> bool:
+        if not self.task_list:
+            return False
+        if selected := self.task_list.selected:
+            return Client.clock(
+                selected.clock_id, ClockLocation(app_config.wm_config.location)
+            )
+        return False
+
 
 class Tasks(Focusable):
 
@@ -69,6 +79,9 @@ class Tasks(Focusable):
 
     def compose(self) -> ComposeResult:
         yield self.wdg
+
+    def clock(self) -> bool:
+        return self.clock()
 
     def on_key(self, event: events.Key) -> None:
         if not self.has_focus:
