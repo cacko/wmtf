@@ -12,6 +12,7 @@ from wmtf import __name__
 
 class WMConfig(BaseModel, extra=Extra.ignore):
     host: str = Field(default="https://workmanager.travelfusion.com")
+    location: str = Field(default="office")
     username: Optional[str] = Field(default="")
     password: Optional[str] = Field(default="")
 

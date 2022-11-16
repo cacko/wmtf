@@ -5,7 +5,11 @@ from textual.containers import Container
 from .widgets.tasks import Tasks as WidgetTasks
 from .widgets.report import Report as WidgetReport
 from .widgets.task import Task as WidgetTask
+from .widgets.app_name import AppName as WidgetAppName
+from .widgets.app_location import AppLocation as WidgetAppLocation
 from .widgets.types import Focusable
+from wmtf.wm.models import ClockLocation
+from wmtf.config import app_config
 
 from wmtf import RESOURCES_PATH
 
@@ -15,10 +19,14 @@ class Tui(App):
     CSS_PATH = (RESOURCES_PATH / "app.css").as_posix()
 
     BINDINGS = [
+        ("c", "clock", "Clock On/Off"),
+        ("l", "toggle_location", "Toggle Location"),
         ("t", "toggle_views", "Toggle Views"),
         ("r", "reload", "Refresh"),
         ("q", "quit", "Quit"),
     ]
+
+    LOCATIONS = [ClockLocation.HOME.value, ClockLocation.OFFICE.value]
 
     @property
     def widget_task(self) -> WidgetTask:
@@ -32,16 +40,27 @@ class Tui(App):
     def widget_report(self) -> WidgetReport:
         return self.query_one(WidgetReport)
 
+    @property
+    def widget_location(self) -> WidgetAppLocation:
+        return self.query_one(WidgetAppLocation)
+
     def compose(self) -> ComposeResult:
         self._bindings.bind("tab", "switch_view", show=False, universal=True)
         self.title = "Work Manager"
         yield Header(show_clock=True)
+
+        yield Container(
+            WidgetAppName(id="app_name", classes="box"),
+            WidgetAppLocation(id="app_location", classes="box"),
+            id="info",
+        )
         yield Container(
             WidgetTasks(id="tasks", classes="box"),
             WidgetReport(id="report", classes="box"),
             WidgetTask(id="task", classes="box hidden scroll"),
             id="content",
         )
+
         yield Footer()
 
     def on_mount(self, event: events.Mount) -> None:
@@ -60,6 +79,14 @@ class Tui(App):
         nxt = Focusable.next()
         if nxt:
             nxt.focus()
+
+    def action_clock(self):
+        self.widget_task.clock()
+
+    def action_toggle_location(self):
+        self.widget_location.location(
+            self.LOCATIONS[int(not self.LOCATIONS.index(app_config.wm_config.location))]
+        )
 
     def on_tasks_selected(self, message: WidgetTasks.Selected) -> None:
         self.widget_task.load(message.task.id)

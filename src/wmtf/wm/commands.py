@@ -28,6 +28,7 @@ class LoginData:
     userToLogin: str
     passwordToLogin: str
 
+
 class ReportData(BaseModel, extra=Extra.ignore):
     META_FIELD_YEAR_reportStartDate: str
     META_FIELD_MONTH_reportStartDate: str
@@ -78,7 +79,6 @@ class CommandMeta(type):
     def tasks(cls) -> "Tasks":
         return Tasks(**cls.config.get(Commands.TASKS.value))  # type: ignore
 
-
     @property
     def task(cls) -> "Task":
         return Task(**cls.config.get(Commands.TASK.value))  # type: ignore
@@ -86,9 +86,9 @@ class CommandMeta(type):
     @property
     def report(cls) -> "Report":
         return Report(**cls.config.get(Commands.REPORT.value))  # type: ignore
-    
+
     @property
-    def report_id(cls) -> 'ReportId':
+    def report_id(cls) -> "ReportId":
         return ReportId(**cls.config.get(Commands.REPORT_ID.value))  # type: ignore
 
 
@@ -107,21 +107,23 @@ class Clock(Command):
 @dataclass(config=ConfigDict(extra=Extra.ignore))
 class Tasks(Command):
     query: dict[str, str]
-    
+
 
 @dataclass(config=ConfigDict(extra=Extra.ignore))
 class Task(Command):
     query: dict[str, str]
 
+
 @dataclass(config=ConfigDict(extra=Extra.ignore))
 class Login(Command):
     data: LoginData
 
+
 @dataclass(config=ConfigDict(extra=Extra.ignore))
 class Report(Command):
     data: ReportData
-    
+
 
 @dataclass(config=ConfigDict(extra=Extra.ignore))
 class ReportId(Command):
-    pass    
+    pass

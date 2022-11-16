@@ -1,9 +1,14 @@
-#root {
-    layout: vertical;
+Screen {
     overflow: hidden;
+    layout: vertical;
 }
 
-#root .box {
+#info {
+    layout: horizontal;
+    height: 6;
+}
+
+#info .box {
     height: auto;
     width: 1fr;
 }

@@ -23,6 +23,10 @@ class TaskWidget(Box):
         self.update("Loading...")
         self.task = Client.task(id)
         self.update(self.render())
+        
+    def clock(self):
+        assert(self.task)
+        
 
     def render(self):
         return self.get_panel(
@@ -52,10 +56,11 @@ class Task(Focusable):
     def compose(self) -> ComposeResult:
         yield self.wdg
         
-
-
     def load(self, task_id: int):
         self.wdg.load(task_id)
+        
+    def clock(self):
+        self.wdg.clock()
 
     def hide(self):
         self.add_class("hidden")
