@@ -33,7 +33,7 @@ class ActiveTaskWidget(Static):
             self.task_work = ""
 
     def render(self) -> Text:
-        return Text.from_markup(f"[magenta]{self.task_name}[/] {self.task_work}")
+        return Text.from_markup(f"[bold red]{self.task_work}[/] [magenta]{self.task_name}[/]")
 
 
 class ActiveTask(Widget):

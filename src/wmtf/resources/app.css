@@ -14,10 +14,9 @@ Screen {
 }
 
 #status_info {
-    padding: 2 0 0 0;
+    padding: 2 1 0 1;
     layout: vertical;
     align: left middle;
-
 }
 
 #status_info>.box {
