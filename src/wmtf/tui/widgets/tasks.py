@@ -81,7 +81,7 @@ class Tasks(Focusable):
         yield self.wdg
 
     def clock(self) -> bool:
-        return self.clock()
+        return self.wdg.clock()
 
     def on_key(self, event: events.Key) -> None:
         if not self.has_focus:

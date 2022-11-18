@@ -31,7 +31,6 @@ class ReportWidget(Box):
         self.__report = Status("Loading", spinner="bouncingBall")
         self.__report.start()
         self.update_timer.resume()
-        self.update(self.render())
         t = ReportService(self.update_report)
         t.start()
 
