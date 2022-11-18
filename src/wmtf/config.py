@@ -1,6 +1,6 @@
 from pathlib import Path
 from typing import Optional
-
+import socket
 from appdir import get_app_dir
 from yaml import Loader, load, dump
 
@@ -75,6 +75,7 @@ class app_config(object, metaclass=app_config_meta):
     def init(self):
         with open(__class__.app_config, "w") as fp:
             data = {"wm": WMConfig().dict(), "jira": JiraConfig().dict()}
+            self.auto_location()
             dump(data, fp)
 
     def getvar(self, var, *args, **kwargs):
@@ -84,6 +85,29 @@ class app_config(object, metaclass=app_config_meta):
     def __save(self):
         with open(__class__.app_config, "w") as fp:
             dump(self._config, fp)
+
+    def auto_location(self):
+        self.setvar("wm.location", (
+            "office" if self.__get_local_ip.startswith("10.1") else "home"
+        ))
+
+    def __get_local_ip(self):
+        return (
+            (
+                [
+                    ip
+                    for ip in socket.gethostbyname_ex(socket.gethostname())[2]
+                    if not ip.startswith("127.")
+                ]
+                or [
+                    [
+                        (s.connect(("8.8.8.8", 53)), s.getsockname()[0], s.close())
+                        for s in [socket.socket(socket.AF_INET, socket.SOCK_DGRAM)]
+                    ][0][1]
+                ]
+            )
+            + ["no IP found"]
+        )[0]
 
     def setvar(self, var, value, *args, **kwargs):
         assert isinstance(self._config, dict)
