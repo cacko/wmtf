@@ -17,7 +17,7 @@ class Report(Generic[T]):
         self, console: Console, options: ConsoleOptions
     ) -> RenderResult:
         for day in self.list:
-            parts = [f"## {day.day.strftime('%A %d %b')} / {day.total_display}"]
+            parts = [f"# {day.day.strftime('%A %d %b')} / {day.total_display}"]
             if not len(day.tasks):
                 continue
             for task in day.tasks:

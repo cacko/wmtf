@@ -2,7 +2,7 @@ from rich.markdown import Markdown as RichMarkdown, Heading
 from rich.console import Console, ConsoleOptions, RenderResult, JustifyMethod
 from rich.style import Style
 from rich.panel import Panel
-from rich.box import DOUBLE
+from rich.box import HORIZONTALS
 from rich.text import Text
 from typing import Optional, Union
 
@@ -17,8 +17,9 @@ class LeftHeader(Heading):
             # Draw a border around h1s
             yield Panel(
                 text,
-                box=DOUBLE,
+                box=HORIZONTALS,
                 style="markdown.h1.border",
+                padding=0
             )
         else:
             # Styled text for h2 and beyond
