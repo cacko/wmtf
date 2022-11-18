@@ -7,7 +7,6 @@ from textual import events
 from typing import Optional
 from rich.text import Text
 from .types import Box, Focusable
-from wmtf.config import app_config
 
 
 class TaskWidget(Box):

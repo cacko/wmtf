@@ -24,6 +24,9 @@ class TasksWidget(Box):
         return "My Tasks"
 
     def on_mount(self) -> None:
+        self.reload()
+
+    def reload(self):
         tasks = Client.tasks()
         self.task_list = TaskList(
             tasks,
@@ -82,6 +85,9 @@ class Tasks(Focusable):
 
     def clock(self) -> bool:
         return self.wdg.clock()
+
+    def reload(self):
+        self.wdg.reload()
 
     def on_key(self, event: events.Key) -> None:
         if not self.has_focus:

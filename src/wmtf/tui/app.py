@@ -62,8 +62,8 @@ class Tui(App):
             id="heading",
         )
         yield Container(
-            WidgetTasks(id="tasks", classes="box"),
-            WidgetReport(id="report", classes="box"),
+            WidgetTasks(id="tasks", classes="box scroll"),
+            WidgetReport(id="report", classes="box scroll"),
             WidgetTask(id="task", classes="box hidden scroll"),
             id="content",
         )
@@ -78,6 +78,7 @@ class Tui(App):
         self.widget_report.toggle_class("hidden")
 
     def action_reload(self) -> None:
+        self.widget_tasks.reload()
         self.widget_task.hide()
         self.widget_report.unhide()
         self.widget_report.load()
