@@ -1,21 +1,16 @@
-import re
-from datetime import datetime, tzinfo
+from datetime import datetime, timedelta
+from time import sleep
 
-CLOCK_START_PATTERN = re.compile(r"([123]\d?)/(1[012]?)\s+([01]\d):([012345]\d)", re.MULTILINE)
+s = "1:05"
 
-s = 'CLOCK OFF  alex.spasov (home)  16/11 10:02'
+h, m = [int(x) for x in s.split(":")]
 
-m = CLOCK_START_PATTERN.search(s)
+td = timedelta(hours=h, minutes=m)
 
-day, month, hour, minute = map(int, m.groups())
 
-d = datetime(
-    year=datetime.now().year,
-    month=month,
-    day=day,
-    hour=hour,
-    minute=minute,
-)
-df = datetime.now() - d
-print(str(df))
-print(str(df).split(".")[0])
+
+r = RunningTime(s)  
+    
+for x in range(3):
+    print(r)
+    sleep(10)

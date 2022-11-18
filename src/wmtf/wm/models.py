@@ -42,6 +42,14 @@ class ReportDay:
     @property
     def total_display(self) -> str:
         return ":".join(str(self.total_work).split(":")[:2])
+    
+    @property
+    def is_today(self) -> bool:
+        return datetime.now().date() == self.day
+    
+    @property
+    def is_weekend(self) -> bool:
+        return self.day.weekday in [5,6]
 
 
 @dataclass

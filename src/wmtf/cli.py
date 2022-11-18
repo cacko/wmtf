@@ -16,7 +16,7 @@ from wmtf.wm.client import Client
 from wmtf.wm.html.login import LoginError
 from wmtf.wm.html.parser import ParserError
 from wmtf.wm.models import TaskInfo
-from wmtf.tui.renderables.report import Report as ReportRenderable
+from wmtf.tui.renderables.report import Days as ReportRenderable
 
 
 def banner(txt: str, fg: str = "green", bold=True):
