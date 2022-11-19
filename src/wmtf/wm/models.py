@@ -49,7 +49,7 @@ class ReportDay:
     
     @property
     def is_weekend(self) -> bool:
-        return self.day.weekday in [5,6]
+        return self.day.weekday() in [5,6]
 
 
 @dataclass

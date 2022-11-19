@@ -1,13 +1,12 @@
 from wmtf.wm.client import Client
 from wmtf.wm.models import ReportDay
 from textual.app import ComposeResult
-from textual.geometry import Region
 from textual.reactive import reactive
 from wmtf.tui.renderables.report import Days as ReportRenderable
 from corethread import StoppableThread
 from rich.status import Status
 from rich.text import Text
-from .types import Focusable, Box
+from wmtf.tui.widgets.types import Focusable, Box
 from typing import Optional
 from datetime import datetime, timedelta
 
