@@ -1,7 +1,7 @@
 from wmtf.wm.models import Task as TaskModel
 from rich.console import Console, ConsoleOptions, RenderResult, ConsoleRenderable
 from .markdown import Markdown
-
+from rich.text import Text
 
 class Task(ConsoleRenderable):
     def __init__(
