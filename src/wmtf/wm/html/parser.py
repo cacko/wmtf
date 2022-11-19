@@ -56,7 +56,7 @@ def replace_links(s: str) -> str:
     for url in URLExtract().gen_urls(s, with_schema_only=True):
         try:
             assert isinstance(url, str)
-            s = s.replace(url, f"[{escape(truncate(url, 50))}]({escape(url)})")
+            s = s.replace(url, f"[{truncate(url, 50)}]({url})")
         except AssertionError as e:
             raise e
     return s
