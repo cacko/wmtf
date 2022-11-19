@@ -60,6 +60,7 @@ setup(
         "python-crontab>=2.6.0",
         "random-user-agent>=1.0.1",
         "progressor>=1.0.14",
+        "urlextract>=1.7.1"
         
     ],
     setup_requires=["wheel"],
