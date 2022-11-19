@@ -3,7 +3,7 @@ from .markdown import Markdown
 from wmtf.wm.html.parser import textual_links
 from rich.console import RenderResult, Console, ConsoleOptions
 from textual.widgets import Static
-
+from rich.text import Text
 
 class Task:
     def __init__(
@@ -15,7 +15,7 @@ class Task:
     def __rich_console__(
         self, console: Console, options: ConsoleOptions
     ) -> RenderResult:
-        yield Static(self.task.summary, classes="task-summary h1").renderable
+        yield Text(self.task.summary, style="uu")
         yield Static(
             textual_links(self.task.description, "open_browser"),
             classes="task-description",
