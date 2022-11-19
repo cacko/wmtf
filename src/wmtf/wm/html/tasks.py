@@ -1,4 +1,3 @@
-from collections import namedtuple
 from typing import Optional
 
 import pandas as pd
@@ -12,6 +11,7 @@ from .parser import (
     extract_id_from_url,
     strip_tags,
     extract_clock_start,
+    replace_links,
 )
 
 
@@ -47,13 +47,17 @@ class Task(Parser):
             br.replace_with("<br>")
 
     def parse(self) -> TaskItem:
-        df = pd.read_html(self.struct.prettify(), match="Sales Pipeline")[2]
+        df = pd.read_html(
+            str(self.struct),
+            match="Sales Pipeline",
+        )[2]
         df.columns = df.iloc[0]
         task_row = df.iloc[1]
+
         return TaskItem(
             id=self.id,
             summary=task_row["Summary"],
-            description=task_row["Desc"].replace("<br>", "\n\n"),
+            description=replace_links(task_row["Desc"]).replace("<br>", "\n\n"),
             assignee=task_row["Assignee"],
             comments=self.__get_comments(),
         )
@@ -65,7 +69,7 @@ class Task(Parser):
             return [
                 TaskComment(
                     author=r["Who"],
-                    comment=r["Comment"].replace("<br>", "\n>"),
+                    comment=replace_links(r["Comment"]).replace("<br>", "\n>"),
                     date=r["Date"],
                 )
                 for _, r in df.drop([0, 1]).iterrows()

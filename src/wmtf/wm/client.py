@@ -2,7 +2,8 @@ from dataclasses import asdict
 from datetime import datetime, timedelta
 from functools import reduce
 from typing import Any, Optional
-
+import logging
+from pathlib import Path
 from requests import Response, Session
 
 from wmtf.config import WMConfig, app_config
@@ -214,8 +215,14 @@ class Client(object, metaclass=ClientMeta):
         kw = {"headers": self.headers, **kwds}
         match (cmd.method):
             case Method.POST:
-                return self.session.post(url, **kw)
+                return self.__save_response(self.session.post(url, **kw), cmd)
             case Method.GET:
-                return self.session.get(url, **kw)
+                return self.__save_response(self.session.get(url, **kw), cmd)
             case _:
                 raise NotImplementedError
+            
+    def __save_response(self, resp: Response, cmd: Command) -> Response:
+        if logging.getLogger().level == logging.DEBUG:
+            with (app_config.cache_dir / f"{cmd.__class__.__name__}.html") as fp:
+                fp.write_bytes(resp.content)
+        return resp

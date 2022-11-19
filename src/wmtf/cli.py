@@ -10,7 +10,7 @@ from rich.markdown import Markdown
 
 from wmtf.config import app_config
 from wmtf.tui.app import Tui
-from wmtf.ui.items import MenuItem, TaskItem
+from wmtf.ui.items import MenuItem, TaskItem, DisabledItem
 from wmtf.ui.menu import Menu
 from wmtf.wm.client import Client
 from wmtf.wm.html.login import LoginError
@@ -97,7 +97,12 @@ def cli_settings(ctx: click.Context):
             for txt, task in [
                 ("Credentials", cli_credentials),
             ]
-        ] + [MenuItem(text="<< back", obj=main_menu)]
+        ] + [
+            DisabledItem(disabled=f"config dir", text=f"{app_config.config_dir}"),
+            DisabledItem(disabled=f"cache dir", text=f"{app_config.cache_dir}"),
+            DisabledItem(disabled=f"data dir", text=f"{app_config.data_dir}"),
+            MenuItem(text="<< back", obj=main_menu)
+            ]
         with Menu(menu_items, title="Select task") as item:
             match item.obj:
                 case Command():

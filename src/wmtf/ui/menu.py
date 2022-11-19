@@ -35,9 +35,11 @@ class Menu(object, metaclass=MenuMeta):
     _items: list = []
     _title: str = "What you want?"
     _parent: Optional[MenuItem] = None
+    _options: dict[str, Any]
 
     def __init__(self, items: list[MT], title=None, **kwds) -> None:
         self._items = list(items)
+        self._options = kwds
         if title:
             self._title = title
 
@@ -45,12 +47,19 @@ class Menu(object, metaclass=MenuMeta):
         choice = None
 
         options = [
-            Choice(title=x.display, value=x.value) if isinstance(x, MenuItem) else x
+            Choice(title=x.display, value=x.value, disabled=x.disabled)
+            if isinstance(x, MenuItem)
+            else x
             for x in self._items
         ]
         while not choice:
             try:
-                choice = select(message=self._title, choices=options, style=style).ask()
+                choice = select(
+                    message=self._title,
+                    choices=options,
+                    style=style,
+                    **self._options
+                ).ask()
                 res = next(filter(lambda x: x.value == choice, self._items), None)
                 if res:
                     return res

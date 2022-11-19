@@ -4,11 +4,15 @@ from urllib.parse import parse_qs, urlparse
 from datetime import datetime
 
 from bs4 import BeautifulSoup, element
-
+from urlextract import URLExtract
+from corestring import truncate
+from rich.markup import escape
 from wmtf.wm.models import ClockLocation
 
 CLOCK_PATTERN = re.compile(r".+\((\w+)\)", re.MULTILINE)
-CLOCK_START_PATTERN = re.compile(r"([123]\d?)/(1[012]?)\s+([01]\d):([012345]\d)", re.MULTILINE)
+CLOCK_START_PATTERN = re.compile(
+    r"([123]\d?)/(1[012]?)\s+([01]\d):([012345]\d)", re.MULTILINE
+)
 TAG_RE = re.compile(r"<[^>]+>")
 
 
@@ -34,6 +38,7 @@ def extract_clock(txt: str) -> ClockLocation:
         return ClockLocation(matches.group(1))
     return ClockLocation.OFF
 
+
 def extract_clock_start(text: str) -> Optional[datetime]:
     if matches := CLOCK_START_PATTERN.search(text):
         day, month, hour, minute = map(int, matches.groups())
@@ -47,11 +52,23 @@ def extract_clock_start(text: str) -> Optional[datetime]:
     return None
 
 
+def replace_links(s: str) -> str:
+    for url in URLExtract().gen_urls(s, with_schema_only=True):
+        try:
+            assert isinstance(url, str)
+            s = s.replace(url, f"[{escape(truncate(url, 50))}]({escape(url)})")
+        except AssertionError as e:
+            raise e
+    return s
+
+
 def strip_tags(txt: str) -> str:
     return TAG_RE.sub("", txt)
 
+
 class ParserError(Exception):
     pass
+
 
 class Parser(object):
 
@@ -70,7 +87,7 @@ class Parser(object):
     @property
     def id(self) -> int:
         return self.__id
-    
+
     def handle_error(self):
         error = self.struct.select('font[color="red"][size="+2"]')
         if not len(error):

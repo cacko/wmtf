@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import Optional
 import socket
-from appdir import get_app_dir
+from appdirs import user_cache_dir, user_config_dir, user_data_dir
 from yaml import Loader, load, dump
 
 
@@ -38,16 +38,20 @@ class app_config_meta(type):
         return cls().setvar(var, value, *args, **kwargs)
 
     @property
-    def app_dir(cls):
-        return Path(get_app_dir(__name__)).expanduser()
+    def config_dir(cls) -> Path:
+        return Path(user_config_dir(__name__))
+
+    @property
+    def cache_dir(cls) -> Path:
+        return Path(user_cache_dir(__name__))
+
+    @property
+    def data_dir(cls) -> Path:
+        return Path(user_data_dir(__name__))
 
     @property
     def app_config(cls) -> Path:
-        return cls.app_dir / "config.yaml"
-
-    @property
-    def cache_dir(cls):
-        return cls.app_dir / "cache"
+        return cls.config_dir / "config.yaml"
 
     @property
     def wm_config(cls) -> WMConfig:
@@ -68,6 +72,10 @@ class app_config(object, metaclass=app_config_meta):
     _config: Optional[dict] = None
 
     def __init__(self) -> None:
+        if not __class__.cache_dir.exists():
+            __class__.cache_dir.mkdir(parents=True, exist_ok=True)
+        if not __class__.data_dir.exists():
+            __class__.data_dir.mkdir(parents=True, exist_ok=True)
         if not __class__.app_config.exists():
             self.init()
         self._config = load(__class__.app_config.read_text(), Loader=Loader)
@@ -87,9 +95,10 @@ class app_config(object, metaclass=app_config_meta):
             dump(self._config, fp)
 
     def auto_location(self):
-        self.setvar("wm.location", (
-            "office" if self.__get_local_ip.startswith("10.1") else "home"
-        ))
+        self.setvar(
+            "wm.location",
+            ("office" if self.__get_local_ip.startswith("10.1") else "home"),
+        )
 
     def __get_local_ip(self):
         return (
