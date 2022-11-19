@@ -6,7 +6,7 @@ from textual import events
 from textual.app import ComposeResult
 from textual.message import Message, MessageTarget
 from textual.keys import Keys
-from .types import Box, Focusable
+from wmtf.tui.widgets.types import Box, Focusable
 from wmtf.config import app_config
 
 

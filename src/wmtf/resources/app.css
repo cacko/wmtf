@@ -51,3 +51,8 @@ Screen {
 #content .hidden.scroll {
     overflow: hidden;
 }
+
+.h1 {
+    border-bottom: solid red;
+    color: green;
+}

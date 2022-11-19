@@ -7,7 +7,7 @@ from bs4 import PageElement, element
 from wmtf.config import app_config
 from wmtf.wm.models import ClockLocation, ReportDay, ReportTask
 
-from .parser import Parser, extract_id_from_a, strip_tags
+from wmtf.wm.html.parser import Parser, extract_id_from_a, strip_tags
 
 
 class HtmlReportMeta(type):

@@ -5,13 +5,13 @@ import pandas as pd
 from wmtf.wm.models import Task as TaskItem
 from wmtf.wm.models import TaskComment, TaskInfo
 
-from .parser import (
+from wmtf.wm.html.parser import (
     Parser,
     extract_clock,
     extract_id_from_url,
     strip_tags,
     extract_clock_start,
-    replace_links,
+    markdown_links,
 )
 
 
@@ -57,7 +57,7 @@ class Task(Parser):
         return TaskItem(
             id=self.id,
             summary=task_row["Summary"],
-            description=replace_links(task_row["Desc"]).replace("<br>", "\n\n"),
+            description=task_row["Desc"].replace("<br>", "\n\n"),
             assignee=task_row["Assignee"],
             comments=self.__get_comments(),
         )
@@ -69,7 +69,7 @@ class Task(Parser):
             return [
                 TaskComment(
                     author=r["Who"],
-                    comment=replace_links(r["Comment"]).replace("<br>", "\n>"),
+                    comment=r["Comment"].replace("<br>", "\n>"),
                     date=r["Date"],
                 )
                 for _, r in df.drop([0, 1]).iterrows()

@@ -3,11 +3,12 @@ from textual.app import ComposeResult
 from wmtf.tui.renderables.task import Task as TaskRenderable
 from wmtf.wm.models import Task as TaskModel
 from textual.keys import Keys
+from textual.widgets import Static
 from textual import events
 from typing import Optional
 from rich.text import Text
-from .types import Box, Focusable
-
+from wmtf.tui.widgets.types import Box, Focusable
+from wmtf.wm.html.parser import textual_links
 
 class TaskWidget(Box):
     task: Optional[TaskModel] = None

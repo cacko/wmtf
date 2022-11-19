@@ -12,6 +12,7 @@ from .widgets.active_task import ActiveTask as WidgetActiveTask
 from .widgets.types import Focusable
 from wmtf.wm.models import ClockLocation
 from wmtf.config import app_config
+from webbrowser import open_new_tab
 
 from wmtf import RESOURCES_PATH
 
@@ -96,6 +97,9 @@ class Tui(App):
         self.widget_location.location(
             self.LOCATIONS[int(not self.LOCATIONS.index(app_config.wm_config.location))]
         )
+        
+    def action_open_browser(self, link: str):
+        open_new_tab(link)
 
     def on_tasks_selected(self, message: WidgetTasks.Selected) -> None:
         self.widget_task.load(message.task.id)

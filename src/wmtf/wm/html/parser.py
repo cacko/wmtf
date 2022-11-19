@@ -1,5 +1,5 @@
 import re
-from typing import Optional
+from typing import Optional, Generator
 from urllib.parse import parse_qs, urlparse
 from datetime import datetime
 
@@ -8,6 +8,7 @@ from urlextract import URLExtract
 from corestring import truncate
 from rich.markup import escape
 from wmtf.wm.models import ClockLocation
+from functools import reduce
 
 CLOCK_PATTERN = re.compile(r".+\((\w+)\)", re.MULTILINE)
 CLOCK_START_PATTERN = re.compile(
@@ -52,14 +53,37 @@ def extract_clock_start(text: str) -> Optional[datetime]:
     return None
 
 
-def replace_links(s: str) -> str:
+def get_links(s: str) -> Generator[str, None, None]:
     for url in URLExtract().gen_urls(s, with_schema_only=True):
         try:
             assert isinstance(url, str)
-            s = s.replace(url, f"[{truncate(url, 50)}]({url})")
-        except AssertionError as e:
-            raise e
-    return s
+            yield url
+        except AssertionError:
+            pass
+
+
+def markdown_links(s: str) -> str:
+    return reduce(
+        lambda r, url: r.replace(url, f"[{truncate(url, 50)}]({url})"), get_links(s), s
+    )
+
+
+def console_links(s: str) -> str:
+    return reduce(
+        lambda r, url: r.replace(url, f"[link={url}]{truncate(url, 50)}[/link]"),
+        get_links(s),
+        s,
+    )
+
+
+def textual_links(s: str, action) -> str:
+    return reduce(
+        lambda r, url: r.replace(
+            url, f"[@click={action}('{url}')]{truncate(url, 50)}[/]"
+        ),
+        get_links(s),
+        s,
+    )
 
 
 def strip_tags(txt: str) -> str:
