@@ -117,6 +117,7 @@ class Parser(object):
         if not len(error):
             return
         if error_msg := error[0].get_text().strip():
+            
             raise ParserError(error_msg)
 
     def to_element(self, code: str):

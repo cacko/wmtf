@@ -61,15 +61,9 @@ class app_config_meta(type):
     def jira_config(cls) -> JiraConfig:
         return JiraConfig(**cls().getvar("jira"))
 
-    @property
-    def is_new(cls) -> bool:
-        try:
-            wm_config = cls.wm_config
-            assert(len(wm_config.username)>0)
-            assert(len(wm_config.password)>0)
-            return False
-        except AssertionError:
-            return True
+    def is_configured(cls) -> bool:
+        wm_config = cls.wm_config
+        return all([wm_config.username != "", wm_config.password != ""])
 
 class app_config(object, metaclass=app_config_meta):
 

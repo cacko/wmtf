@@ -7,13 +7,13 @@ from pyfiglet import Figlet
 from rich import print
 from rich.console import Console
 from rich.markdown import Markdown
-
+from time import sleep
 from wmtf.config import app_config
 from wmtf.tui.app import Tui
 from wmtf.ui.items import MenuItem, TaskItem, DisabledItem
 from wmtf.ui.menu import Menu
 from wmtf.wm.client import Client
-from wmtf.wm.html.login import LoginError
+from wmtf.wm.html.login import LoginError, MaintenanceError
 from wmtf.wm.html.parser import ParserError
 from wmtf.wm.models import TaskInfo
 from wmtf.tui.renderables.report import Days as ReportRenderable
@@ -197,13 +197,17 @@ def cli_clockoff(ctx: click.Context):
     if not active_task:
         return click.echo(click.style(f"No task is currently active", fg="red"))
 
-    if active_task:
-        click.echo(f">> Trying to clock off task '{active_task.summary}'")
-        res = Client.clock_off(active_task.clock_id)
-        if res:
-            return click.echo(click.style(f"Clocked off", fg="green"))
-        else:
-            return click.echo(click.style(f"Clock failed", fg="red"))
+    while True:
+        try: 
+            click.echo(f">> Trying to clock off task '{active_task.summary}'")
+            res = Client.clock_off(active_task.clock_id)
+            if res:
+                return click.echo(click.style(f"Clocked off", fg="green"))
+            else:
+                return click.echo(click.style(f"Clock failed", fg="red"))
+        except MaintenanceError:
+            with Spinner("Maitenance error, retrying in 20 seconds."):
+                sleep(20)
 
 
 @cli.command("cron-clock-off", short_help="Schedule cron to clock off")
