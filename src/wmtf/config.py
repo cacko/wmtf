@@ -79,12 +79,14 @@ class app_config(object, metaclass=app_config_meta):
         if not __class__.app_config.exists():
             self.init()
         self._config = load(__class__.app_config.read_text(), Loader=Loader)
+        if not self._config.get("wm", {}).get("location", ""):
+            self.auto_location()
 
     def init(self):
         with open(__class__.app_config, "w") as fp:
             data = {"wm": WMConfig().dict(), "jira": JiraConfig().dict()}
-            self.auto_location()
             dump(data, fp)
+
 
     def getvar(self, var, *args, **kwargs):
         assert isinstance(self._config, dict)
@@ -97,26 +99,17 @@ class app_config(object, metaclass=app_config_meta):
     def auto_location(self):
         self.setvar(
             "wm.location",
-            ("office" if self.__get_local_ip.startswith("10.1") else "home"),
+            ("office" if self.local_ip.startswith("10.1") else "home"),
         )
 
-    def __get_local_ip(self):
-        return (
-            (
-                [
-                    ip
-                    for ip in socket.gethostbyname_ex(socket.gethostname())[2]
-                    if not ip.startswith("127.")
-                ]
-                or [
-                    [
-                        (s.connect(("8.8.8.8", 53)), s.getsockname()[0], s.close())
-                        for s in [socket.socket(socket.AF_INET, socket.SOCK_DGRAM)]
-                    ][0][1]
-                ]
-            )
-            + ["no IP found"]
-        )[0]
+    @property
+    def local_ip(self):
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(("8.8.8.8", 80))
+        ip = s.getsockname()[0]
+        s.close()
+        return ip
+        
 
     def setvar(self, var, value, *args, **kwargs):
         assert isinstance(self._config, dict)
