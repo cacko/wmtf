@@ -1,9 +1,3 @@
-from wmtf.cli import cli, validate_credentials
-from wmtf.config import app_config
+from wmtf.cli import run
 
-try:
-    if not app_config.is_configured():
-        assert(validate_credentials())    
-    cli()
-except AssertionError:
-    pass
+run()

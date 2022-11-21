@@ -1,13 +1,9 @@
 import logging
 import os
 from http.client import HTTPConnection
-import sys
+
 import structlog
 from pathlib import Path
-
-from wmtf.cli import  validate_credentials
-from wmtf.config import app_config
-
 
 RESOURCES_PATH = Path(__file__).parent / "resources"
 
@@ -40,10 +36,3 @@ if root_logger.getEffectiveLevel() == logging.DEBUG:
     requests_log = logging.getLogger("urllib3")
     requests_log.setLevel(logging.DEBUG)
     requests_log.propagate = True
-
-
-try:
-    if not app_config.is_configured():
-        assert(validate_credentials())
-except AssertionError:
-    sys.exit(0)

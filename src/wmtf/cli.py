@@ -217,3 +217,17 @@ def cli_cron_clock_off(ctx: click.Context):
     job = cron.new(command="/home/users/alex.spasov/clock.sh")
     job.schedule()
     cron.write()
+
+
+def run():
+    from wmtf.config import app_config
+
+    try:
+        if not app_config.is_configured():
+            assert(validate_credentials())    
+        cli()
+    except AssertionError:
+        pass
+    
+if __name__ == "__main__":
+    run()
