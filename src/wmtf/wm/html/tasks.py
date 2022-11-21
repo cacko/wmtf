@@ -10,8 +10,8 @@ from wmtf.wm.html.parser import (
     extract_clock,
     extract_id_from_url,
     strip_tags,
-    extract_clock_start,
-    markdown_links,
+    extract_clock_time,
+    extract_comment_time
 )
 
 
@@ -35,7 +35,7 @@ class TaskList(Parser):
                 clock_id=extract_id_from_url(r["CLOCK"][1]),
                 clock=extract_clock(r["CLOCK"][0]),
                 summary=strip_tags(r["Summary"][0]),
-                clock_start=extract_clock_start(r["CLOCK"][0]),
+                clock_start=extract_clock_time(r["CLOCK"][0]),
             )
             for _, r in dfd.iterrows()
         ]
@@ -70,7 +70,7 @@ class Task(Parser):
                 TaskComment(
                     author=r["Who"],
                     comment=r["Comment"].replace("<br>", "\n>"),
-                    date=r["Date"],
+                    timestamp=extract_comment_time(r["Date"]),
                 )
                 for _, r in df.drop([0, 1]).iterrows()
             ]

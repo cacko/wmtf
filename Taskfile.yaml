@@ -19,7 +19,6 @@ tasks:
       - git commit -am "$(curl -s https://commit.cacko.net/index.txt)" || true
       - git push || true
 
-  
   export:
     desc: export env
     cmds:

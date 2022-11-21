@@ -11,14 +11,22 @@ from wmtf.wm.models import ClockLocation
 from functools import reduce
 
 CLOCK_PATTERN = re.compile(r".+\((\w+)\)", re.MULTILINE)
-CLOCK_START_PATTERN = re.compile(
+CLOCK_TIME_PATTERN = re.compile(
     r"([123]\d?)/(1[012]?)\s+([01]\d):([012345]\d)", re.MULTILINE
+)
+COMMENT_TIME_PATTERN = re.compile(
+    r"(\d+)/(1[012]?)/(2[012])\s+([01]\d):([012345]\d)", re.MULTILINE
 )
 TAG_RE = re.compile(r"<[^>]+>")
 MAINTENANCE_STR = "The database is currently being archived"
 
+
 class MaintenanceError(Exception):
     pass
+
+
+def strip_tags(txt: str) -> str:
+    return TAG_RE.sub("", txt)
 
 
 def extract_id_from_a(el: element.Tag):
@@ -44,8 +52,8 @@ def extract_clock(txt: str) -> ClockLocation:
     return ClockLocation.OFF
 
 
-def extract_clock_start(text: str) -> Optional[datetime]:
-    if matches := CLOCK_START_PATTERN.search(text):
+def extract_clock_time(text: str) -> Optional[datetime]:
+    if matches := CLOCK_TIME_PATTERN.search(text):
         day, month, hour, minute = map(int, matches.groups())
         return datetime(
             year=datetime.now().year,
@@ -55,6 +63,23 @@ def extract_clock_start(text: str) -> Optional[datetime]:
             minute=minute,
         )
     return None
+
+
+def extract_comment_time(text: str) -> datetime:
+    if matches := COMMENT_TIME_PATTERN.search(strip_tags(text)):
+        day, month, year, hour, minute = map(int, matches.groups())
+        return datetime(
+            year=2000 + year,
+            month=month,
+            day=day,
+            hour=hour,
+            minute=minute,
+        )
+    return datetime(
+        year=1981,
+        day=8,
+        month=8
+    )
 
 
 def get_links(s: str) -> Generator[str, None, None]:
@@ -88,10 +113,6 @@ def textual_links(s: str, action) -> str:
         get_links(s),
         s,
     )
-
-
-def strip_tags(txt: str) -> str:
-    return TAG_RE.sub("", txt)
 
 
 class ParserError(Exception):

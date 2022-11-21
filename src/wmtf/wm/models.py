@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from datetime import date, datetime, timedelta
 from enum import Enum
 from typing import Optional
+import arrow
 
 class ClockIcon(Enum):
     HOME = "🏠"
@@ -78,9 +79,13 @@ class TaskInfo:
 
 @dataclass
 class TaskComment:
-    date: str
     author: str
     comment: str
+    timestamp: datetime
+    
+    @property
+    def timestamp_display(self):
+        return arrow.get(self.timestamp).humanize()
 
 @dataclass
 class Task:
