@@ -57,12 +57,12 @@ class TaskItem(MenuItem):
     @property
     def display(self) -> AnyFormattedText:
         if self.obj.isActive:
-            return merge_formatted_text(
+            return to_formatted_text(merge_formatted_text(
                 [
                     keyword(self.text),
                     punctuation(f" {self.clock_icon.value}"),
                 ]
-            )
+            ))
         return text(self.obj.summary)
 
     @property

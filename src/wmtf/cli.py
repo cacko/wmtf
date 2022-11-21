@@ -16,7 +16,9 @@ from wmtf.wm.client import Client
 from wmtf.wm.html.login import LoginError, MaintenanceError
 from wmtf.wm.html.parser import ParserError
 from wmtf.wm.models import TaskInfo
-from wmtf.tui.renderables.report import Days as ReportRenderable
+from wmtf.ui.renderables.report import Days as ReportRenderable
+from wmtf.ui.renderables.task import Task as TaskRenderable
+
 
 
 def banner(txt: str, fg: str = "green", bold=True):
@@ -154,13 +156,11 @@ def cli_tasks(ctx: click.Context):
 def cli_task(ctx: click.Context, task_id: int):
     try:
         task = Client.task(task_id)
+        with Spinner("Loading"):
+            days = Client.report()
         click.clear()
-        console = Console()
-        parts = [f"# {task.summary}", task.description, "---"]
-        if task.comments:
-            for c in task.comments:
-                parts.append(f"> **{c.author}**\n>\n> {c.comment}")
-        console.print(Markdown("\n\n".join(parts)))
+        banner(txt="Task", fg="blue")
+        print(TaskRenderable(task))
     except ParserError as e:
         click.echo(click.style(e, fg="red"))
     click.pause()
