@@ -63,9 +63,13 @@ class app_config_meta(type):
 
     @property
     def is_new(cls) -> bool:
-        wm_config = cls.wm_config
-        return not all([wm_config.username, wm_config.password])
-
+        try:
+            wm_config = cls.wm_config
+            assert(wm_config.username != "")
+            assert(wm_config.password != "")
+            return True
+        except AssertionError:
+            return False
 
 class app_config(object, metaclass=app_config_meta):
 
@@ -86,7 +90,6 @@ class app_config(object, metaclass=app_config_meta):
         with open(__class__.app_config, "w") as fp:
             data = {"wm": WMConfig().dict(), "jira": JiraConfig().dict()}
             dump(data, fp)
-
 
     def getvar(self, var, *args, **kwargs):
         assert isinstance(self._config, dict)
@@ -109,7 +112,6 @@ class app_config(object, metaclass=app_config_meta):
         ip = s.getsockname()[0]
         s.close()
         return ip
-        
 
     def setvar(self, var, value, *args, **kwargs):
         assert isinstance(self._config, dict)
