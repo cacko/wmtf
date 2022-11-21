@@ -15,6 +15,10 @@ CLOCK_START_PATTERN = re.compile(
     r"([123]\d?)/(1[012]?)\s+([01]\d):([012345]\d)", re.MULTILINE
 )
 TAG_RE = re.compile(r"<[^>]+>")
+MAINTENANCE_STR = "The database is currently being archived"
+
+class MaintenanceError(Exception):
+    pass
 
 
 def extract_id_from_a(el: element.Tag):
@@ -117,7 +121,8 @@ class Parser(object):
         if not len(error):
             return
         if error_msg := error[0].get_text().strip():
-            
+            if MAINTENANCE_STR in error_msg:
+                raise MaintenanceError(error_msg)
             raise ParserError(error_msg)
 
     def to_element(self, code: str):

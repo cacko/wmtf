@@ -15,10 +15,14 @@ class Task:
     def __rich_console__(
         self, console: Console, options: ConsoleOptions
     ) -> RenderResult:
-        yield Text(self.task.summary, style="uu")
+        title = Text(overflow="ellipsis", no_wrap=True)
+        title.append(self.task.summary, 'green bold')
+        title.append("\n\n")
+        yield title
         yield Static(
             textual_links(self.task.description, "open_browser"),
-            classes="task-description",
+            expand=True,
+            classes="description",
         ).renderable
 
         if self.task.comments:

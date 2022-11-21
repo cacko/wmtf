@@ -57,7 +57,7 @@ class Task(Parser):
         return TaskItem(
             id=self.id,
             summary=task_row["Summary"],
-            description=task_row["Desc"].replace("<br>", "\n\n"),
+            description=task_row["Desc"].replace("<br>", "\n"),
             assignee=task_row["Assignee"],
             comments=self.__get_comments(),
         )

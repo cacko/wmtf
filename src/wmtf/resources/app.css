@@ -1,6 +1,8 @@
 Screen {
     overflow: hidden;
     layout: vertical;
+    align: center middle;
+    layers: below above;
 }
 
 #heading {
@@ -52,7 +54,6 @@ Screen {
     overflow: hidden;
 }
 
-.h1 {
-    border-bottom: solid red;
-    color: green;
+.description {
+    padding: 1;
 }
