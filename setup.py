@@ -70,6 +70,6 @@ setup(
     package_data={"wmtf.resources": ["*"]},
     entry_points="""
         [console_scripts]
-        wmtf=wmtf.cli:cli
+        wmtf=wmtf.cli:run
     """,
 )
