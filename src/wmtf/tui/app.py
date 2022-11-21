@@ -1,5 +1,5 @@
 from textual.app import App, ComposeResult
-from textual.widgets import Header, Footer, Static
+from textual.widgets import Header, Footer
 from textual import events
 from textual.containers import Container
 from .widgets.tasks import Tasks as WidgetTasks
@@ -7,12 +7,13 @@ from .widgets.report import Report as WidgetReport
 from .widgets.task import Task as WidgetTask
 from .widgets.app_name import AppName as WidgetAppName
 from .widgets.app_location import AppLocation as WidgetAppLocation
-from .widgets.app_user import AppUser as WidgetAppUser
 from .widgets.active_task import ActiveTask as WidgetActiveTask
+from .widgets.alert import Alert as WidgetAlert
 from .widgets.types import Focusable
 from wmtf.wm.models import ClockLocation
 from wmtf.config import app_config
 from webbrowser import open_new_tab
+from typing import Any
 
 from wmtf import RESOURCES_PATH
 
@@ -46,12 +47,16 @@ class Tui(App):
     @property
     def widget_location(self) -> WidgetAppLocation:
         return self.query_one(WidgetAppLocation)
+    
+    @property
+    def widget_alert(self) -> WidgetAlert:
+        return self.query_one(WidgetAlert)
 
     def compose(self) -> ComposeResult:
         self._bindings.bind("tab", "switch_view", show=False, universal=True)
         self.title = "Work Manager"
+        yield WidgetAlert(id="alert", classes="hidden")
         yield Header(show_clock=True)
-
         yield Container(
             WidgetAppName(id="app_name", classes="box"),
             Container(
@@ -68,7 +73,6 @@ class Tui(App):
             WidgetTask(id="task", classes="box hidden scroll"),
             id="content",
         )
-
         yield Footer()
 
     def on_mount(self, event: events.Mount) -> None:
@@ -97,7 +101,7 @@ class Tui(App):
         self.widget_location.location(
             self.LOCATIONS[int(not self.LOCATIONS.index(app_config.wm_config.location))]
         )
-        
+
     def action_open_browser(self, link: str):
         open_new_tab(link)
 
@@ -105,3 +109,7 @@ class Tui(App):
         self.widget_task.load(message.task.id)
         self.widget_task.unhide()
         self.widget_report.hide()
+        
+    def on_alert_error(self, message: Any):
+        self.widget_alert.message(message)
+        self.widget_alert.unhide() 

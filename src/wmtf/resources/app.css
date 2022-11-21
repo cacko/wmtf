@@ -57,3 +57,12 @@ Screen {
 .description {
     padding: 1;
 }
+
+#alert {
+    width: 28;
+    height: 8;
+    color: auto;
+    content-align: center middle;
+    background: darkcyan;
+    layer: above;
+}

@@ -6,7 +6,7 @@ from wmtf.tui.renderables.report import Days as ReportRenderable
 from corethread import StoppableThread
 from rich.status import Status
 from rich.text import Text
-from wmtf.tui.widgets.types import Focusable, Box
+from wmtf.tui.widgets.types import Focusable, Box, VisibilityMixin
 from typing import Optional
 from datetime import datetime, timedelta
 
@@ -96,7 +96,7 @@ class ReportWidget(Box):
 
 
 
-class Report(Focusable):
+class Report(VisibilityMixin, Focusable):
 
     __wdg: Optional[ReportWidget] = None
 
@@ -111,9 +111,3 @@ class Report(Focusable):
 
     def load(self):
         self.wdg.load()
-
-    def hide(self):
-        self.add_class("hidden")
-
-    def unhide(self):
-        self.remove_class("hidden")

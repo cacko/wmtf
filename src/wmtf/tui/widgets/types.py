@@ -11,6 +11,14 @@ from textual import events
 from textual.widget import Widget
 
 
+class VisibilityMixin:
+    def hide(self):
+        self.add_class("hidden")  # type: ignore
+
+    def unhide(self):
+        self.remove_class("hidden")  # type: ignore
+
+
 class Box(Static):
 
     box = reactive(SQUARE)

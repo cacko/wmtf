@@ -7,8 +7,8 @@ from textual.widgets import Static
 from textual import events
 from typing import Optional
 from rich.text import Text
-from wmtf.tui.widgets.types import Box, Focusable
-from wmtf.wm.html.parser import textual_links
+from wmtf.tui.widgets.types import Box, Focusable, VisibilityMixin
+
 
 class TaskWidget(Box):
     task: Optional[TaskModel] = None
@@ -24,17 +24,17 @@ class TaskWidget(Box):
         self.update("Loading...")
         self.task = Client.task(id)
         self.update(self.render())
-        
+
     def render(self):
         return self.get_panel(
             TaskRenderable(self.task) if self.task else Text("Not found")
         )
 
 
-class Task(Focusable):
+class Task(VisibilityMixin, Focusable):
 
     __wdg: Optional[TaskWidget] = None
-    
+
     @property
     def wdg(self) -> TaskWidget:
         if not self.__wdg:
@@ -52,12 +52,6 @@ class Task(Focusable):
 
     def compose(self) -> ComposeResult:
         yield self.wdg
-        
+
     def load(self, task_id: int):
         self.wdg.load(task_id)
-
-    def hide(self):
-        self.add_class("hidden")
-
-    def unhide(self):
-        self.remove_class("hidden")
