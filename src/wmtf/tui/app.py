@@ -55,7 +55,7 @@ class Tui(App):
     def compose(self) -> ComposeResult:
         self._bindings.bind("tab", "switch_view", show=False, universal=True)
         self.title = "Work Manager"
-        yield WidgetAlert(id="alert", classes="hidden")
+        # yield WidgetAlert(id="alert", classes="hidden")
         yield Header(show_clock=True)
         yield Container(
             WidgetAppName(id="app_name", classes="box"),

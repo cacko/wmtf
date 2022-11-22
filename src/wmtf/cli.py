@@ -13,7 +13,7 @@ from wmtf.tui.app import Tui
 from wmtf.ui.items import MenuItem, TaskItem, DisabledItem
 from wmtf.ui.menu import Menu
 from wmtf.wm.client import Client
-from wmtf.wm.html.login import LoginError, MaintenanceError
+from wmtf.wm import LoginError, MaintenanceError
 from wmtf.wm.html.parser import ParserError
 from wmtf.wm.models import TaskInfo
 from wmtf.ui.renderables.report import Days as ReportRenderable

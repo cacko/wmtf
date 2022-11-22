@@ -2,11 +2,10 @@ import re
 from typing import Optional, Generator
 from urllib.parse import parse_qs, urlparse
 from datetime import datetime
-
+from wmtf.wm import MaintenanceError
 from bs4 import BeautifulSoup, element
 from urlextract import URLExtract
 from corestring import truncate
-from rich.markup import escape
 from wmtf.wm.models import ClockLocation
 from functools import reduce
 
@@ -19,10 +18,6 @@ COMMENT_TIME_PATTERN = re.compile(
 )
 TAG_RE = re.compile(r"<[^>]+>")
 MAINTENANCE_STR = "The database is currently being archived"
-
-
-class MaintenanceError(Exception):
-    pass
 
 
 def strip_tags(txt: str) -> str:
@@ -75,11 +70,7 @@ def extract_comment_time(text: str) -> datetime:
             hour=hour,
             minute=minute,
         )
-    return datetime(
-        year=1981,
-        day=8,
-        month=8
-    )
+    return datetime(year=1981, day=8, month=8)
 
 
 def get_links(s: str) -> Generator[str, None, None]:

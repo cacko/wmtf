@@ -1,8 +1,5 @@
-from wmtf.wm.html.parser import Parser, ParserError, MaintenanceError
-
-
-class LoginError(Exception):
-    pass
+from wmtf.wm.html.parser import Parser, ParserError
+from wmtf.wm import LoginError
 
 
 class Login(Parser):

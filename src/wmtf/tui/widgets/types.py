@@ -10,7 +10,6 @@ from typing import Optional
 from textual import events
 from textual.widget import Widget
 
-
 class VisibilityMixin:
     def hide(self):
         self.add_class("hidden")  # type: ignore
