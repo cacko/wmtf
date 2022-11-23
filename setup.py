@@ -61,7 +61,8 @@ setup(
         "random-user-agent>=1.0.1",
         "progressor>=1.0.14",
         "urlextract>=1.7.1",
-        "arrow>=1.2.3"
+        "arrow>=1.2.3",
+        "lxml>=4.9.1"
         
     ],
     setup_requires=["wheel"],
