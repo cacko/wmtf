@@ -1,12 +1,9 @@
 import click
 import questionary
 from click import Command
-from crontab import CronTab
 from progressor import Spinner
 from pyfiglet import Figlet
 from rich import print
-from rich.console import Console
-from rich.markdown import Markdown
 from time import sleep
 from wmtf.config import app_config
 from wmtf.tui.app import Tui
@@ -210,15 +207,6 @@ def cli_clockoff(ctx: click.Context, location: str):
         except MaintenanceError:
             with Spinner("Maitenance error, retrying in 20 seconds."):
                 sleep(20)
-
-
-@cli.command("cron-clock-off", short_help="Schedule cron to clock off")
-@click.pass_context
-def cli_cron_clock_off(ctx: click.Context):
-    cron = CronTab()
-    job = cron.new(command="/home/users/alex.spasov/clock.sh")
-    job.schedule()
-    cron.write()
 
 
 def run():
