@@ -15,7 +15,7 @@ from wmtf.ui.menu import Menu
 from wmtf.wm.client import Client
 from wmtf.wm import LoginError, MaintenanceError
 from wmtf.wm.html.parser import ParserError
-from wmtf.wm.models import TaskInfo
+from wmtf.wm.models import TaskInfo, ClockLocation
 from wmtf.ui.renderables.report import Days as ReportRenderable
 from wmtf.ui.renderables.task import Task as TaskRenderable
 
@@ -191,12 +191,14 @@ def cli_report(ctx: click.Context):
 
 @cli.command("clock-off", short_help="Clock off current active task")
 @click.pass_context
-def cli_clockoff(ctx: click.Context):
+@click.argument("location", type=click.Choice(['home', 'office'], case_sensitive=False))
+def cli_clockoff(ctx: click.Context, location: str):
     tasks = Client.tasks()
     active_task = next(filter(lambda x: x.isActive, tasks), None)
     if not active_task:
         return click.echo(click.style(f"No task is currently active", fg="red"))
-
+    if ClockLocation(location.lower()) != active_task.clock:
+        return click.echo(click.style(f"active task is not clocked at {location}", fg="red"))
     while True:
         try: 
             click.echo(f">> Trying to clock off task '{active_task.summary}'")
