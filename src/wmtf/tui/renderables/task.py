@@ -95,4 +95,8 @@ class Task:
                 )
                 heading.append(f" ({c.timestamp_display})", "dim")
                 yield heading
-                yield Text(f"{textual_links(c.comment, 'open_browser')}")
+                yield Static(
+                    textual_links(c.comment, "open_browser"),
+                    expand=True,
+                    classes="comment",
+                ).renderable

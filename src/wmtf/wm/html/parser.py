@@ -116,10 +116,13 @@ class Parser(object):
     __id: int
 
     def __init__(self, html: bytes, id: int = 0) -> None:
-        self.struct = BeautifulSoup(html, features="html.parser")
+        self.struct = BeautifulSoup(self.clean(html), features="html.parser")
         self.__id = id
         self.handle_error()
         self.init()
+        
+    def clean(self, html: bytes) -> bytes:
+        return html.replace(b"&tab;", b"\t")
 
     def init(self):
         pass
