@@ -17,8 +17,8 @@ class Days(Generic[T]):
     def __rich_console__(
         self, console: Console, options: ConsoleOptions
     ) -> RenderResult:
-        parts = []
         for day in reversed(self.list):
+            parts = []
             if day.is_weekend:
                 continue
             total_display = (
