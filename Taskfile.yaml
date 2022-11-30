@@ -45,6 +45,6 @@ tasks:
   deploy:
     desc: all
     cmds:
-      - task: push
       - task: build
       - task: publish
+      - task: push
