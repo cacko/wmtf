@@ -60,6 +60,10 @@ class Task(Parser):
             description=task_row["Desc"].replace("<br>", "\n"),
             assignee=task_row["Assignee"],
             comments=self.__get_comments(),
+            create=task_row["Create"],
+            priority=task_row["Priority"],
+            value=task_row["Bus. Value"],
+            group=task_row['Group']
         )
 
     def __get_comments(self) -> Optional[list[TaskComment]]:

@@ -77,8 +77,17 @@ class Task:
     ) -> RenderResult:
         title = Text(overflow="fold")
         title.append(self.task.summary.upper(), "green bold")
-        title.append("\n\n")
         yield title
+        sub_title = Text(overflow="ellipsis")
+        sub_title.append(f"{self.task.group}", "red")
+        sub_title.append(" > ")
+        sub_title.append(f"{self.task.value}", "blue")
+        sub_title.append(" > ")
+        sub_title.append(f"{self.task.age}", "yellow")
+        sub_title.append(" > ")
+        sub_title.append(f"{self.task.priority}", "magenta")
+        sub_title.append("\n\n")
+        yield sub_title
         yield Static(
             textual_links(self.task.description, "open_browser"),
             expand=True,

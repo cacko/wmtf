@@ -4,6 +4,11 @@ from enum import Enum
 from typing import Optional
 import arrow
 
+class TimeDeltaUnit(Enum):
+    DAYS = "d"
+    HOURS = "h"
+    MINUTES = "m"
+
 class ClockIcon(Enum):
     HOME = "🏠"
     OFFICE = "🏢"
@@ -24,6 +29,11 @@ class ClockLocation(Enum):
             case _:
                 return ClockIcon.OFF
     
+@dataclass
+class TimeDelta:
+    number: float
+    unit: TimeDeltaUnit
+
 @dataclass
 class ReportTask:
     id: int
@@ -93,5 +103,29 @@ class Task:
     summary: str
     description: str
     assignee: str
+    group: str
+    priority: int
+    value: str
+    create: str
     comments: Optional[list[TaskComment]] = None
+
+    @property
+    def created(self) -> datetime:
+        parts = [TimeDelta(number=float(x[:-1]), unit=TimeDeltaUnit(x[-1])) for x in self.create.split(" ")]
+        units = {}
+        for part in parts:
+            match part.unit:
+                case TimeDeltaUnit.DAYS:
+                    units['days'] = part.number
+                case TimeDeltaUnit.HOURS:
+                    units["hours"] = part.number
+                case TimeDeltaUnit.MINUTES:
+                    units['minues'] = part.number
+        td = timedelta(**units)
+        return datetime.now() - td
+
+    @property
+    def age(self) -> str:
+        return arrow.get(self.created).humanize(arrow.now())
+
     
