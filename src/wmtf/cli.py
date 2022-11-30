@@ -1,7 +1,7 @@
 import click
 import questionary
 from click import Command
-from progressor import Spinner
+from progressor import Spinner, Progress
 from pyfiglet import Figlet
 from rich import print
 from time import sleep
@@ -15,7 +15,9 @@ from wmtf.wm.html.parser import ParserError
 from wmtf.wm.models import TaskInfo, ClockLocation
 from wmtf.ui.renderables.report import Days as ReportRenderable
 from wmtf.ui.renderables.task import Task as TaskRenderable
-
+from random import randint
+from typing import Optional
+from coretime import seconds_to_duration
 
 
 def banner(txt: str, fg: str = "green", bold=True):
@@ -61,6 +63,7 @@ def quit():
     """Quit."""
     click.echo(click.style("Bye!", fg="blue"))
     import sys
+
     sys.exit(0)
 
 
@@ -100,8 +103,8 @@ def cli_settings(ctx: click.Context):
             DisabledItem(disabled=f"config dir", text=f"{app_config.config_dir}"),
             DisabledItem(disabled=f"cache dir", text=f"{app_config.cache_dir}"),
             DisabledItem(disabled=f"data dir", text=f"{app_config.data_dir}"),
-            MenuItem(text="<< back", obj=main_menu)
-            ]
+            MenuItem(text="<< back", obj=main_menu),
+        ]
         with Menu(menu_items, title="Select task") as item:
             match item.obj:
                 case Command():
@@ -188,16 +191,25 @@ def cli_report(ctx: click.Context):
 
 @cli.command("clock-off", short_help="Clock off current active task")
 @click.pass_context
-@click.argument("location", type=click.Choice(['home', 'office'], case_sensitive=False))
-def cli_clockoff(ctx: click.Context, location: str):
+@click.argument("location", type=click.Choice(["home", "office"], case_sensitive=False))
+@click.option("--max-delay", type=int)
+def cli_clockoff(ctx: click.Context, location: str, max_delay: Optional[int]):
     tasks = Client.tasks()
     active_task = next(filter(lambda x: x.isActive, tasks), None)
     if not active_task:
         return click.echo(click.style(f"No task is currently active", fg="red"))
     if ClockLocation(location.lower()) != active_task.clock:
-        return click.echo(click.style(f"active task is not clocked at {location}", fg="red"))
+        return click.echo(
+            click.style(f"active task is not clocked at {location}", fg="red")
+        )
+    if max_delay:
+        interval = randint(1, max(1, max_delay)) * 60
+        with Spinner(seconds_to_duration(interval), spinner="arrow3") as sp:
+            for counter in range(interval):
+                sleep(1)
+                sp.update(seconds_to_duration(interval - counter))
     while True:
-        try: 
+        try:
             click.echo(f">> Trying to clock off task '{active_task.summary}'")
             res = Client.clock_off(active_task.clock_id)
             if res:
@@ -214,10 +226,11 @@ def run():
 
     try:
         if not app_config.is_configured():
-            assert(validate_credentials())    
+            assert validate_credentials()
         cli()
     except AssertionError:
         pass
-    
+
+
 if __name__ == "__main__":
     run()

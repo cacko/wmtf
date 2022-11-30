@@ -60,8 +60,9 @@ setup(
         "progressor>=1.0.14",
         "urlextract>=1.7.1",
         "arrow>=1.2.3",
-        "lxml>=4.9.1"
-        
+        "lxml>=4.9.1",
+        "emoji>=2.2.0",
+        "coretime>=0.1.4"
     ],
     setup_requires=["wheel"],
     python_requires=">=3.10",

@@ -2,8 +2,6 @@ name: wmtf
 channels:
   - conda-forge
 dependencies:
-  - _libgcc_mutex=0.1
-  - _openmp_mutex=4.5
   - black=22.10.0
   - blinker=1.5
   - brotlipy=0.7.0
@@ -23,23 +21,15 @@ dependencies:
   - icu=70.1
   - idna=3.4
   - importlib-metadata=4.11.4
-  - importlib_metadata=5.0.0
   - jaraco.classes=3.2.2
   - jeepney=0.8.0
   - jira=3.4.1
   - keyring=23.9.3
-  - ld_impl_linux-64=2.39
   - libcxx=14.0.6
-  - libcxxabi=14.0.6
   - libffi=3.4.2
-  - libgcc-ng=12.2.0
   - libglib=2.74.1
-  - libgomp=12.2.0
   - libiconv=1.17
-  - libnsl=2.0.0
   - libsqlite=3.39.4
-  - libstdcxx-ng=12.2.0
-  - libuuid=2.32.1
   - libxml2=2.10.3
   - libxslt=1.1.37
   - libzlib=1.2.13
@@ -53,6 +43,7 @@ dependencies:
   - packaging=21.3
   - pathspec=0.10.1
   - pcre2=10.37
+  - peewee=3.15.3
   - pip=22.2.2
   - platformdirs=2.5.2
   - pycodestyle=2.9.1
@@ -71,9 +62,9 @@ dependencies:
   - requests=2.28.1
   - requests-oauthlib=1.3.1
   - requests-toolbelt=0.10.0
-  - secretstorage=3.3.3
   - semver=2.13.0
   - setuptools=65.4.1
+  - sqlite=3.39.4
   - structlog=22.1.0
   - tk=8.6.12
   - tomli=2.0.1
@@ -96,8 +87,10 @@ dependencies:
     - commonmark==0.9.1
     - corestring==0.1.4
     - corethread==0.1.3
+    - coretime==0.1.4
     - dataclasses-json==0.5.7
     - deprecated==1.2.13
+    - emoji==2.2.0
     - filelock==3.8.0
     - frozenlist==1.3.3
     - html5lib==1.1
@@ -113,6 +106,7 @@ dependencies:
     - prompt-toolkit==3.0.31
     - pyfiglet==0.8.post1
     - pygments==2.13.0
+    - python-crontab==2.6.0
     - python-dateutil==2.8.2
     - pytz==2022.6
     - pytz-deprecation-shim==0.1.0.post0
@@ -132,7 +126,7 @@ dependencies:
     - urlextract==1.7.1
     - wcwidth==0.2.5
     - webencodings==0.5.1
-    - wmtf==0.1.93
+    - wmtf==0.1.97
     - wrapt==1.14.1
     - yarl==1.8.1
-prefix: /home/users/alex.spasov/miniforge3/envs/wmtf
+prefix: /Users/jago/miniforge3/envs/global/envs/wmtf

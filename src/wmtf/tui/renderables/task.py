@@ -5,7 +5,7 @@ from rich.console import RenderResult, Console, ConsoleOptions
 from textual.widgets import Static
 from rich.text import Text
 from random import randint
-
+from emoji import emojize
 
 class Task:
 
@@ -79,13 +79,13 @@ class Task:
         title.append(self.task.summary.upper(), "green bold")
         yield title
         sub_title = Text(overflow="ellipsis")
-        sub_title.append(f"{self.task.group}", "red")
-        sub_title.append(" > ")
-        sub_title.append(f"{self.task.value}", "blue")
-        sub_title.append(" > ")
-        sub_title.append(f"{self.task.age}", "yellow")
-        sub_title.append(" > ")
-        sub_title.append(f"{self.task.priority}", "magenta")
+        sub_title.append(emojize(f":open_file_folder:{self.task.group}"), "red")
+        sub_title.append(" ")
+        sub_title.append(emojize(f":money_bag:{self.task.value}"), "blue")
+        sub_title.append(" ")
+        sub_title.append(emojize(f":hourglass_done:{self.task.age}"), "yellow")
+        sub_title.append(" ")
+        sub_title.append(emojize(f":chart_increasing:{self.task.priority}"), "magenta")
         sub_title.append("\n\n")
         yield sub_title
         yield Static(
