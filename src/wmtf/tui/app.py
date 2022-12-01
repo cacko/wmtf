@@ -9,7 +9,8 @@ from .widgets.app_name import AppName as WidgetAppName
 from .widgets.app_location import AppLocation as WidgetAppLocation
 from .widgets.active_task import ActiveTask as WidgetActiveTask
 from .widgets.alert import Alert as WidgetAlert
-from .widgets.types import Focusable, Theme
+from .widgets.types import Focusable
+from .theme import Theme
 from wmtf.wm.models import ClockLocation
 from wmtf.config import app_config
 from webbrowser import open_new_tab
@@ -52,8 +53,10 @@ class Tui(App):
     def widget_alert(self) -> WidgetAlert:
         return self.query_one(WidgetAlert)
 
+    def get_css_variables(self) -> dict[str, str]:
+        return Theme.system.generate()
+
     def compose(self) -> ComposeResult:
-        Theme.colors = self.design["dark" if self.dark else "light"]
         self._bindings.bind("tab", "switch_view", show=False, universal=True)
         self.title = "Work Manager"
         # yield WidgetAlert(id="alert", classes="hidden")
@@ -114,8 +117,8 @@ class Tui(App):
     def on_alert_error(self, message: Any):
         self.widget_alert.message(message)
         self.widget_alert.unhide()
-        
+
     def watch_dark(self, dark: bool) -> None:
-        Theme.colors = self.design["dark" if dark else "light"]
+        Theme.system = "dark" if dark else "light"
         super().watch_dark(dark)
         self.refresh()

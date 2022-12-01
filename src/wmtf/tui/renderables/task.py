@@ -1,6 +1,6 @@
 from wmtf.wm.models import Task as TaskModel
 from .markdown import Markdown
-from wmtf.tui.widgets.types import Theme
+from wmtf.tui.theme import Theme
 from wmtf.wm.html.parser import textual_links
 from rich.console import RenderResult, Console, ConsoleOptions
 from textual.widgets import Static
@@ -78,29 +78,26 @@ class Task:
         self, console: Console, options: ConsoleOptions
     ) -> RenderResult:
         title = Text(overflow="fold")
-        assert Theme.colors.success
-        title.append(self.task.summary.upper(), f"{Theme.colors.success.hex} bold")
+        title.append(self.task.summary.upper(), f"{Theme.colors.success} bold")
         yield title
         sub_title = Text(overflow="ellipsis")
-        assert Theme.colors.warning
-        assert Theme.colors.accent
-        assert Theme.colors.error
-        assert Theme.colors.secondary
+        assert Theme.system.warning
+        assert Theme.system.accent
+        assert Theme.system.error
+        assert Theme.system.secondary
         sub_title.append(
-            emojize(f":open_file_folder:{self.task.group}"), Theme.colors.warning.hex
+            emojize(f":open_file_folder:{self.task.group}"), Theme.colors.warning
         )
         sub_title.append(" ")
-        sub_title.append(
-            emojize(f":money_bag:{self.task.value}"), Theme.colors.accent.hex
-        )
+        sub_title.append(emojize(f":money_bag:{self.task.value}"), Theme.colors.accent)
         sub_title.append(" ")
         sub_title.append(
-            emojize(f":hourglass_done:{self.task.age}"), Theme.colors.success.hex
+            emojize(f":hourglass_done:{self.task.age}"), Theme.colors.success
         )
         sub_title.append(" ")
         sub_title.append(
             emojize(f":chart_increasing:{self.task.priority}"),
-            Theme.colors.error.hex,
+            Theme.colors.error,
         )
         sub_title.append("\n\n")
         yield sub_title
