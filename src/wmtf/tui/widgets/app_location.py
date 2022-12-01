@@ -5,6 +5,7 @@ from textual.reactive import reactive
 from rich.text import Text
 from wmtf.config import app_config
 from wmtf.wm.models import ClockLocation
+from wmtf.tui.theme import Theme
 
 
 class AppLocationWidget(Static):
@@ -24,9 +25,13 @@ class AppLocationWidget(Static):
 
     def render(self):
         location = ClockLocation(self.location)
-        return Text.from_markup(
-            f"[bold yellow]{app_config.wm_config.username}[/] {location.icon.value} [green]{self.location.upper()}[/] "
+        renderable = Text()
+        renderable.append(app_config.wm_config.username, Theme.colors.accent_lighten_1)
+        renderable.append(
+            f" {location.icon.value} {self.location.upper()} ",
+            Theme.colors.primary_background_lighten_3,
         )
+        return renderable
 
 
 class AppLocation(Widget):

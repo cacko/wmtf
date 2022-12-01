@@ -1,5 +1,6 @@
 from pyfiglet import Figlet
 from rich.text import Text
+from wmtf.tui.theme import Theme
 
 
 class AppName:
@@ -7,4 +8,4 @@ class AppName:
         return Figlet().renderText(text="workmanager").rstrip()
 
     def __rich__(self) -> Text:
-        return Text.from_markup("[magenta]{}[/]".format(self))
+        return Text(f"{self}", Theme.colors.warning_lighten_2)

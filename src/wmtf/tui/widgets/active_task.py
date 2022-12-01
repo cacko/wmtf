@@ -9,6 +9,7 @@ from textual.widget import Widget
 from textual.app import ComposeResult
 from textual.reactive import reactive
 from rich.text import Text
+from wmtf.tui.theme import Theme
 
 
 class ActiveTaskWidget(Static):
@@ -35,7 +36,11 @@ class ActiveTaskWidget(Static):
             self.task_work = ""
 
     def render(self) -> Text:
-        return Text.from_markup(f"{self.task_location} [bold red]{self.task_work}[/] [magenta]{self.task_name}[/]")
+        renderable = Text(overflow="fold")
+        renderable.append(self.task_location)
+        renderable.append(f" {self.task_work}", Theme.colors.secondary)
+        renderable.append(f" {self.task_name}", Theme.colors.secondary_darken_3)
+        return renderable
 
 
 class ActiveTask(Widget):
