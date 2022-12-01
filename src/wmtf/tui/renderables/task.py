@@ -7,12 +7,6 @@ from textual.widgets import Static
 from rich.text import Text
 from random import randint
 from emoji import emojize
-from textual.app import ComposeResult
-from textual.design import ColorSystem
-from textual.color import Color, ColorParseError
-from textual.containers import Grid
-from textual.reactive import reactive
-from rich.console import RenderableType
 
 
 class Task:
@@ -84,29 +78,29 @@ class Task:
         self, console: Console, options: ConsoleOptions
     ) -> RenderResult:
         title = Text(overflow="fold")
-        assert Theme.theme.success
-        title.append(self.task.summary.upper(), f"{Theme.theme.success.hex} bold")
+        assert Theme.colors.success
+        title.append(self.task.summary.upper(), f"{Theme.colors.success.hex} bold")
         yield title
         sub_title = Text(overflow="ellipsis")
-        assert Theme.theme.warning
-        assert Theme.theme.accent
-        assert Theme.theme.error
-        assert Theme.theme.secondary
+        assert Theme.colors.warning
+        assert Theme.colors.accent
+        assert Theme.colors.error
+        assert Theme.colors.secondary
         sub_title.append(
-            emojize(f":open_file_folder:{self.task.group}"), Theme.theme.warning.hex
+            emojize(f":open_file_folder:{self.task.group}"), Theme.colors.warning.hex
         )
         sub_title.append(" ")
         sub_title.append(
-            emojize(f":money_bag:{self.task.value}"), Theme.theme.accent.hex
+            emojize(f":money_bag:{self.task.value}"), Theme.colors.accent.hex
         )
         sub_title.append(" ")
         sub_title.append(
-            emojize(f":hourglass_done:{self.task.age}"), Theme.theme.success.hex
+            emojize(f":hourglass_done:{self.task.age}"), Theme.colors.success.hex
         )
         sub_title.append(" ")
         sub_title.append(
             emojize(f":chart_increasing:{self.task.priority}"),
-            Theme.theme.error.hex,
+            Theme.colors.error.hex,
         )
         sub_title.append("\n\n")
         yield sub_title

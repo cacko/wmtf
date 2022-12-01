@@ -11,52 +11,28 @@ from textual import events
 from textual.widget import Widget
 from textual.design import ColorSystem
 
-DEFAULT_COLORS = {
-    "dark": ColorSystem(
-        primary="#004578",
-        secondary="#ffa62b",
-        warning="#ffa62b",
-        error="#ba3c5b",
-        success="#4EBF71",
-        accent="#0178D4",
-        dark=True,
-    ),
-    "light": ColorSystem(
-        primary="#004578",
-        secondary="#ffa62b",
-        warning="#ffa62b",
-        error="#ba3c5b",
-        success="#4EBF71",
-        accent="#0178D4",
-        dark=False,
-    ),
-}
 
 class ThemeMeta(type):
-    
-    __instance: Optional['Theme'] = None
-    __mode: str = "dark"
-    
+
+    __instance: Optional["Theme"] = None
+    __theme: Optional[ColorSystem] = None
+
     def __call__(cls):
         if not cls.__instance:
             cls.__instance = type.__call__(cls)
         return cls.__instance
-    
+
     @property
-    def mode(cls) -> str:
-        return cls.__mode
-    
-    @mode.setter
-    def mode(cls, value):
-        cls.__mode = value
-    
-    @property
-    def theme(cls) -> ColorSystem:
-        return DEFAULT_COLORS[cls.__mode]
-    
+    def colors(cls) -> ColorSystem:
+        return cls.__theme  # type: ignore
+
+    @colors.setter
+    def colors(cls, value: ColorSystem):
+        cls.__theme = value
+
+
 class Theme(object, metaclass=ThemeMeta):
     pass
-    
 
 
 class VisibilityMixin:

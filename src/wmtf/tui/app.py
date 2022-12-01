@@ -9,7 +9,7 @@ from .widgets.app_name import AppName as WidgetAppName
 from .widgets.app_location import AppLocation as WidgetAppLocation
 from .widgets.active_task import ActiveTask as WidgetActiveTask
 from .widgets.alert import Alert as WidgetAlert
-from .widgets.types import Focusable, DEFAULT_COLORS, Theme
+from .widgets.types import Focusable, Theme
 from wmtf.wm.models import ClockLocation
 from wmtf.config import app_config
 from webbrowser import open_new_tab
@@ -31,15 +31,6 @@ class Tui(App):
     ]
 
     LOCATIONS = [ClockLocation.HOME.value, ClockLocation.OFFICE.value]
-
-    def get_css_variables(self) -> dict[str, str]:
-        """Get a mapping of variables used to pre-populate CSS.
-
-        Returns:
-            dict[str, str]: A mapping of variable name to value.
-        """
-        variables = DEFAULT_COLORS["dark" if self.dark else "light"].generate()
-        return variables
 
     @property
     def widget_task(self) -> WidgetTask:
@@ -124,6 +115,6 @@ class Tui(App):
         self.widget_alert.unhide()
         
     def watch_dark(self, dark: bool) -> None:
-        Theme.mode = "dark" if dark else "light"
+        Theme.colors = self.design["dark" if dark else "light"]
         super().watch_dark(dark)
         self.refresh()
