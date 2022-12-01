@@ -53,6 +53,7 @@ class Tui(App):
         return self.query_one(WidgetAlert)
 
     def compose(self) -> ComposeResult:
+        Theme.colors = self.design["dark" if self.dark else "light"]
         self._bindings.bind("tab", "switch_view", show=False, universal=True)
         self.title = "Work Manager"
         # yield WidgetAlert(id="alert", classes="hidden")
