@@ -1,11 +1,19 @@
 from wmtf.wm.models import Task as TaskModel
 from .markdown import Markdown
+from wmtf.tui.widgets.types import Theme
 from wmtf.wm.html.parser import textual_links
 from rich.console import RenderResult, Console, ConsoleOptions
 from textual.widgets import Static
 from rich.text import Text
 from random import randint
 from emoji import emojize
+from textual.app import ComposeResult
+from textual.design import ColorSystem
+from textual.color import Color, ColorParseError
+from textual.containers import Grid
+from textual.reactive import reactive
+from rich.console import RenderableType
+
 
 class Task:
 
@@ -67,7 +75,7 @@ class Task:
 
     def __author_colors(self, author: str):
         if author not in self.__authors:
-            rand_idx = randint(0, len(self.__colors))
+            rand_idx = randint(0, len(self.__colors) - 1)
             rand_color = self.__colors.pop(rand_idx)
             self.__authors[author] = rand_color
         return self.__authors[author]
@@ -76,16 +84,30 @@ class Task:
         self, console: Console, options: ConsoleOptions
     ) -> RenderResult:
         title = Text(overflow="fold")
-        title.append(self.task.summary.upper(), "green bold")
+        assert Theme.theme.success
+        title.append(self.task.summary.upper(), f"{Theme.theme.success.hex} bold")
         yield title
         sub_title = Text(overflow="ellipsis")
-        sub_title.append(emojize(f":open_file_folder:{self.task.group}"), "red")
+        assert Theme.theme.warning
+        assert Theme.theme.accent
+        assert Theme.theme.error
+        assert Theme.theme.secondary
+        sub_title.append(
+            emojize(f":open_file_folder:{self.task.group}"), Theme.theme.warning.hex
+        )
         sub_title.append(" ")
-        sub_title.append(emojize(f":money_bag:{self.task.value}"), "blue")
+        sub_title.append(
+            emojize(f":money_bag:{self.task.value}"), Theme.theme.accent.hex
+        )
         sub_title.append(" ")
-        sub_title.append(emojize(f":hourglass_done:{self.task.age}"), "yellow")
+        sub_title.append(
+            emojize(f":hourglass_done:{self.task.age}"), Theme.theme.success.hex
+        )
         sub_title.append(" ")
-        sub_title.append(emojize(f":chart_increasing:{self.task.priority}"), "magenta")
+        sub_title.append(
+            emojize(f":chart_increasing:{self.task.priority}"),
+            Theme.theme.error.hex,
+        )
         sub_title.append("\n\n")
         yield sub_title
         yield Static(

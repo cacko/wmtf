@@ -9,12 +9,11 @@ from .widgets.app_name import AppName as WidgetAppName
 from .widgets.app_location import AppLocation as WidgetAppLocation
 from .widgets.active_task import ActiveTask as WidgetActiveTask
 from .widgets.alert import Alert as WidgetAlert
-from .widgets.types import Focusable
+from .widgets.types import Focusable, DEFAULT_COLORS, Theme
 from wmtf.wm.models import ClockLocation
 from wmtf.config import app_config
 from webbrowser import open_new_tab
 from typing import Any
-
 from wmtf import RESOURCES_PATH
 
 
@@ -25,12 +24,22 @@ class Tui(App):
     BINDINGS = [
         ("c", "clock", "Clock On/Off"),
         ("l", "toggle_location", "Toggle Location"),
-        ("t", "toggle_views", "Toggle Views"),
+        ("v", "toggle_views", "Toggle Views"),
         ("r", "reload", "Refresh"),
+        ("t", "toggle_dark", "Toggle Theme"),
         ("q", "quit", "Quit"),
     ]
 
     LOCATIONS = [ClockLocation.HOME.value, ClockLocation.OFFICE.value]
+
+    def get_css_variables(self) -> dict[str, str]:
+        """Get a mapping of variables used to pre-populate CSS.
+
+        Returns:
+            dict[str, str]: A mapping of variable name to value.
+        """
+        variables = DEFAULT_COLORS["dark" if self.dark else "light"].generate()
+        return variables
 
     @property
     def widget_task(self) -> WidgetTask:
@@ -47,7 +56,7 @@ class Tui(App):
     @property
     def widget_location(self) -> WidgetAppLocation:
         return self.query_one(WidgetAppLocation)
-    
+
     @property
     def widget_alert(self) -> WidgetAlert:
         return self.query_one(WidgetAlert)
@@ -109,7 +118,12 @@ class Tui(App):
         self.widget_task.load(message.task.id)
         self.widget_task.unhide()
         self.widget_report.hide()
-        
+
     def on_alert_error(self, message: Any):
         self.widget_alert.message(message)
-        self.widget_alert.unhide() 
+        self.widget_alert.unhide()
+        
+    def watch_dark(self, dark: bool) -> None:
+        Theme.mode = "dark" if dark else "light"
+        super().watch_dark(dark)
+        self.refresh()
