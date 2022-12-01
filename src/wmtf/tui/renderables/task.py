@@ -78,26 +78,27 @@ class Task:
         self, console: Console, options: ConsoleOptions
     ) -> RenderResult:
         title = Text(overflow="fold")
-        title.append(self.task.summary.upper(), f"{Theme.colors.success} bold")
+        title.append(
+            self.task.summary.upper(), f"{Theme.colors.success_lighten_2} bold"
+        )
         yield title
         sub_title = Text(overflow="ellipsis")
-        assert Theme.system.warning
-        assert Theme.system.accent
-        assert Theme.system.error
-        assert Theme.system.secondary
         sub_title.append(
-            emojize(f":open_file_folder:{self.task.group}"), Theme.colors.warning
+            emojize(f":open_file_folder:{self.task.group}"),
+            Theme.colors.warning_lighten_2,
         )
         sub_title.append(" ")
-        sub_title.append(emojize(f":money_bag:{self.task.value}"), Theme.colors.accent)
+        sub_title.append(
+            emojize(f":money_bag:{self.task.value}"), Theme.colors.accent_lighten_2
+        )
         sub_title.append(" ")
         sub_title.append(
-            emojize(f":hourglass_done:{self.task.age}"), Theme.colors.success
+            emojize(f":hourglass_done:{self.task.age}"), Theme.colors.success_lighten_2
         )
         sub_title.append(" ")
         sub_title.append(
             emojize(f":chart_increasing:{self.task.priority}"),
-            Theme.colors.error,
+            Theme.colors.error_lighten_2,
         )
         sub_title.append("\n\n")
         yield sub_title
