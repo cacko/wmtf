@@ -2,6 +2,7 @@ from typing import List, Optional
 from wmtf.wm.models import TaskInfo
 from rich.text import Text
 from rich.console import RichCast
+from wmtf.tui.theme import Theme
 
 from .symbols import RIGHT_TRIANGLE
 
@@ -39,16 +40,16 @@ class TaskList(RichCast):
                 else str(item)
             )
             if self.selected == item:
-                content.append(RIGHT_TRIANGLE, "green bold")
+                content.append(RIGHT_TRIANGLE, Theme.colors.success_lighten_1)
                 content.append(" ")
-                content.append(string_index, "bright_magenta bold")
+                content.append(string_index, Theme.colors.success_lighten_3)
                 content.append(" ")
-                content.append(string_item, "green bold")
+                content.append(string_item, Theme.colors.success_lighten_1)
             else:
                 content.append("  ")
-                content.append(string_index, "bright_magenta")
+                content.append(string_index, Theme.colors.accent_lighten_2)
                 content.append(" ")
-                content.append(string_item, "red bold" if item.isActive else None)
+                content.append(string_item, Theme.colors.accent_lighten_1 if item.isActive else None)
             content.append("\n")
         return content
 

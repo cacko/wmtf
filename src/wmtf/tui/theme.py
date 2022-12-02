@@ -126,7 +126,7 @@ class ThemeMeta(type):
 class Theme(object, metaclass=ThemeMeta):
     DEFAULT_COLORS = {
         "dark": ColorSystem(
-            primary="#69D2E7",
+            primary="#004578",
             secondary="#ffa62b",
             warning="#ffa62b",
             error="#ba3c5b",
@@ -135,6 +135,7 @@ class Theme(object, metaclass=ThemeMeta):
             dark=True,
         ),
         "light": ColorSystem(
+            background="#e4e4e4",
             primary="#004578",
             secondary="#ffa62b",
             warning="#ffa62b",

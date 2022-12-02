@@ -7,6 +7,7 @@ from textual.widgets import Static
 from rich.text import Text
 from random import randint
 from emoji import emojize
+from functools import reduce
 
 
 class Task:
@@ -74,6 +75,32 @@ class Task:
             self.__authors[author] = rand_color
         return self.__authors[author]
 
+    @property
+    def content(self):
+
+        return reduce(
+            lambda r, x: [*r, x, " "],
+            map(
+                lambda v: (emojize(v[0]), v[1]),
+                [
+                    (
+                        f":open_file_folder:{self.task.group}",
+                        Theme.colors.warning_lighten_2,
+                    ),
+                    (f":money_bag:{self.task.value}", Theme.colors.accent_lighten_2),
+                    (
+                        f":hourglass_done:{self.task.age}",
+                        Theme.colors.success_lighten_2,
+                    ),
+                    (
+                        f":chart_increasing:{self.task.priority}",
+                        Theme.colors.error_lighten_2,
+                    ),
+                ],
+            ),
+            [],
+        )
+
     def __rich_console__(
         self, console: Console, options: ConsoleOptions
     ) -> RenderResult:
@@ -82,26 +109,10 @@ class Task:
             self.task.summary.upper(), f"{Theme.colors.success_lighten_2} bold"
         )
         yield title
-        sub_title = Text(overflow="ellipsis")
-        sub_title.append(
-            emojize(f":open_file_folder:{self.task.group}"),
-            Theme.colors.warning_lighten_2,
+        yield Text(overflow="ellipsis").assemble(
+            *self.content,
+            end="\n\n",
         )
-        sub_title.append(" ")
-        sub_title.append(
-            emojize(f":money_bag:{self.task.value}"), Theme.colors.accent_lighten_2
-        )
-        sub_title.append(" ")
-        sub_title.append(
-            emojize(f":hourglass_done:{self.task.age}"), Theme.colors.success_lighten_2
-        )
-        sub_title.append(" ")
-        sub_title.append(
-            emojize(f":chart_increasing:{self.task.priority}"),
-            Theme.colors.error_lighten_2,
-        )
-        sub_title.append("\n\n")
-        yield sub_title
         yield Static(
             textual_links(self.task.description, "open_browser"),
             expand=True,

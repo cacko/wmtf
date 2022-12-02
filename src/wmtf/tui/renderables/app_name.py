@@ -8,4 +8,4 @@ class AppName:
         return Figlet().renderText(text="workmanager").rstrip()
 
     def __rich__(self) -> Text:
-        return Text(f"{self}", Theme.colors.warning_lighten_2)
+        return Text(f"{self}", Theme.colors.accent_lighten_1)
