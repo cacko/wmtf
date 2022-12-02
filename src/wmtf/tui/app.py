@@ -24,10 +24,10 @@ class Tui(App):
 
     BINDINGS = [
         ("c", "clock", "Clock On/Off"),
-        ("l", "toggle_location", "Toggle Location"),
-        ("v", "toggle_views", "Toggle Views"),
+        ("l", "toggle_location", "Location"),
+        ("v", "toggle_views", "Views"),
         ("r", "reload", "Refresh"),
-        ("t", "toggle_dark", "Toggle Theme"),
+        ("t", "toggle_dark", "Theme"),
         ("q", "quit", "Quit"),
     ]
 
