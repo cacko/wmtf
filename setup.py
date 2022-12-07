@@ -62,7 +62,8 @@ setup(
         "arrow>=1.2.3",
         "lxml>=4.9.1",
         "emoji>=2.2.0",
-        "coretime>=0.1.4"
+        "coretime>=0.1.4",
+        "humanize>=4.4.0"
     ],
     setup_requires=["wheel"],
     python_requires=">=3.10",

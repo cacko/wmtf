@@ -87,6 +87,7 @@ dependencies:
     - coretime==0.1.4
     - emoji==2.2.0
     - filelock==3.8.0
+    - humanize==4.4.0
     - importlib-metadata==4.13.0
     - nanoid==2.0.0
     - numpy==1.23.5
