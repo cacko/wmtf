@@ -11,7 +11,9 @@ from wmtf.wm.html.parser import (
     extract_id_from_url,
     strip_tags,
     extract_clock_time,
-    extract_comment_time
+    extract_comment_time,
+    extract_estimate,
+    extract_estimate_used,
 )
 
 
@@ -36,6 +38,8 @@ class TaskList(Parser):
                 clock=extract_clock(r["CLOCK"][0]),
                 summary=strip_tags(r["Summary"][0]),
                 clock_start=extract_clock_time(r["CLOCK"][0]),
+                estimate=extract_estimate(r["Work"][0]),
+                estimate_used=extract_estimate_used(r["Work"][0]),
             )
             for _, r in dfd.iterrows()
         ]
@@ -63,7 +67,9 @@ class Task(Parser):
             create=task_row["Create"],
             priority=task_row["Priority"],
             value=task_row["Bus. Value"],
-            group=task_row['Group']
+            group=task_row["Group"],
+            estimate=extract_estimate(task_row["Work"]),
+            estimate_used=extract_estimate_used(task_row["Work"]),
         )
 
     def __get_comments(self) -> Optional[list[TaskComment]]:

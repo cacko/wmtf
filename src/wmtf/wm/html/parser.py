@@ -8,6 +8,7 @@ from urlextract import URLExtract
 from corestring import truncate
 from wmtf.wm.models import ClockLocation
 from functools import reduce
+from datetime import timedelta
 
 CLOCK_PATTERN = re.compile(r".+\((\w+)\)", re.MULTILINE)
 CLOCK_TIME_PATTERN = re.compile(
@@ -15,6 +16,9 @@ CLOCK_TIME_PATTERN = re.compile(
 )
 COMMENT_TIME_PATTERN = re.compile(
     r"(\d+)/(1[012]?)/(\d+)\s+([01]\d):([012345]\d)", re.MULTILINE
+)
+ESTIMATE_PATTERN = re.compile(
+    r"(?P<estimate_used>\d+(\.\d+)?)% of (?P<estimate>\d+(\.\d+)?)h"
 )
 TAG_RE = re.compile(r"<[^>]+>")
 MAINTENANCE_STR = "The database is currently being archived"
@@ -73,6 +77,18 @@ def extract_comment_time(text: str) -> datetime:
     return datetime(year=1981, day=8, month=8)
 
 
+def extract_estimate(text: str) -> Optional[timedelta]:
+    if ma := ESTIMATE_PATTERN.search(text):
+        return timedelta(hours=float(ma.group("estimate")))
+    return None
+
+
+def extract_estimate_used(text: str) -> Optional[float]:
+    if ma := ESTIMATE_PATTERN.search(text):
+        return float(ma.group("estimate_used"))
+    return None
+
+
 def get_links(s: str) -> Generator[str, None, None]:
     for url in URLExtract().gen_urls(s, with_schema_only=True):
         try:
@@ -120,7 +136,7 @@ class Parser(object):
         self.__id = id
         self.handle_error()
         self.init()
-        
+
     def clean(self, html: bytes) -> bytes:
         return html.replace(b"&tab;", b"\t")
 

@@ -87,6 +87,10 @@ class Task:
                         f":open_file_folder:{self.task.group}",
                         Theme.colors.warning_lighten_2,
                     ),
+                    (
+                        f":alarm_clock:{self.task.estimateDisplay} ({self.task.estimate_used:.0f}%)",
+                        self.task.estimate_color,
+                    ),
                     (f":money_bag:{self.task.value}", Theme.colors.accent_lighten_2),
                     (
                         f":hourglass_done:{self.task.age}",
