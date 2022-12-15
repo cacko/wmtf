@@ -74,7 +74,20 @@ class HtmlReportTask(object, metaclass=HtmlReportMeta):
         self.__description = ""
 
     def is_valid(self):
-        return self.__id > 0
+        return all(
+            [
+                self.__id > 0,
+                sum(
+                    [
+                        self.__start.hour,
+                        self.__start.minute,
+                        self.__end.hour,
+                        self.__end.minute,
+                    ]
+                )
+                > 0,
+            ]
+        )
 
     def do_process(self, row: PageElement):
         match row:
