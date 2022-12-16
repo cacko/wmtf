@@ -14,8 +14,8 @@ function createWindow(): BrowserWindow {
   win = new BrowserWindow({
     x: 0,
     y: 0,
-    width: size.width,
-    height: size.height,
+    width: Math.min(1280, size.width),
+    height: Math.min(800, size.height),
     webPreferences: {
       nodeIntegration: true,
       allowRunningInsecureContent: (serve),
@@ -58,7 +58,14 @@ try {
   // initialization and is ready to create browser windows.
   // Some APIs can only be used after this event occurs.
   // Added 400 ms to fix the black background issue while using transparent window. More detais at https://github.com/electron/electron/issues/15947
-  app.on('ready', () => setTimeout(createWindow, 400));
+  app.on('ready', () => {
+    setTimeout(createWindow, 400);
+
+    var python = require('child_process').spawn('wmtf', ['api-serve']);
+    python.stdout.on('data',function(data){
+        console.log("data: ",data.toString('utf8'));
+    });
+  });
 
   // Quit when all windows are closed.
   app.on('window-all-closed', () => {
