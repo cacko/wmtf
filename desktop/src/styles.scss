@@ -1,50 +1,183 @@
-/* You can add global styles to this file, and also import other style files */
-html, body {
-  margin: 0;
-  padding: 0;
+@use '@angular/material' as mat;
+@include mat.core();
+$theme-primary: mat.define-palette(mat.$blue-grey-palette, 500);
+$theme-accent: mat.define-palette(mat.$blue-palette, 700, 600, 500);
+$theme-warn: mat.define-palette(mat.$red-palette);
+$custom-typography: mat.define-typography-config(
+  $font-family: '"Syne Mono", monospace;',
+);
+$theme: mat.define-dark-theme((
+  color: (
+    primary: $theme-primary,
+    accent: $theme-accent,
+    warn: $theme-warn,
+  ),
+  typography: $custom-typography
+));
 
-  height: 100%;
-  font-family: Arial, Helvetica, sans-serif;
+
+// $theme: mat.define-light-theme((
+//   color: (
+//     primary: $theme-primary,
+//     accent: $theme-accent,
+//     warn: $theme-warn,
+//   ),
+//   typography: $custom-typography
+// ));
+
+@include mat.all-component-themes($theme);
+
+@import '~@angular/cdk/overlay-prebuilt.css';
+@import './terminal.css';
+@import './mixins.scss';
+
+
+
+
+:root {
+  --global-font-color:var(--font-color);
 }
 
-/* CAN (MUST) BE REMOVED ! Sample Global style */
-.container {
-  height: 100%;
+html,
+body,
+app-root {
+  min-height: 100vh;
+}
+
+app-root {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
+}
 
-  background: url(./assets/background.jpg) no-repeat center fixed;
-  -webkit-background-size: cover; /* pour anciens Chrome et Safari */
-  background-size: cover; /* version standardisée */
+img {
+  width: auto;
+  max-width: 100%;
+}
 
-  .title {
-    color: white;
-    margin: 0;
-    padding: 50px 20px;
+header[title] {
+  padding: 1em 0;
+  font-size: 120%;
+  font-weight: bold;
+  font-variant: small-caps;
+}
+
+@media only screen and (max-width: 30em) {
+  .terminal-nav {
+    flex-direction: row;
+    align-items: center;
   }
+}
 
-  a {
-    color: #fff !important;
-    text-transform: uppercase;
-    text-decoration: none;
-    background: #ed3330;
-    padding: 20px;
-    border-radius: 5px;
-    display: inline-block;
-    border: none;
-    transition: all 0.4s ease 0s;
+[timestamp] {
+  font-size: 60%;
+  font-kerning: 0.7;
+  text-transform: uppercase;
+}
 
-    &:hover {
-      background: #fff;
-      color: #ed3330 !important;
-      letter-spacing: 1px;
-      -webkit-box-shadow: 0px 5px 40px -10px rgba(0,0,0,0.57);
-      -moz-box-shadow: 0px 5px 40px -10px rgba(0,0,0,0.57);
-      box-shadow: 5px 40px -10px rgba(0,0,0,0.57);
-      transition: all 0.4s ease 0s;
+[username] {
+  font-kerning: 0.7;
+  text-transform: lowercase;
+  font-variant: small-caps;
+  font-size: 80%;
+  font-weight: bold;
+}
+
+div.terminal-card {
+  >header {
+    color: var(--font-color);
+  }
+}
+
+.container {
+  width: 100%;
+}
+
+@media only screen and (max-width:55em) {
+  .container {
+    max-width: calc(100% - 40px)
+  }
+}
+
+.mat-paginator {
+  background: var(--background-color);
+  color: var(--font-color);
+
+  .mat-button.mat-primary.mat-button-disabled,
+  .mat-button.mat-accent.mat-button-disabled,
+  .mat-button.mat-warn.mat-button-disabled,
+  .mat-button.mat-button-disabled.mat-button-disabled,
+  .mat-icon-button.mat-primary.mat-button-disabled,
+  .mat-icon-button.mat-accent.mat-button-disabled,
+  .mat-icon-button.mat-warn.mat-button-disabled,
+  .mat-icon-button.mat-button-disabled.mat-button-disabled,
+  .mat-stroked-button.mat-primary.mat-button-disabled,
+  .mat-stroked-button.mat-accent.mat-button-disabled,
+  .mat-stroked-button.mat-warn.mat-button-disabled,
+  .mat-stroked-button.mat-button-disabled.mat-button-disabled {
+    color: var(--tertiary-color);
+  }
+}
+
+table {
+  td, td {
+  border: none;
+  }
+}
+
+.lb-controlContainer {
+  display: none;
+}
+
+.search-backdrop {
+  background-color: rgba(0,0,0,0.7);
+}
+.search-overlay {
+  flex-grow: 1;
+  justify-content: center;
+  align-items: center;
+  form {
+    display: flex;
+    flex-grow: 1;
+    align-items: center;
+    justify-content: center;
+    mat-form-field {
+      width: 90%;
+      max-width: 500px;
+      input {
+        font-family: var(--font-stack);
+          font-size: 2em;
+          text-transform: lowercase;
+          font-variant: small-caps;
+      }
     }
   }
 }
+.mat-expansion-panel {
+  color: var(--font-color);
+  .mat-expansion-panel-content {
+    font-size: var(--global-font-size);
+    line-height: var(--global-line-height);
+    >.mat-expansion-panel-body {
+      font-size: var(--global-font-size);
+      line-height: var(--global-line-height);
 
+    }
+  }
+  [timestamp] {
+    font-size: 70%;
+  }
+}
+
+
+
+.terminal-card {
+  font-size: 1.1rem;
+  .terminal-card-header {
+    border-left-width: 1em;
+    border-left-style: inset;
+    height: unset;
+    text-align: center;
+    font-size: var(--global-font-size);
+    line-height: var(--global-line-height);
+  }
+}

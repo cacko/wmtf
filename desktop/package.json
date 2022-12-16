@@ -57,6 +57,7 @@
     "@angular/platform-browser-dynamic": "14.2.6",
     "@angular/router": "14.2.6",
     "lodash-es": "4.17.21",
+    "object-hash": "3.0.0",
     "rxjs": "7.5.7",
     "tslib": "^2.4.0",
     "zone.js": "~0.11.8"
@@ -78,6 +79,7 @@
     "@types/jasminewd2": "2.0.10",
     "@types/lodash-es": "4.17.6",
     "@types/node": "18.11.0",
+    "@types/object-hash": "3.0.1",
     "@typescript-eslint/eslint-plugin": "5.40.0",
     "@typescript-eslint/parser": "5.40.0",
     "conventional-changelog-cli": "2.2.2",

@@ -31,7 +31,7 @@ import { MatGridListModule } from '@angular/material/grid-list';
 import { TasksComponent } from './components/tasks/tasks.component';
 import { ReportComponent } from './components/report/report.component';
 import { TaskComponent } from './components/task/task.component';
-
+import {MatListModule} from '@angular/material/list';
 // AoT requires an exported function for factories
 const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader => new TranslateHttpLoader(http, './assets/i18n/', '.json');
 
@@ -44,6 +44,7 @@ const MaterialModules = [
   MatTooltipModule,
   MatSnackBarModule,
   MatGridListModule,
+  MatListModule
 ];
 
 @NgModule({

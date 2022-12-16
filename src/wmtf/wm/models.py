@@ -105,6 +105,7 @@ class TaskInfo:
             "clock_start": self.clock_start.isoformat() if self.clock_start else None,
             "estimate": self.estimate.seconds if self.estimate else None,
             "estimate_user": self.estimate_used if self.estimate_used else None,
+            "summary": self.summary
         }
 
     @property

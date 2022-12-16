@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { AnyAaaaRecord } from 'dns';
 import { ApiService } from '../../core/services/api.service';
 import { ApiType } from '../../entity/api';
+import { TaskInfo } from '../../entity/task';
 
 @Component({
   selector: 'app-tasks',
@@ -10,13 +11,16 @@ import { ApiType } from '../../entity/api';
 })
 export class TasksComponent implements OnInit {
 
+  items: TaskInfo[] = [];
+  selected: TaskInfo[] = null;
+
   constructor(
     private api: ApiService
   ) { }
 
   ngOnInit(): void {
-    this.api.fetch(ApiType.TASKS).then((tasks: any) => {
-      console.log(tasks);
+    this.api.fetch(ApiType.TASKS).then((tasks: TaskInfo[]) => {
+      this.items = tasks;
     }).catch(err => {
 
     });

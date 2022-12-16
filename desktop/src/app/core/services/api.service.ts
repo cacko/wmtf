@@ -73,7 +73,7 @@ export class ApiService implements HttpInterceptor {
   fetch(path: string, params: Params = {}): Promise<any> {
     return new Promise((resolve, reject) => {
       this.httpClient
-        .get(`http://localhost:44331/${path}`, {
+        .get(`http://127.0.0.1:44331/${path}`, {
           params: omitBy(params, isEmpty),
         })
         .subscribe({
