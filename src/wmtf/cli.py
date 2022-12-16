@@ -18,6 +18,10 @@ from wmtf.ui.renderables.task import Task as TaskRenderable
 from random import randint
 from typing import Optional
 from coretime import seconds_to_duration
+import logging
+from wmtf.api.server import Server
+
+from time import sleep
 
 
 def banner(txt: str, fg: str = "green", bold=True):
@@ -219,6 +223,13 @@ def cli_clockoff(ctx: click.Context, location: str, max_delay: Optional[int]):
         except MaintenanceError:
             with Spinner("Maitenance error, retrying in 20 seconds."):
                 sleep(20)
+
+
+@cli.command("api-serve", short_help="Start api server")
+@click.pass_context
+def cli_api_server(ctx: click.Context):
+    api_server = Server()
+    api_server.start()
 
 
 def run():

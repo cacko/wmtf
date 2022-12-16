@@ -63,7 +63,8 @@ setup(
         "lxml>=4.9.1",
         "emoji>=2.2.0",
         "coretime>=0.1.4",
-        "humanize>=4.4.0"
+        "humanize>=4.4.0",
+        "butilka==0.1.19"
     ],
     setup_requires=["wheel"],
     python_requires=">=3.10",

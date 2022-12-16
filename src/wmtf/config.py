@@ -23,6 +23,12 @@ class JiraConfig(BaseModel, extra=Extra.ignore):
     password: str = Field(default="")
 
 
+class ApiConfig(BaseModel, extra=Extra.ignore):
+    host: str = Field(default="127.0.0.1")
+    port: int = Field(default=44331)
+    threadpool_workers: int = Field(default=2)
+
+
 class app_config_meta(type):
     _instance = None
 
@@ -58,12 +64,17 @@ class app_config_meta(type):
         return WMConfig(**cls().getvar("wm"))
 
     @property
+    def api_config(cls) -> ApiConfig:
+        return ApiConfig(**cls().getvar("api"))
+
+    @property
     def jira_config(cls) -> JiraConfig:
         return JiraConfig(**cls().getvar("jira"))
 
     def is_configured(cls) -> bool:
         wm_config = cls.wm_config
         return all([wm_config.username != "", wm_config.password != ""])
+
 
 class app_config(object, metaclass=app_config_meta):
 
@@ -82,7 +93,11 @@ class app_config(object, metaclass=app_config_meta):
 
     def init(self):
         with open(__class__.app_config, "w") as fp:
-            data = {"wm": WMConfig().dict(), "jira": JiraConfig().dict()}
+            data = {
+                "wm": WMConfig().dict(),
+                "jira": JiraConfig().dict(),
+                "api": ApiConfig().dict(),
+            }
             dump(data, fp)
 
     def getvar(self, var, *args, **kwargs):

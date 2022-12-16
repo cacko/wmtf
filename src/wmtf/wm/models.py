@@ -1,10 +1,11 @@
 from dataclasses import dataclass
 from datetime import date, datetime, timedelta
 from enum import Enum
-from typing import Optional
+from typing import Optional, Any
 import arrow
 from wmtf.tui.theme import Theme
 from humanize import naturaldelta
+
 
 class TimeDeltaUnit(Enum):
     DAYS = "d"
@@ -49,6 +50,16 @@ class ReportTask:
     clock_end: datetime
     summary: str
 
+    def dict(self) -> dict[str, Any]:
+        return {
+            "id": self.id,
+            "clock": self.clock.value,
+            "clock_time": self.clock_time.seconds,
+            "clock_start": self.clock_start.isoformat(),
+            "clock_end": self.clock_end.isoformat(),
+            "summary": self.summary,
+        }
+
 
 @dataclass
 class ReportDay:
@@ -68,6 +79,13 @@ class ReportDay:
     def is_weekend(self) -> bool:
         return self.day.weekday() in [5, 6]
 
+    def dict(self) -> dict[str, Any]:
+        return {
+            "day": self.day.isoformat(),
+            "total_work": self.total_work.seconds,
+            "tasks": [t.dict() for t in self.tasks],
+        }
+
 
 @dataclass
 class TaskInfo:
@@ -79,6 +97,9 @@ class TaskInfo:
     estimate: Optional[timedelta] = None
     estimate_used: Optional[float] = None
 
+    def dict(self) -> dict[str, Any]:
+        raise NotImplementedError
+    
     @property
     def isActive(self):
         return self.clock in [ClockLocation.HOME, ClockLocation.OFFICE]
@@ -106,7 +127,9 @@ class TaskComment:
     def timestamp_display(self):
         return arrow.get(self.timestamp).humanize()
 
-
+    def dict(self) -> dict[str, Any]:
+        raise NotImplementedError
+    
 @dataclass
 class Task:
     id: int
@@ -120,6 +143,9 @@ class Task:
     comments: Optional[list[TaskComment]] = None
     estimate: Optional[timedelta] = None
     estimate_used: Optional[float] = None
+
+    def dict(self) -> dict[str, Any]:
+        raise NotImplementedError
 
     @property
     def created(self) -> datetime:
@@ -159,7 +185,7 @@ class Task:
                     return Theme.colors.error_lighten_3
         except AssertionError:
             return Theme.colors.text
-        
+
     @property
     def estimateDisplay(self) -> str:
         try:
