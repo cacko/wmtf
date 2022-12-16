@@ -64,7 +64,7 @@ setup(
         "emoji>=2.2.0",
         "coretime>=0.1.4",
         "humanize>=4.4.0",
-        "butilka==0.1.20"
+        "butilka==0.1.25"
     ],
     setup_requires=["wheel"],
     python_requires=">=3.10",

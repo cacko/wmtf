@@ -82,7 +82,7 @@ dependencies:
     - beautifulsoup4==4.11.1
     - bottle==0.12.23
     - bs4==0.0.1
-    - butilka==0.1.20
+    - butilka==0.1.25
     - commonmark==0.9.1
     - corestring==0.1.4
     - corethread==0.1.3
