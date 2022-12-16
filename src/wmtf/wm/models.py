@@ -98,8 +98,15 @@ class TaskInfo:
     estimate_used: Optional[float] = None
 
     def dict(self) -> dict[str, Any]:
-        raise NotImplementedError
-    
+        return {
+            "id": self.id,
+            "clock_id": self.clock_id,
+            "clock": self.clock.value,
+            "clock_start": self.clock_start.isoformat() if self.clock_start else None,
+            "estimate": self.estimate.seconds if self.estimate else None,
+            "estimate_user": self.estimate_used if self.estimate_used else None,
+        }
+
     @property
     def isActive(self):
         return self.clock in [ClockLocation.HOME, ClockLocation.OFFICE]
@@ -128,8 +135,13 @@ class TaskComment:
         return arrow.get(self.timestamp).humanize()
 
     def dict(self) -> dict[str, Any]:
-        raise NotImplementedError
-    
+        return {
+            "author": self.author,
+            "comment": self.comment,
+            "timestamp": self.timestamp.isoformat(),
+        }
+
+
 @dataclass
 class Task:
     id: int
@@ -145,7 +157,18 @@ class Task:
     estimate_used: Optional[float] = None
 
     def dict(self) -> dict[str, Any]:
-        raise NotImplementedError
+        return {
+            "id": self.id,
+            "description": self.description,
+            "assignee": self.assignee,
+            "group": self.group,
+            "priority": self.priority,
+            "value": self.value,
+            "created": self.created.isoformat(),
+            "comments": [c.dict() for c in self.comments] if self.comments else [],
+            "estimate": self.estimate.seconds if self.estimate else None,
+            "estimate_used": self.estimate_used if self.estimate_used else None,
+        }
 
     @property
     def created(self) -> datetime:

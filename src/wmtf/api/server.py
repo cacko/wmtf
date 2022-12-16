@@ -4,7 +4,7 @@ from wmtf.config import app_config
 from butilka.server import BlockingServer as ButilkaServer
 from butilka.server import request
 from wmtf.wm.client import Client
-from wmtf.wm.models import ReportDay, ReportTask
+from bottle import abort
 
 
 class ServerMeta(type):
@@ -52,10 +52,15 @@ class Server(ButilkaServer, metaclass=ServerMeta):
         return [d.dict() for d in days]
 
     def do_tasks(self):
-        pass
+        tasks = Client.tasks()
+        return [t.dict() for t in tasks]
 
     def do_task(self, id):
-        pass
+        try:
+            task = Client.task(id)
+            return task.dict()
+        except Exception:
+            abort(404, f"Task {id} not found")
 
     def do_clock(self, clock_id: int, location: str):
         pass
@@ -79,12 +84,12 @@ def report():
 
 @app.route("/tasks")
 def tasks():
-    raise NotImplementedError
+    return Server.tasks()
 
 
 @app.route("/task/<id:int>")
-def task(id):
-    raise NotImplementedError
+def task(id: int):
+    return Server.task(id)
 
 
 @app.route("/clock", method="POST")
