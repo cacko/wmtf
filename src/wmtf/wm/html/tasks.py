@@ -1,5 +1,5 @@
 from typing import Optional
-
+from bs4 import Comment
 import pandas as pd
 
 from wmtf.wm.models import Task as TaskItem
@@ -18,10 +18,14 @@ from wmtf.wm.html.parser import (
 
 
 class TaskList(Parser):
+
     def parse(self) -> list[TaskInfo]:
-        df = pd.read_html(
+        print(self.struct.prettify())
+        df_all = pd.read_html(
             self.struct.prettify(), match="<1>", attrs={"cellpadding": "4"}
-        )[0]
+        )
+        print(df_all)
+        df = df_all[0]
         columns = df.iloc[0]
         dfd = pd.read_html(
             self.struct.prettify(),
@@ -31,6 +35,7 @@ class TaskList(Parser):
             skiprows=[0],
         )[0]
         dfd.columns = columns
+        print(len(list(dfd.iterrows())))
         return [
             TaskInfo(
                 id=extract_id_from_url(r.iloc[0][1]),
@@ -38,8 +43,8 @@ class TaskList(Parser):
                 clock=extract_clock(r["CLOCK"][0]),
                 summary=strip_tags(r["Summary"][0]),
                 clock_start=extract_clock_time(r["CLOCK"][0]),
-                estimate=extract_estimate(r["Work"][0]),
-                estimate_used=extract_estimate_used(r["Work"][0]),
+                estimate=extract_estimate(r["Work"]),
+                estimate_used=extract_estimate_used(r["Work"]),
             )
             for _, r in dfd.iterrows()
         ]
@@ -68,8 +73,8 @@ class Task(Parser):
             priority=task_row["Priority"],
             value=task_row["Bus. Value"],
             group=task_row["Group"],
-            estimate=extract_estimate(task_row["Work"]),
-            estimate_used=extract_estimate_used(task_row["Work"]),
+            estimate=extract_estimate([task_row["Work"]]),
+            estimate_used=extract_estimate_used([task_row["Work"]]),
         )
 
     def __get_comments(self) -> Optional[list[TaskComment]]:

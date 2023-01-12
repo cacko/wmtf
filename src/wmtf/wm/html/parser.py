@@ -77,16 +77,25 @@ def extract_comment_time(text: str) -> datetime:
     return datetime(year=1981, day=8, month=8)
 
 
-def extract_estimate(text: str) -> Optional[timedelta]:
-    if ma := ESTIMATE_PATTERN.search(text):
-        return timedelta(hours=float(ma.group("estimate")))
+def extract_estimate(text: str|list) -> Optional[timedelta]:
+    try:
+        assert isinstance(text, list)
+
+        if ma := ESTIMATE_PATTERN.search(text[0]):
+            return timedelta(hours=float(ma.group("estimate")))
+    except AssertionError:
+        return None
+
     return None
 
 
-def extract_estimate_used(text: str) -> Optional[float]:
-    if ma := ESTIMATE_PATTERN.search(text):
-        return float(ma.group("estimate_used"))
-    return None
+def extract_estimate_used(text: str|list) -> Optional[float]:
+    try:
+        assert isinstance(text, list)
+        if ma := ESTIMATE_PATTERN.search(text):
+            return float(ma.group("estimate_used"))
+    except AssertionError:
+        return None
 
 
 def get_links(s: str) -> Generator[str, None, None]:
