@@ -80,7 +80,6 @@ def extract_comment_time(text: str) -> datetime:
 def extract_estimate(text: str|list) -> Optional[timedelta]:
     try:
         assert isinstance(text, list)
-
         if ma := ESTIMATE_PATTERN.search(text[0]):
             return timedelta(hours=float(ma.group("estimate")))
     except AssertionError:
@@ -92,7 +91,7 @@ def extract_estimate(text: str|list) -> Optional[timedelta]:
 def extract_estimate_used(text: str|list) -> Optional[float]:
     try:
         assert isinstance(text, list)
-        if ma := ESTIMATE_PATTERN.search(text):
+        if ma := ESTIMATE_PATTERN.search(text[0]):
             return float(ma.group("estimate_used"))
     except AssertionError:
         return None
