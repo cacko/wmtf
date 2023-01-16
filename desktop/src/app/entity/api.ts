@@ -1,7 +1,7 @@
 export enum ApiType {
-  REPORT = 'report',
-  TASKS = 'tasks',
-  TASK = "task",
-  USER = "user",
-  CLOCK = "clock"
+  REPORT = 'api/report',
+  TASKS = 'api/tasks',
+  TASK = "api/task",
+  USER = "api/user",
+  CLOCK = "api/clock"
 }

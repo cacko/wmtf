@@ -9,7 +9,7 @@ from rich.text import Text
 from wmtf.tui.widgets.types import Focusable, Box, VisibilityMixin
 from typing import Optional
 from datetime import datetime, timedelta
-
+from wmtf.tui.widgets import TIMER_LOCK
 
 class RunningTime(object):
 
@@ -57,6 +57,7 @@ class ReportWidget(Box):
         self.__timer_active = False
 
     def load(self):
+        TIMER_LOCK.acquire()
         self.__report = Status("Loading", spinner="dots12")
         self.__report.start()
         self.start_timer()
@@ -77,6 +78,7 @@ class ReportWidget(Box):
     def update_report(self, report: list[ReportDay]):
         if isinstance(self.__report, Status):
             self.__report.stop()
+            TIMER_LOCK.release()
             self.pause_timer()
 
         self.__report = report

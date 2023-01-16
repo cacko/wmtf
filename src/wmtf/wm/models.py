@@ -96,6 +96,7 @@ class TaskInfo:
     clock_start: Optional[datetime] = None
     estimate: Optional[timedelta] = None
     estimate_used: Optional[float] = None
+    group: Optional[str] = None
 
     def dict(self) -> dict[str, Any]:
         return {

@@ -49,11 +49,16 @@ class TasksWidget(Box):
             self.update(self.render())
 
     def load(self):
-        if self.task_list:
+        try:
+            assert self.task_list
             selected = self.task_list.selected
             assert isinstance(selected, TaskInfo)
             assert isinstance(selected.id, int)
+            assert selected.group
             return selected
+        except AssertionError:
+            return False
+
 
     def clock(self) -> bool:
         if not self.task_list:
