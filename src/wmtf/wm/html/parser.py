@@ -12,7 +12,7 @@ from datetime import timedelta
 
 CLOCK_PATTERN = re.compile(r".+\((\w+)\)", re.MULTILINE)
 CLOCK_TIME_PATTERN = re.compile(
-    r"([123]\d?)/(1[012]?)\s+([01]\d):([012345]\d)", re.MULTILINE
+    r"([123]\d?)/([01][012]?)\s+([01]\d):([012345]\d)", re.MULTILINE
 )
 COMMENT_TIME_PATTERN = re.compile(
     r"(\d+)/(1[012]?)/(\d+)\s+([01]\d):([012345]\d)", re.MULTILINE

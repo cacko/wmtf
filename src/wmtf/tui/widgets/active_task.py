@@ -10,6 +10,7 @@ from textual.app import ComposeResult
 from textual.reactive import reactive
 from rich.text import Text
 from wmtf.tui.theme import Theme
+import logging
 
 
 class ActiveTaskWidget(Static):
@@ -17,8 +18,6 @@ class ActiveTaskWidget(Static):
     task_name = reactive("")
     task_work = reactive("")
     task_location = reactive("")
-
-    __task: Optional[TaskInfo] = None
 
     def on_mount(self) -> None:
         self.update(self.render())
