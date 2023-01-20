@@ -131,5 +131,4 @@ config.yaml
 /t.py
 __debug/
 .dbg
-
-<br>https://reports.travelfusion.com/reports/index.php?type=client&resolveUsernames=true&allowedusers=Conferma%2CRoomex%2CTravelplanet%2CCMAC+Group&stages%5Bdetails%5D=details&stages%5Bterms%5D=terms&stages%5Bbooking%5D=booking&startDate=2022-03-24+00%3A00&endDate=2022-03-31+00%3A00&report=searchStages&randomId=R9LK35IBTVN&run=true&submit=Run+Report
+/cache

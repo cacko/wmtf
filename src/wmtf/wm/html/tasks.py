@@ -4,6 +4,9 @@ import pandas as pd
 import logging
 from wmtf.wm.models import Task as TaskItem
 from wmtf.wm.models import TaskComment, TaskInfo
+import re
+
+BOLD_TAGS = re.compile(r'<\/?b>')
 
 from wmtf.wm.html.parser import (
     Parser,
@@ -18,6 +21,10 @@ from wmtf.wm.html.parser import (
 
 
 class TaskList(Parser):
+
+    def clean(self, html: bytes):
+        html = re.sub(BOLD_TAGS, "", html.decode()).encode()
+        return super().clean(html)
 
     def parse(self) -> list[TaskInfo]:
         df_all = pd.read_html(

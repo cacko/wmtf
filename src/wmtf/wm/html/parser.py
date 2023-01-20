@@ -9,6 +9,7 @@ from corestring import truncate
 from wmtf.wm.models import ClockLocation
 from functools import reduce
 from datetime import timedelta
+from functools import reduce
 
 CLOCK_PATTERN = re.compile(r".+\((\w+)\)", re.MULTILINE)
 CLOCK_TIME_PATTERN = re.compile(
@@ -21,6 +22,8 @@ ESTIMATE_PATTERN = re.compile(
     r"(?P<estimate_used>\d+(\.\d+)?)% of (?P<estimate>\d+(\.\d+)?)h"
 )
 TAG_RE = re.compile(r"<[^>]+>")
+BAD_CLOSING = re.compile(r"((<\/\w+)(\s+[^>]+)(>))",  re.MULTILINE)
+
 MAINTENANCE_STR = "The database is currently being archived"
 
 
@@ -145,8 +148,15 @@ class Parser(object):
         self.handle_error()
         self.init()
 
-    def clean(self, html: bytes) -> bytes:
+    def clean(self, html: bytes):
+        res = self.fix_closing(html)
+        return self.fix_tab(res)
+
+    def fix_tab(self, html: bytes) -> bytes:
         return html.replace(b"&tab;", b"\t")
+
+    def fix_closing(self, html: bytes) -> bytes:
+        return re.sub(BAD_CLOSING, r"\2\4", html.decode()).encode()
 
     def init(self):
         pass
