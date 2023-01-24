@@ -10,6 +10,7 @@ from wmtf.wm.models import ClockLocation
 from functools import reduce
 from datetime import timedelta
 from functools import reduce
+import logging
 
 CLOCK_PATTERN = re.compile(r".+\((\w+)\)", re.MULTILINE)
 CLOCK_TIME_PATTERN = re.compile(

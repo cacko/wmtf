@@ -60,6 +60,10 @@ class Task(Parser):
         for br in self.struct("br"):
             br.replace_with("<br>")
 
+    def clean(self, html: bytes):
+        html = re.sub(BOLD_TAGS, "", html.decode()).encode()
+        return super().clean(html)
+
     def parse(self) -> TaskItem:
         df = pd.read_html(
             str(self.struct),
