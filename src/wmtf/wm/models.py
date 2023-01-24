@@ -5,6 +5,15 @@ from typing import Optional, Any
 import arrow
 from wmtf.tui.theme import Theme
 from humanize import naturaldelta
+import re
+
+RECENT_PATTERN = re.compile(r"RECENT<br>(\d+)(h|m|d)")
+
+
+def extract_recent(text: str) -> Optional[tuple[int, str]]:
+    if matches := RECENT_PATTERN.search(text):
+        return (int(matches[1]), str(matches[2]))
+    return None
 
 
 class TimeDeltaUnit(Enum):
@@ -106,7 +115,7 @@ class TaskInfo:
             "clock_start": self.clock_start.isoformat() if self.clock_start else None,
             "estimate": self.estimate.seconds if self.estimate else None,
             "estimate_user": self.estimate_used if self.estimate_used else None,
-            "summary": self.summary
+            "summary": self.summary,
         }
 
     @property
@@ -174,6 +183,18 @@ class Task:
 
     @property
     def created(self) -> datetime:
+
+        if recent := extract_recent(self.create):
+            p, u = recent[0], TimeDeltaUnit(recent[1])
+            match u:
+                case TimeDeltaUnit.DAYS:
+                    return datetime.now() - timedelta(days=p)
+                case TimeDeltaUnit.HOURS:
+                    return datetime.now() - timedelta(hours=p)
+                case TimeDeltaUnit.MINUTES:
+                    return datetime.now() - timedelta(minutes=p)
+            return datetime.now()
+
         parts = [
             TimeDelta(number=float(x[:-1]), unit=TimeDeltaUnit(x[-1]))
             for x in self.create.split(" ")

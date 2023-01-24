@@ -22,6 +22,7 @@ COMMENT_TIME_PATTERN = re.compile(
 ESTIMATE_PATTERN = re.compile(
     r"(?P<estimate_used>\d+(\.\d+)?)% of (?P<estimate>\d+(\.\d+)?)h"
 )
+
 TAG_RE = re.compile(r"<[^>]+>")
 BAD_CLOSING = re.compile(r"((<\/\w+)(\s+[^>]+)(>))",  re.MULTILINE)
 
