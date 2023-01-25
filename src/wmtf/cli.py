@@ -20,6 +20,8 @@ from typing import Optional
 from coretime import seconds_to_duration
 import logging
 from wmtf.api.server import Server
+from wmtf.git import Git
+from wmtf.git.message import Message
 
 from time import sleep
 
@@ -241,6 +243,57 @@ def run():
         cli()
     except AssertionError:
         pass
+
+def select_task(title:str) -> TaskInfo:
+    try:
+        click.clear()
+        banner(txt=title, fg="blue")
+        menu_items = [
+            TaskItem(text=f"{task.summary}", obj=task) for task in Client.tasks() if task.group
+        ] + [questionary.Separator(), MenuItem(text="exit", obj=quit)]
+        with Menu(menu_items, title="Select task") as item:  # type: ignore
+            return item.obj
+    except ParserError as e:
+        click.echo(click.style(e, fg="red"))
+
+
+
+
+@cli.command('br', short_help="Create branch")
+@click.pass_context
+def create_branch(ctx: click.Context):
+    """List issues currently assigned to you and creates a branch from the name of it"""
+    task = select_task("create branch")
+    assert task
+    branch_name = Git.createName(task)
+    Git.checkout("master")
+    if questionary.confirm(f"About to create branch \"{branch_name}\""):
+        res = Git.create(branch_name)
+        print(res)
+        quit()
+
+@cli.command('commit')
+@click.option('-d', "--dry-run", default=False, is_flag=True)
+@click.option('-t', '--commit-type',
+              type=click.Choice(['ML', 'Random', 'Default', 'Manual'], case_sensitive=False), default="Default")
+def git_commit(dry_run, commit_type):
+    task = select_task("commit to")
+    assert task
+    match (commit_type.lower()):
+        case "default":
+            msg = Message.branch(task)
+        case "ml":
+            msg = Message.summarize(Git.patch())
+        case "random":
+            msg = Message.random()
+        case _:
+            msg = questionary.text("commit message: ").ask()
+
+    if dry_run:
+        print(msg)
+        return
+
+    Git.commit(msg)
 
 
 if __name__ == "__main__":
