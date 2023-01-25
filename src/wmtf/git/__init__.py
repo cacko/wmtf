@@ -20,10 +20,6 @@ class GitMeta(type):
         branch = cls().createBranch(branch_name)
         return branch.checkout()
 
-    @property
-    def issue_key(cls) -> str:
-        return cls().issueKey
-
     def checkout(cls, branch_name) -> Head:
         return cls().checkoutBranch(branch_name)
 
@@ -33,7 +29,7 @@ class GitMeta(type):
     def patch(cls) -> str:
         return "".join([x.diff.decode() for x in cls.diffs()])
 
-    def commit(cls, message) -> str:
+    def commit(cls, message) -> bool:
         return cls().doCommit(message)
 
     def push(cls):
@@ -52,13 +48,6 @@ class Git(object, metaclass=GitMeta):
 
     def __init__(self) -> None:
         self.repo = Repo(".")
-
-    @property
-    def issueKey(self):
-        mask = re.compile(self.config.branch_format)
-        active_branch = self.getActiveBranch()
-        matches = mask.match(active_branch.name)
-        return matches[0]
 
     def getBranchName(self, task: TaskInfo) -> str:
         tr = str.maketrans("", "", string.punctuation)
@@ -83,11 +72,9 @@ class Git(object, metaclass=GitMeta):
         git = self.repo.git
         r = git.add(".")
         print(r)
-        if not message.lower().startswith(self.issueKey.lower()):
-            message = f"{self.issueKey} - {message}"
         r = git.commit("-am", message)
         print(r)
-        return self.issueKey
+        return True
 
     def doSvnRebase(self):
         git = self.repo.git
