@@ -259,10 +259,10 @@ def select_task(title:str) -> TaskInfo:
 
 
 
-@cli.command('br', short_help="Create branch")
+@cli.command('branch', short_help="Create branch")
 @click.pass_context
 def create_branch(ctx: click.Context):
-    """List issues currently assigned to you and creates a branch from the name of it"""
+    """List tasks currently assigned to you and creates a branch from the name of it"""
     task = select_task("create branch")
     assert task
     branch_name = Git.createName(task)

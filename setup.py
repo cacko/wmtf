@@ -64,7 +64,7 @@ setup(
         "humanize>=4.4.0",
         "corelog>=0.0.7",
         "fastapi>=0.89.1",
-        "uvicorn>=0.20.0"
+        "uvicorn>=0.20.0",
         "gitpython>=3.1.30",
         "nltk>=3.8.1",
         "transformers>=4.26.0",
