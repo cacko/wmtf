@@ -62,7 +62,7 @@ class Git(object, metaclass=GitMeta):
 
     def getBranchName(self, task: TaskInfo) -> str:
         tr = str.maketrans("", "", string.punctuation)
-        return f"{task.id}-{snakecase((task.summary(tr))):.40}".strip()
+        return f"{task.id}-{snakecase((task.summary.translate(tr))):.40}".strip()
 
     def getActiveBranch(self) -> Head:
         return self.repo.active_branch
