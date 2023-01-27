@@ -1,7 +1,7 @@
 import click
 import questionary
 from click import Command
-from progressor import Spinner, Progress
+from progressor import Spinner
 from pyfiglet import Figlet
 from rich import print
 from time import sleep
@@ -20,15 +20,25 @@ from typing import Optional
 from coretime import seconds_to_duration
 import logging
 from wmtf.api.server import Server
-from wmtf.git import Git
+from wmtf.git import Git, GitError
 from wmtf.git.message import Message
-
+import sys
 from time import sleep
 
 
-def banner(txt: str, fg: str = "green", bold=True):
+def banner(txt: str, color:str="bright_green"):
     logo = Figlet(width=120).renderText(text=txt)
-    click.echo(click.style(logo, fg=fg, bold=bold))
+    click.secho(logo, fg=color)
+
+def output(txt:str, color="bright_blue"):
+    click.secho(txt, fg=color)
+
+def error(e: Exception, txt: Optional[str] = None):
+    if not txt:
+        txt = f"{e}"
+    click.secho(txt, fg="bright_red", err=True)
+    if e:
+        logging.debug(txt, exc_info=e)
 
 
 def validate_credentials() -> bool:
@@ -67,9 +77,7 @@ def cli(ctx: click.Context):
 @cli.command("quit")
 def quit():
     """Quit."""
-    click.echo(click.style("Bye!", fg="blue"))
-    import sys
-
+    output("Bye!", fg="blue")
     sys.exit(0)
 
 
@@ -90,7 +98,7 @@ def main_menu(ctx: click.Context):
                 case Command():
                     ctx.invoke(item.obj)
     except KeyboardInterrupt:
-        click.echo(click.style("Bye!", fg="blue"))
+        quit()
 
 
 @cli.command("settings", short_help="App settings")
@@ -99,7 +107,7 @@ def cli_settings(ctx: click.Context):
     """Set usernames and passwords"""
     try:
         click.clear()
-        banner(txt="settings", fg="yellow")
+        banner(txt="settings", color="yellow")
         menu_items = [
             MenuItem(text=f"{txt}", obj=task)
             for txt, task in [
@@ -118,14 +126,14 @@ def cli_settings(ctx: click.Context):
                 case TaskInfo():
                     ctx.forward(cli_task, task_id=item.obj.id)
     except ParserError as e:
-        click.echo(click.style(e, fg="red"))
+        error(e, txt="Settings failed")
 
 
 @cli.command("credentials", short_help="Set credentials")
 @click.pass_context
 def cli_credentials(ctx: click.Context):
     click.clear()
-    banner(txt="credentials", fg="magenta")
+    banner(txt="credentials", color="magenta")
     valid = validate_credentials()
     click.pause()
     if parent := ctx.parent:
@@ -142,7 +150,7 @@ def cli_tasks(ctx: click.Context):
     """List issues currently assigned to you and creates a branch from the name of it"""
     try:
         click.clear()
-        banner(txt="my tasks", fg="blue")
+        banner(txt="my tasks", color="bright_blue")
         menu_items = [
             TaskItem(text=f"{task.summary}", obj=task) for task in Client.tasks()
         ] + [questionary.Separator(), MenuItem(text="back", obj=main_menu)]
@@ -153,7 +161,7 @@ def cli_tasks(ctx: click.Context):
                 case TaskInfo():
                     ctx.forward(cli_task, task_id=item.obj.id)
     except ParserError as e:
-        click.echo(click.style(e, fg="red"))
+        error(e)
 
 
 @cli.command("task", short_help="Open task")
@@ -163,12 +171,12 @@ def cli_task(ctx: click.Context, task_id: int):
     try:
         task = Client.task(task_id)
         with Spinner("Loading"):
-            days = Client.report()
+            _ = Client.report()
         click.clear()
         banner(txt="Task", fg="blue")
         print(TaskRenderable(task))
     except ParserError as e:
-        click.echo(click.style(e, fg="red"))
+        error(e)
     click.pause()
     if parent := ctx.parent:
         if parent != ctx.find_root():
@@ -187,7 +195,7 @@ def cli_report(ctx: click.Context):
         banner(txt="my report", fg="red")
         print(ReportRenderable(days))
     except ParserError as e:
-        click.echo(click.style(e, fg="red"))
+        error(e)
     click.pause()
     if parent := ctx.parent:
         if parent != ctx.find_root():
@@ -205,9 +213,7 @@ def cli_clockoff(ctx: click.Context, location: str, max_delay: Optional[int]):
     if not active_task:
         return click.echo(click.style(f"No task is currently active", fg="red"))
     if ClockLocation(location.lower()) != active_task.clock:
-        return click.echo(
-            click.style(f"active task is not clocked at {location}", fg="red")
-        )
+        return error(Exception(f"active task is not clocked at {location}"))
     if max_delay:
         interval = randint(1, max(1, max_delay)) * 60
         with Spinner(seconds_to_duration(interval), spinner="arrow3") as sp:
@@ -219,9 +225,9 @@ def cli_clockoff(ctx: click.Context, location: str, max_delay: Optional[int]):
             click.echo(f">> Trying to clock off task '{active_task.summary}'")
             res = Client.clock_off(active_task.clock_id)
             if res:
-                return click.echo(click.style(f"Clocked off", fg="green"))
+                return output(f"Clocked off")
             else:
-                return click.echo(click.style(f"Clock failed", fg="red"))
+                return error(Exception(f"Clock failed"))
         except MaintenanceError:
             with Spinner("Maitenance error, retrying in 20 seconds."):
                 sleep(20)
@@ -247,17 +253,14 @@ def run():
 def select_task(title:str) -> TaskInfo:
     try:
         click.clear()
-        banner(txt=title, fg="blue")
+        banner(txt=title, color="blue")
         menu_items = [
             TaskItem(text=f"{task.summary}", obj=task) for task in Client.tasks() if task.group
         ] + [questionary.Separator(), MenuItem(text="exit", obj=quit)]
         with Menu(menu_items, title="Select task") as item:  # type: ignore
             return item.obj
     except ParserError as e:
-        click.echo(click.style(e, fg="red"))
-
-
-
+        error(e)
 
 @cli.command('branch', short_help="Create branch")
 @click.pass_context
@@ -265,12 +268,15 @@ def cli_branch(ctx: click.Context):
     """List tasks currently assigned to you and creates a branch from the name of it"""
     task = select_task("create branch")
     assert task
-    branch_name = Git.branchName(task)
-    Git.checkout("master")
-    if questionary.confirm(f"About to create branch \"{branch_name}\""):
-        res = Git.checkout(branch_name)
-        click.echo(click.style(res, fg='green'))
-        quit()
+    try:
+        branch_name = Git.branchName(task)
+        Git.checkout("master")
+        if questionary.confirm(f"About to create branch \"{branch_name}\""):
+            res = Git.checkout(branch_name)
+            output(res,)
+            quit()
+    except GitError as e:
+        error(e)
 
 @cli.command('commit')
 @click.option('-d', "--dry-run", default=False, is_flag=True)
@@ -279,23 +285,25 @@ def cli_branch(ctx: click.Context):
 def cli_commit(dry_run, commit_type):
     task = select_task("commit to")
     assert task
-    match (commit_type.lower()):
-        case "default":
-            msg = Message.branch(task)
-        case "random":
-            msg = Message.random()
-        case _:
-            msg = questionary.text("commit message: ").ask()
+    try:
+        match (commit_type.lower()):
+            case "default":
+                msg = Message.branch(task)
+            case "random":
+                msg = Message.random()
+            case _:
+                msg = questionary.text("commit message: ").ask()
 
-    if dry_run:
-        print(msg)
-        return
+        if dry_run:
+            print(msg)
+            return
+        r = Git.mergeTask(task, "--squash")
+        output(r)
 
-    r = Git.mergeTask(task, "--squash")
-    click.echo(click.style(r, fg='green'))
-
-    r = Git.commit(msg)
-    click.echo(click.style(r, fg='green'))
+        r = Git.commit(msg)
+        output(r)
+    except GitError as e:
+        error(e)
 
 
 if __name__ == "__main__":
