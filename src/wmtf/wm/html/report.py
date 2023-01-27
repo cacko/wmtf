@@ -1,7 +1,6 @@
 import re
-from dataclasses import dataclass
 from datetime import date, datetime, time, timedelta
-from typing import Any, Generator, Iterable, Optional
+from typing import Any, Generator, Iterable
 
 from bs4 import PageElement, element
 from wmtf.config import app_config

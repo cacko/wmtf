@@ -3,7 +3,6 @@ from datetime import datetime, timedelta
 from functools import reduce
 from typing import Any, Optional
 import logging
-from pathlib import Path
 from requests import Response, Session
 
 from wmtf.config import WMConfig, app_config

@@ -35,7 +35,7 @@ tasks:
     cmds:
       - task: build
       - pip uninstall -y {{.PROJECT}}
-      - find dist -type f -name "*.whl" | head -n 1 | xargs pip install
+      - find dist -type f -name "*.whl" | head -n 1 | xargs mamba run --live-stream -n base pip install
 
   publish:
     desc: publish

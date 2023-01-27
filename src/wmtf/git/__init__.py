@@ -3,6 +3,7 @@ from git import Diff, Repo, Head
 import string
 import re
 from wmtf.wm.models import TaskInfo
+from pathlib import Path
 
 
 class GitMeta(type):
@@ -47,7 +48,7 @@ class Git(object, metaclass=GitMeta):
     repo: Repo = None
 
     def __init__(self) -> None:
-        self.repo = Repo(".")
+        self.repo = Repo("..")
 
     def getBranchName(self, task: TaskInfo) -> str:
         tr = str.maketrans("", "", string.punctuation)

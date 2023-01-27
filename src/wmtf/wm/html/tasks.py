@@ -1,5 +1,4 @@
 from typing import Optional
-from bs4 import Comment
 import pandas as pd
 import logging
 from wmtf.wm.models import Task as TaskItem

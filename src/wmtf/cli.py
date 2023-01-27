@@ -275,15 +275,13 @@ def cli_branch(ctx: click.Context):
 @cli.command('commit')
 @click.option('-d', "--dry-run", default=False, is_flag=True)
 @click.option('-t', '--commit-type',
-              type=click.Choice(['ML', 'Random', 'Default', 'Manual'], case_sensitive=False), default="Default")
+              type=click.Choice(['Random', 'Default', 'Manual'], case_sensitive=False), default="Default")
 def cli_commit(dry_run, commit_type):
     task = select_task("commit to")
     assert task
     match (commit_type.lower()):
         case "default":
             msg = Message.branch(task)
-        case "ml":
-            msg = Message.summarize(Git.patch())
         case "random":
             msg = Message.random()
         case _:
