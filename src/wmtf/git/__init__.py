@@ -13,21 +13,21 @@ class GitMeta(type):
             cls._instance = type.__call__(cls, *args, **kwds)
         return cls._instance
 
-    def createName(cls, task: TaskInfo) -> str:
+    def branchName(cls, task: TaskInfo) -> str:
         return cls().getBranchName(task)
 
-    def create(cls, branch_name) -> Head:
-        branch = cls().createBranch(branch_name)
-        return branch.checkout()
 
     def checkout(cls, branch_name) -> Head:
-        return cls().checkoutBranch(branch_name)
+        return cls().doCheckout(branch_name)
 
     def diffs(cls) -> list[Diff]:
         return cls().getDiffs()
 
     def patch(cls) -> str:
         return "".join([x.diff.decode() for x in cls.diffs()])
+
+    def mergeTask(cls, task: TaskInfo, *args) -> str:
+        return cls().doMerge(cls.branchName(task), *args)
 
     def commit(cls, message) -> bool:
         return cls().doCommit(message)
@@ -56,11 +56,13 @@ class Git(object, metaclass=GitMeta):
     def getActiveBranch(self) -> Head:
         return self.repo.active_branch
 
-    def createBranch(self, name) -> Head:
-        return self.repo.create_head(name)
-
-    def checkoutBranch(self, name):
-        return self.repo.git.checkout(name)
+    def doCheckout(self, name:str):
+        repo = self.repo
+        head = Head(repo, f"refs/heads/{name}")
+        if head.is_valid():
+            return head.checkout()
+        head = self.repo.create_head(name)
+        return head.checkout()
 
     def doPull(self):
         return self.repo.git.pull()
@@ -70,18 +72,18 @@ class Git(object, metaclass=GitMeta):
 
     def doCommit(self, message):
         git = self.repo.git
-        r = git.add(".")
-        print(r)
-        r = git.commit("-am", message)
-        print(r)
-        return True
+        return git.commit("-am", message)
+
+    def doMerge(self, branch: str, *args):
+        git = self.repo.git
+        return git.merge(branch, *args)
+        
 
     def doSvnRebase(self):
         git = self.repo.git
-        git.re
+        return git.svn("rebase")
 
     def doPush(self):
         ab = self.getActiveBranch().name
         git = self.repo.git
-        r = git.push("-u", "origin", f"{ab}")
-        print(r)
+        return git.push("-u", "origin", f"{ab}")

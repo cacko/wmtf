@@ -261,22 +261,22 @@ def select_task(title:str) -> TaskInfo:
 
 @cli.command('branch', short_help="Create branch")
 @click.pass_context
-def create_branch(ctx: click.Context):
+def cli_branch(ctx: click.Context):
     """List tasks currently assigned to you and creates a branch from the name of it"""
     task = select_task("create branch")
     assert task
-    branch_name = Git.createName(task)
+    branch_name = Git.branchName(task)
     Git.checkout("master")
     if questionary.confirm(f"About to create branch \"{branch_name}\""):
-        res = Git.create(branch_name)
-        print(res)
+        res = Git.checkout(branch_name)
+        click.echo(click.style(res, fg='green'))
         quit()
 
 @cli.command('commit')
 @click.option('-d', "--dry-run", default=False, is_flag=True)
 @click.option('-t', '--commit-type',
               type=click.Choice(['ML', 'Random', 'Default', 'Manual'], case_sensitive=False), default="Default")
-def git_commit(dry_run, commit_type):
+def cli_commit(dry_run, commit_type):
     task = select_task("commit to")
     assert task
     match (commit_type.lower()):
@@ -293,7 +293,11 @@ def git_commit(dry_run, commit_type):
         print(msg)
         return
 
-    Git.commit(msg)
+    r = Git.mergeTask(task, "--squash")
+    click.echo(click.style(r, fg='green'))
+
+    r = Git.commit(msg)
+    click.echo(click.style(r, fg='green'))
 
 
 if __name__ == "__main__":
