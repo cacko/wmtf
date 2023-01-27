@@ -68,7 +68,12 @@ setup(
         "gitpython>=3.1.30",
         "nltk>=3.8.1",
         "transformers>=4.26.0",
-        "shutup>=0.2.0"
+        "shutup>=0.2.0",
+        "numpy==1.24.1",
+        "torch==2.0.0.dev20230127",
+        "sympy==1.11.1",
+        "mpmath==1.2.1",
+        
 
     ],
     setup_requires=["wheel"],
