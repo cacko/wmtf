@@ -82,11 +82,11 @@ class Git(object, metaclass=GitMeta):
         except BaseGitError as e:
             raise GitError(GitError.get_cause(e)) from e
 
-    def call(self, cmd: GitCommand, **kwds):
+    def call(self, cmd: GitCommand, *args, **kwds):
         try:
             method = cmd.value
             assert hasattr(self, method) and callable(getattr(self, method))
-            return getattr(self, method)(**kwds)
+            return getattr(self, method)(*args, **kwds)
         except BaseGitError as e:
             raise GitError(GitError.get_cause(e)) from e
 
