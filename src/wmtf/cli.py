@@ -263,7 +263,7 @@ def select_task(title: str, only_ids: Optional[list[str]] = None) -> TaskInfo:
         menu_items = [
             TaskItem(text=f"{task.summary}", obj=task)
             for task in Client.tasks()
-            if task.group and any[only_ids is None or task.id in only_ids]
+            if task.group and any([only_ids is None or task.id in only_ids])
         ] + [questionary.Separator(), MenuItem(text="exit", obj=quit)]
         with Menu(menu_items, title="Select task") as item:  # type: ignore
             return item.obj
