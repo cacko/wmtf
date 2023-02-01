@@ -82,7 +82,7 @@ def cli(ctx: click.Context):
 @cli.command("quit")
 def quit():
     """Quit."""
-    output("Bye!", fg="blue")
+    output("Bye!", color="blue")
     sys.exit(0)
 
 
@@ -256,7 +256,7 @@ def run():
         pass
 
 
-def select_task(ctx: click.Context, title: str, only_ids: Optional[list[str]] = None) -> TaskInfo:
+def select_task(title: str, only_ids: Optional[list[str]] = None) -> TaskInfo:
     try:
         click.clear()
         banner(txt=title, color="blue")
@@ -266,11 +266,7 @@ def select_task(ctx: click.Context, title: str, only_ids: Optional[list[str]] = 
             if task.group and any([only_ids is None or task.id in only_ids])
         ] + [questionary.Separator(), MenuItem(text="exit", obj=quit)]
         with Menu(menu_items, title="Select task") as item:  # type: ignore
-            match item.obj:
-                case Command():
-                    return item.obj
-                case TaskInfo():
-                    ctx.forward(cli_task, task_id=item.obj.id)
+            return item.obj
     except ParserError as e:
         error(e)
 
@@ -279,19 +275,23 @@ def select_task(ctx: click.Context, title: str, only_ids: Optional[list[str]] = 
 @click.pass_context
 def cli_branch(ctx: click.Context):
     """List tasks currently assigned to you and creates a branch from the name of it"""
-    task = select_task(ctx, "create branch")
+    task = select_task("create branch")
     assert task
-    try:
-        branch_name = Git.branchName(task)
-        Git.checkout("master")
-        if questionary.confirm(f'About to create branch "{branch_name}"'):
-            res = Git.checkout(branch_name)
-            output(
-                res,
-            )
-            quit()
-    except GitError as e:
-        error(e)
+    match task:
+        case TaskInfo():
+            try:
+                branch_name = Git.branchName(task)
+                Git.checkout("master")
+                if questionary.confirm(f'About to create branch "{branch_name}"'):
+                    res = Git.checkout(branch_name)
+                    output(
+                        res,
+                    )
+                    quit()
+            except GitError as e:
+                error(e)
+        case Command():
+            ctx.forward(task)
 
 
 @cli.command("commit", short_help="Merge a branch")
@@ -309,28 +309,33 @@ def cli_commit(ctx: click.Context, dry_run, commit_type):
     for b in Git.branches():
         if m:=mr.search(b):
             task_ids.append(int(m.group(1)))
-    task = select_task(ctx, "commit to", task_ids)
+    task = select_task("commit to", task_ids)
     assert task
-    try:
-        match (commit_type.lower()):
-            case "default":
-                comment = questionary.text("commit message: ").ask()
-                msg = "\n".join([Message.branch(task), comment])
-            case "random":
-                msg = Message.random()
-            case _:
-                msg = questionary.text("commit message: ").ask()
+    match task:
+        case TaskInfo():
+            try:
+                match (commit_type.lower()):
+                    case "default":
+                        comment = questionary.text("commit message: ").ask()
+                        msg = "\n".join([Message.branch(task), comment])
+                    case "random":
+                        msg = Message.random()
+                    case _:
+                        msg = questionary.text("commit message: ").ask()
 
-        if dry_run:
-            print(msg)
-            return
-        r = Git.mergeTask(task, "--squash")
-        output(r)
+                if dry_run:
+                    print(msg)
+                    return
+                r = Git.mergeTask(task, "--squash")
+                output(r)
 
-        r = Git.commit(msg)
-        output(r)
-    except GitError as e:
-        error(e)
+                r = Git.commit(msg)
+                output(r)
+            except GitError as e:
+                error(e)
+        case Command():
+            ctx.forward(task)
+
 
 
 if __name__ == "__main__":
