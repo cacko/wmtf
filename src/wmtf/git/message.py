@@ -26,4 +26,4 @@ class Message(object, metaclass=MessageMeta):
 
     def branchMessage(self, task: TaskInfo) -> str:
         tr = str.maketrans("", "", string.punctuation)
-        return f"({task.id}) {(task.summary.translate(tr)):.40}".strip()
+        return f"#{task.id} {(task.summary.translate(tr))}".strip()
