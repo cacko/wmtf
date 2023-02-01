@@ -291,7 +291,7 @@ def cli_branch(ctx: click.Context):
             except GitError as e:
                 error(e)
         case Command():
-            ctx.forward(task)
+            ctx.invoke(task)
 
 
 @cli.command("commit", short_help="Merge a branch")
@@ -334,7 +334,7 @@ def cli_commit(ctx: click.Context, dry_run, commit_type):
             except GitError as e:
                 error(e)
         case Command():
-            ctx.forward(task)
+            ctx.invoke(task)
 
 
 
