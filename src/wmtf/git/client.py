@@ -11,6 +11,7 @@ from wmtf.wm.models import TaskInfo
 from enum import StrEnum
 from stringcase import sentencecase
 import logging
+from os import environ
 
 
 class GitCommand(StrEnum):
@@ -83,7 +84,7 @@ class Git(object, metaclass=GitMeta):
 
     def __init__(self) -> None:
         try:
-            self.repo = Repo(".")
+            self.repo = Repo(environ.get("WMTF_GIT_REPO", "."))
         except BaseGitError as e:
             raise GitError(GitError.get_cause(e)) from e
 
