@@ -24,14 +24,19 @@ from wmtf.git import Git, GitError
 from wmtf.git.message import Message
 import sys
 from time import sleep
+import re
+from functools import reduce
 
 
-def banner(txt: str, color:str="bright_green"):
+
+def banner(txt: str, color: str = "bright_green"):
     logo = Figlet(width=120).renderText(text=txt)
     click.secho(logo, fg=color)
 
-def output(txt:str, color="bright_blue"):
+
+def output(txt: str, color="bright_blue"):
     click.secho(txt, fg=color)
+
 
 def error(e: Exception, txt: Optional[str] = None):
     if not txt:
@@ -250,19 +255,23 @@ def run():
     except AssertionError:
         pass
 
-def select_task(title:str) -> TaskInfo:
+
+def select_task(title: str, only_ids: Optional[list[str]] = None) -> TaskInfo:
     try:
         click.clear()
         banner(txt=title, color="blue")
         menu_items = [
-            TaskItem(text=f"{task.summary}", obj=task) for task in Client.tasks() if task.group
+            TaskItem(text=f"{task.summary}", obj=task)
+            for task in Client.tasks()
+            if task.group and any[only_ids is None or task.id in only_ids]
         ] + [questionary.Separator(), MenuItem(text="exit", obj=quit)]
         with Menu(menu_items, title="Select task") as item:  # type: ignore
             return item.obj
     except ParserError as e:
         error(e)
 
-@cli.command('branch', short_help="Create branch")
+
+@cli.command("branch", short_help="Create branch")
 @click.pass_context
 def cli_branch(ctx: click.Context):
     """List tasks currently assigned to you and creates a branch from the name of it"""
@@ -271,21 +280,31 @@ def cli_branch(ctx: click.Context):
     try:
         branch_name = Git.branchName(task)
         Git.checkout("master")
-        if questionary.confirm(f"About to create branch \"{branch_name}\""):
+        if questionary.confirm(f'About to create branch "{branch_name}"'):
             res = Git.checkout(branch_name)
-            output(res,)
+            output(
+                res,
+            )
             quit()
     except GitError as e:
         error(e)
 
-@cli.command('commit')
-@click.option('-d', "--dry-run", default=False, is_flag=True)
-@click.option('-t', '--commit-type',
-              type=click.Choice(['Random', 'Default', 'Manual'], case_sensitive=False), default="Default")
+
+@cli.command("commit", short_help="Merge a branch")
+@click.option("-d", "--dry-run", default=False, is_flag=True)
+@click.option(
+    "-t",
+    "--commit-type",
+    type=click.Choice(["Random", "Default", "Manual"], case_sensitive=False),
+    default="Default",
+)
 def cli_commit(dry_run, commit_type):
-    Git.branches()
-    quit()
-    task = select_task("commit to")
+    mr = re.compile(r'^(\d+)-')
+    task_ids = []
+    for b in Git.branches():
+        if m:=mr.search(b):
+            task_ids.append(int(m.group(1)))
+    task = select_task("commit to", task_ids)
     assert task
     try:
         match (commit_type.lower()):

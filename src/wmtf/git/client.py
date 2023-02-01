@@ -137,4 +137,4 @@ class Git(object, metaclass=GitMeta):
 
     def _branches(self):
         ls = self.repo.branches
-        logging.info(ls)
+        return [b.name for b in ls]
