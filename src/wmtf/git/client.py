@@ -91,7 +91,7 @@ class Git(object, metaclass=GitMeta):
             raise GitError(GitError.get_cause(e)) from e
 
 
-    def _branch_name(self, task: TaskInfo) -> str:
+    def _branch_name(self, task: TaskInfo, *args) -> str:
         tr = str.maketrans("", "", string.punctuation)
         return f"{task.id}-{snakecase((task.summary.translate(tr))):.40}".strip()
 
