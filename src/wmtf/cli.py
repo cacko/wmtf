@@ -256,7 +256,7 @@ def run():
         pass
 
 
-def select_task(title: str, only_ids: Optional[list[str]] = None) -> TaskInfo:
+def select_task(ctx: click.Context, title: str, only_ids: Optional[list[str]] = None) -> TaskInfo:
     try:
         click.clear()
         banner(txt=title, color="blue")
@@ -266,7 +266,11 @@ def select_task(title: str, only_ids: Optional[list[str]] = None) -> TaskInfo:
             if task.group and any([only_ids is None or task.id in only_ids])
         ] + [questionary.Separator(), MenuItem(text="exit", obj=quit)]
         with Menu(menu_items, title="Select task") as item:  # type: ignore
-            return item.obj
+            match item.obj:
+                case Command():
+                    return item.obj
+                case TaskInfo():
+                    ctx.forward(cli_task, task_id=item.obj.id)
     except ParserError as e:
         error(e)
 
@@ -275,7 +279,7 @@ def select_task(title: str, only_ids: Optional[list[str]] = None) -> TaskInfo:
 @click.pass_context
 def cli_branch(ctx: click.Context):
     """List tasks currently assigned to you and creates a branch from the name of it"""
-    task = select_task("create branch")
+    task = select_task(ctx, "create branch")
     assert task
     try:
         branch_name = Git.branchName(task)
@@ -292,19 +296,20 @@ def cli_branch(ctx: click.Context):
 
 @cli.command("commit", short_help="Merge a branch")
 @click.option("-d", "--dry-run", default=False, is_flag=True)
+@click.pass_context
 @click.option(
     "-t",
     "--commit-type",
     type=click.Choice(["Random", "Default", "Manual"], case_sensitive=False),
     default="Default",
 )
-def cli_commit(dry_run, commit_type):
+def cli_commit(ctx: click.Context, dry_run, commit_type):
     mr = re.compile(r'^(\d+)-')
     task_ids = []
     for b in Git.branches():
         if m:=mr.search(b):
             task_ids.append(int(m.group(1)))
-    task = select_task("commit to", task_ids)
+    task = select_task(ctx, "commit to", task_ids)
     assert task
     try:
         match (commit_type.lower()):
