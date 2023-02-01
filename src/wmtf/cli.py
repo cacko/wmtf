@@ -288,7 +288,8 @@ def cli_commit(dry_run, commit_type):
     try:
         match (commit_type.lower()):
             case "default":
-                msg = Message.branch(task)
+                comment = questionary.text("commit message: ").ask()
+                msg = "\n".join([Message.branch(task), comment])
             case "random":
                 msg = Message.random()
             case _:
