@@ -10,6 +10,7 @@ import string
 from wmtf.wm.models import TaskInfo
 from enum import StrEnum
 from stringcase import sentencecase
+import logging
 
 
 class GitCommand(StrEnum):
@@ -21,6 +22,7 @@ class GitCommand(StrEnum):
     COMMIT = "_commit"
     PUSH = "_push"
     PULL = "_pull"
+    BRANCHES = "_branches"
 
 
 class GitError(BaseGitError):
@@ -67,6 +69,9 @@ class GitMeta(type):
 
     def pull(cls):
         return cls().call(GitCommand.PULL)
+
+    def branches(cls) -> list[str]:
+        return cls().call(GitCommand.BRANCHES)
 
     @property
     def active_branch(cls) -> Head:
@@ -128,3 +133,7 @@ class Git(object, metaclass=GitMeta):
         ab = self.getActiveBranch().name
         git = self.repo.git
         return git.push("-u", "origin", f"{ab}")
+
+    def _branches(self):
+        ls = self.repo.branches
+        logging.info(ls)

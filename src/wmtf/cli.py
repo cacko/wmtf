@@ -283,6 +283,8 @@ def cli_branch(ctx: click.Context):
 @click.option('-t', '--commit-type',
               type=click.Choice(['Random', 'Default', 'Manual'], case_sensitive=False), default="Default")
 def cli_commit(dry_run, commit_type):
+    Git.branches()
+    quit()
     task = select_task("commit to")
     assert task
     try:
