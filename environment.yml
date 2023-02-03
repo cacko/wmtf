@@ -76,15 +76,19 @@ dependencies:
   - yaml=0.2.5
   - zipp=3.11.0
   - pip:
+      - aiohttp==3.8.3
+      - aiosignal==1.3.1
       - anyio==3.6.2
       - appdirs==1.4.4
       - arrow==1.2.3
+      - async-timeout==4.0.2
+      - attrs==22.2.0
       - beautifulsoup4==4.11.1
       - better-exceptions==0.3.3
       - bottle==0.12.23
       - bs4==0.0.1
       - commonmark==0.9.1
-      - corelog==0.0.7
+      - corelog==0.0.8
       - corestring==0.1.4
       - corethread==0.1.3
       - coretime==0.1.4
@@ -94,6 +98,7 @@ dependencies:
       - emoji==2.2.0
       - fastapi==0.89.1
       - filelock==3.8.0
+      - frozenlist==1.3.3
       - gitdb==4.0.10
       - gitpython==3.1.30
       - h11==0.14.0
@@ -107,10 +112,14 @@ dependencies:
       - itsdangerous==2.1.2
       - jinja2==3.1.2
       - joblib==1.2.0
+      - markdown-it-py==2.1.0
       - markupsafe==2.1.1
       - marshmallow==3.19.0
       - marshmallow-enum==1.5.1
+      - mdurl==0.1.2
       - mpmath==1.2.1
+      - msgpack==1.0.4
+      - multidict==6.0.4
       - nanoid==2.0.0
       - numpy==1.24.1
       - orjson==3.8.5
@@ -118,7 +127,7 @@ dependencies:
       - progressor==1.0.14
       - prompt-toolkit==3.0.33
       - pyfiglet==0.8.post1
-      - pygments==2.13.0
+      - pygments==2.14.0
       - python-dateutil==2.8.2
       - python-dotenv==0.21.0
       - python-multipart==0.0.5
@@ -127,7 +136,7 @@ dependencies:
       - random-user-agent==1.0.1
       - regex==2022.10.31
       - rfc3986==1.5.0
-      - rich==12.6.0
+      - rich==13.3.1
       - six==1.16.0
       - smmap==5.0.0
       - sniffio==1.3.0
@@ -135,7 +144,7 @@ dependencies:
       - starlette==0.22.0
       - stringcase==1.2.0
       - structlog==22.3.0
-      - textual==0.5.0
+      - textual==0.10.1
       - tqdm==4.64.1
       - typing-inspect==0.8.0
       - ujson==5.7.0
@@ -146,4 +155,5 @@ dependencies:
       - watchfiles==0.18.1
       - wcwidth==0.2.5
       - websockets==10.4
+      - yarl==1.8.2
 prefix: /Volumes/Devo/miniforge3/envs/wmtf

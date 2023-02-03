@@ -1,9 +1,7 @@
 from rich.text import Text
 from textual.reactive import reactive
 from textual.widget import Widget
-from wmtf.wm.models import TaskInfo
 from wmtf.wm.client import Client
-from typing import Optional
 from textual.widgets import Static
 from textual.widget import Widget
 from textual.app import ComposeResult
@@ -21,7 +19,7 @@ class ActiveTaskWidget(Static):
 
     def on_mount(self) -> None:
         self.update(self.render())
-        self.update_timer = self.set_interval(1 / 60, self.update_info, pause=True)
+        self.update_timer = self.set_interval(1 / 2, self.update_info, pause=True)
         self.update_timer.resume()
 
     def update_info(self):

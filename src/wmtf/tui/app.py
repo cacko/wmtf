@@ -17,7 +17,6 @@ from webbrowser import open_new_tab
 from typing import Any
 from wmtf import RESOURCES_PATH
 
-
 class Tui(App):
 
     CSS_PATH = (RESOURCES_PATH / "app.css").as_posix()
@@ -57,7 +56,7 @@ class Tui(App):
         return Theme.system.generate()
 
     def compose(self) -> ComposeResult:
-        self._bindings.bind("tab", "switch_view", show=False, universal=True)
+        self._bindings.bind("tab", "switch_view", show=False, priority=True)
         self.title = "Work Manager"
         # yield WidgetAlert(id="alert", classes="hidden")
         yield Header(show_clock=True)

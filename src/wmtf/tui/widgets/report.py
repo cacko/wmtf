@@ -10,6 +10,14 @@ from wmtf.tui.widgets.types import Focusable, Box, VisibilityMixin
 from typing import Optional
 from datetime import datetime, timedelta
 from wmtf.tui.widgets import TIMER_LOCK
+from textual import log
+from enum import IntEnum
+
+
+class TIMER_EVENT(IntEnum):
+    LOADING = 1
+    RUNNING = 2
+
 
 class RunningTime(object):
 
@@ -41,33 +49,50 @@ class ReportWidget(Box):
     __report: Optional[list[ReportDay] | Status] = None
     __running_total = reactive("")
     __running_time: Optional[RunningTime] = None
-    __timer_active = False
+    __timer_active: Optional[TIMER_EVENT] = None
 
     @property
     def title(self):
         return "Report"
 
-    def start_timer(self):
-        if not self.__timer_active:
-            self.update_timer.resume()
-            self.__timer_active = True
+    def start_timer(self, event: TIMER_EVENT):
+        log(f"TIMER_ACTIVE {self.__timer_active}")
+        if timer := self.__timer_active:
+            match timer:
+                case TIMER_EVENT.RUNNING:
+                    self.running_timer.pause()
+                case TIMER_EVENT.LOADING:
+                    self.update_timer.pause()
+        match event:
+            case TIMER_EVENT.RUNNING:
+                self.running_timer.resume()
+                self.__timer_active = event
+            case TIMER_EVENT.LOADING:
+                self.update_timer.resume()
+                self.__timer_active = event
 
     def pause_timer(self):
-        self.update_timer.pause()
-        self.__timer_active = False
+        if timer := self.__timer_active:
+            match timer:
+                case TIMER_EVENT.RUNNING:
+                    self.running_timer.pause()
+                case TIMER_EVENT.LOADING:
+                    self.update_timer.pause()
+        self.__timer_active = None
 
     def load(self):
         TIMER_LOCK.acquire()
         self.__report = Status("Loading", spinner="dots12")
         self.__report.start()
-        self.start_timer()
+        self.start_timer(TIMER_EVENT.LOADING)
         t = ReportService(self.update_report)
         t.start()
 
     def on_mount(self) -> None:
         self.update_timer = self.set_interval(1 / 60, self.on_timer, pause=True)
+        self.running_timer = self.set_interval(1 / 2, self.on_timer, pause=True)
         self.load()
-        
+
     def on_timer(self, *args, **kwargs) -> None:
         if isinstance(self.__report, list) and self.__running_time:
             self.__running_total = str(self.__running_time)
@@ -79,7 +104,6 @@ class ReportWidget(Box):
         if isinstance(self.__report, Status):
             self.__report.stop()
             TIMER_LOCK.release()
-            self.pause_timer()
 
         self.__report = report
         self.update(self.render())
@@ -87,7 +111,8 @@ class ReportWidget(Box):
             today = next(filter(lambda x: x.is_today, report), None)
             if today:
                 self.__running_time = RunningTime(today.total_work)
-                self.start_timer()
+                self.start_timer(TIMER_EVENT.RUNNING)
+                log("time started")
 
     def render(self):
         if isinstance(self.__report, Status):
@@ -95,7 +120,6 @@ class ReportWidget(Box):
         elif isinstance(self.__report, list):
             return self.get_panel(ReportRenderable(self.__report, self.__running_total))
         return self.get_panel(Text("NOT FOUND"))
-
 
 
 class Report(VisibilityMixin, Focusable):

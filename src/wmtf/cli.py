@@ -25,7 +25,6 @@ from wmtf.git.message import Message
 import sys
 from time import sleep
 import re
-from functools import reduce
 
 
 
