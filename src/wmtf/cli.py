@@ -23,9 +23,7 @@ from wmtf.api.server import Server
 from wmtf.git import Git, GitError
 from wmtf.git.message import Message
 import sys
-from time import sleep
 import re
-
 
 
 def banner(txt: str, color: str = "bright_green"):
@@ -64,10 +62,10 @@ def validate_credentials() -> bool:
         app_config.set(k, v)
     try:
         Client.validate_setup()
-        click.echo(click.style(f"Credentials are valid", fg="green"))
+        output("Credentials are valid", color="green")
         return True
     except LoginError as e:
-        click.echo(click.style(e, fg="red"))
+        error(e)
     return False
 
 
@@ -118,9 +116,11 @@ def cli_settings(ctx: click.Context):
                 ("Credentials", cli_credentials),
             ]
         ] + [
-            DisabledItem(disabled=f"config dir", text=f"{app_config.config_dir}"),
-            DisabledItem(disabled=f"cache dir", text=f"{app_config.cache_dir}"),
-            DisabledItem(disabled=f"data dir", text=f"{app_config.data_dir}"),
+            DisabledItem(disabled="config dir",
+                         text=f"{app_config.config_dir}"),
+            DisabledItem(disabled="cache dir",
+                         text=f"{app_config.cache_dir}"),
+            DisabledItem(disabled="data dir", text=f"{app_config.data_dir}"),
             MenuItem(text="<< back", obj=main_menu),
         ]
         with Menu(menu_items, title="Select task") as item:
@@ -151,12 +151,12 @@ def cli_credentials(ctx: click.Context):
 @cli.command("tasks", short_help="My Tasks")
 @click.pass_context
 def cli_tasks(ctx: click.Context):
-    """List issues currently assigned to you and creates a branch from the name of it"""
     try:
         click.clear()
         banner(txt="my tasks", color="bright_blue")
         menu_items = [
-            TaskItem(text=f"{task.summary}", obj=task) for task in Client.tasks()
+            TaskItem(text=f"{task.summary}", obj=task)
+            for task in Client.tasks()
         ] + [questionary.Separator(), MenuItem(text="back", obj=main_menu)]
         with Menu(menu_items, title="Select task") as item:  # type: ignore
             match item.obj:
@@ -177,7 +177,7 @@ def cli_task(ctx: click.Context, task_id: int):
         with Spinner("Loading"):
             _ = Client.report()
         click.clear()
-        banner(txt="Task", fg="blue")
+        banner(txt="Task", color="blue")
         print(TaskRenderable(task))
     except ParserError as e:
         error(e)
@@ -196,7 +196,7 @@ def cli_report(ctx: click.Context):
         with Spinner("Loading"):
             days = Client.report()
         click.clear()
-        banner(txt="my report", fg="red")
+        banner(txt="my report", color="red")
         print(ReportRenderable(days))
     except ParserError as e:
         error(e)
@@ -209,13 +209,14 @@ def cli_report(ctx: click.Context):
 
 @cli.command("clock-off", short_help="Clock off current active task")
 @click.pass_context
-@click.argument("location", type=click.Choice(["home", "office"], case_sensitive=False))
+@click.argument("location", type=click.Choice(["home", "office"],
+                                              case_sensitive=False))
 @click.option("--max-delay", type=int)
 def cli_clockoff(ctx: click.Context, location: str, max_delay: Optional[int]):
     tasks = Client.tasks()
     active_task = next(filter(lambda x: x.isActive, tasks), None)
     if not active_task:
-        return click.echo(click.style(f"No task is currently active", fg="red"))
+        return error(Exception("No task is currently active"))
     if ClockLocation(location.lower()) != active_task.clock:
         return error(Exception(f"active task is not clocked at {location}"))
     if max_delay:
@@ -229,9 +230,9 @@ def cli_clockoff(ctx: click.Context, location: str, max_delay: Optional[int]):
             click.echo(f">> Trying to clock off task '{active_task.summary}'")
             res = Client.clock_off(active_task.clock_id)
             if res:
-                return output(f"Clocked off")
+                return output("Clocked off")
             else:
-                return error(Exception(f"Clock failed"))
+                return error(Exception("Clock failed"))
         except MaintenanceError:
             with Spinner("Maitenance error, retrying in 20 seconds."):
                 sleep(20)
@@ -255,7 +256,7 @@ def run():
         pass
 
 
-def select_task(title: str, only_ids: Optional[list[str]] = None) -> TaskInfo:
+def select_task(title: str, only_ids: Optional[list[str]] = None):
     try:
         click.clear()
         banner(txt=title, color="blue")
@@ -273,7 +274,6 @@ def select_task(title: str, only_ids: Optional[list[str]] = None) -> TaskInfo:
 @cli.command("branch", short_help="Create branch")
 @click.pass_context
 def cli_branch(ctx: click.Context):
-    """List tasks currently assigned to you and creates a branch from the name of it"""
     task = select_task("create branch")
     assert task
     match task:
@@ -281,11 +281,9 @@ def cli_branch(ctx: click.Context):
             try:
                 branch_name = Git.branchName(task)
                 Git.checkout("master")
-                if questionary.confirm(f'About to create branch "{branch_name}"'):
+                if questionary.confirm(f'Create "{branch_name}"?'):
                     res = Git.checkout(branch_name)
-                    output(
-                        res,
-                    )
+                    output(res.name)
                     quit()
             except GitError as e:
                 error(e)
@@ -306,7 +304,7 @@ def cli_commit(ctx: click.Context, dry_run, commit_type):
     mr = re.compile(r'^(\d+)-')
     task_ids = []
     for b in Git.branches():
-        if m:=mr.search(b):
+        if m := mr.search(b):
             task_ids.append(int(m.group(1)))
     task = select_task("commit to", task_ids)
     assert task
@@ -327,14 +325,11 @@ def cli_commit(ctx: click.Context, dry_run, commit_type):
                     return
                 r = Git.mergeTask(task, "--squash")
                 output(r)
-
                 r = Git.commit(msg)
-                output(r)
             except GitError as e:
                 error(e)
         case Command():
             ctx.invoke(task)
-
 
 
 if __name__ == "__main__":

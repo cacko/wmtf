@@ -9,6 +9,7 @@ __name__ = "wmtf"
 vp = Path(__file__).parent / "version.txt"
 __version__ = semver.VersionInfo.parse(vp.read_text().strip())
 
+
 def version():
     if len(sys.argv) > 1 and sys.argv[1] == "bdist_wheel":
         nv = f"{__version__.bump_patch()}"
