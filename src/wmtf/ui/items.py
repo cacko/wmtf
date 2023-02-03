@@ -57,12 +57,14 @@ class TaskItem(MenuItem):
     @property
     def display(self) -> AnyFormattedText:
         if self.obj.isActive:
-            return to_formatted_text(merge_formatted_text(
-                [
-                    keyword(self.text),
-                    punctuation(f" {self.clock_icon.value}"),
-                ]
-            ))
+            return to_formatted_text(
+                merge_formatted_text(
+                    [
+                        keyword(self.text),
+                        punctuation(f" {self.clock_icon.value}"),
+                    ]
+                )
+            )
         return text(self.obj.summary)
 
     @property
@@ -73,12 +75,11 @@ class TaskItem(MenuItem):
     def clock_icon(self) -> ClockIcon:
         return self.obj.clock.icon
 
+
 class DisabledItem(MenuItem):
-    
     @property
     def display(self):
         return comment(self.text)
-
 
 
 MT = TypeVar("MT", MenuItem, TaskItem, DisabledItem, Separator)

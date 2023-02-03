@@ -16,6 +16,8 @@ from wmtf.config import app_config
 from webbrowser import open_new_tab
 from typing import Any
 from wmtf import RESOURCES_PATH
+from app_version import get_string_version
+
 
 class Tui(App):
 
@@ -57,7 +59,7 @@ class Tui(App):
 
     def compose(self) -> ComposeResult:
         self._bindings.bind("tab", "switch_view", show=False, priority=True)
-        self.title = "Work Manager"
+        self.title = f"Work Manager v{get_string_version('wmtf')}"
         # yield WidgetAlert(id="alert", classes="hidden")
         yield Header(show_clock=True)
         yield Container(
@@ -102,7 +104,8 @@ class Tui(App):
 
     def action_toggle_location(self):
         self.widget_location.location(
-            self.LOCATIONS[int(not self.LOCATIONS.index(app_config.wm_config.location))]
+            self.LOCATIONS[int(not self.LOCATIONS.index(
+                app_config.wm_config.location))]
         )
 
     def action_open_browser(self, link: str):

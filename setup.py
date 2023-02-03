@@ -67,7 +67,8 @@ setup(
         "uvicorn>=0.20.0",
         "gitpython>=3.1.30",
         "aiohttp>=3.8.3",
-        "msgpack>=1.0.4"
+        "msgpack>=1.0.4",
+        "app-version>=0.2.1"
     ],
     setup_requires=["wheel"],
     python_requires=">=3.10",
