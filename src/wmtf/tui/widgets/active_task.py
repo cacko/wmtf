@@ -3,12 +3,8 @@ from textual.reactive import reactive
 from textual.widget import Widget
 from wmtf.wm.client import Client
 from textual.widgets import Static
-from textual.widget import Widget
 from textual.app import ComposeResult
-from textual.reactive import reactive
-from rich.text import Text
 from wmtf.tui.theme import Theme
-import logging
 
 
 class ActiveTaskWidget(Static):
@@ -18,8 +14,12 @@ class ActiveTaskWidget(Static):
     task_location = reactive("")
 
     def on_mount(self) -> None:
+        self.update_timer = self.set_interval(
+            interval=1 / 2,
+            callback=self.update_info,
+            pause=True
+        )
         self.update(self.render())
-        self.update_timer = self.set_interval(1 / 2, self.update_info, pause=True)
         self.update_timer.resume()
 
     def update_info(self):
@@ -31,12 +31,14 @@ class ActiveTaskWidget(Static):
         else:
             self.task_name = ""
             self.task_work = ""
+        self.refresh()
 
     def render(self) -> Text:
         renderable = Text(overflow="fold")
         renderable.append(self.task_location)
         renderable.append(f" {self.task_work}", Theme.colors.secondary)
-        renderable.append(f" {self.task_name}", Theme.colors.secondary_darken_3)
+        renderable.append(f" {self.task_name}",
+                          Theme.colors.secondary_darken_3)
         return renderable
 
 

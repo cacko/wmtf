@@ -17,7 +17,6 @@ class UAMeta(type):
         return cls().getRandomUserAgent()
 
 
-
 class UA(object, metaclass=UAMeta):
 
     def __init__(self):

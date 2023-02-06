@@ -1,11 +1,9 @@
 from typing import Optional
 import pandas as pd
-import logging
 from wmtf.wm.models import Task as TaskItem
 from wmtf.wm.models import TaskComment, TaskInfo
 import re
 
-BOLD_TAGS = re.compile(r'<\/?b>')
 
 from wmtf.wm.html.parser import (
     Parser,
@@ -17,6 +15,8 @@ from wmtf.wm.html.parser import (
     extract_estimate,
     extract_estimate_used,
 )
+
+BOLD_TAGS = re.compile(r'<\/?b>')
 
 
 class TaskList(Parser):

@@ -1,7 +1,6 @@
 from queue import Queue
 from wmtf.config import app_config
 import uvicorn
-import logging
 from fastapi import FastAPI
 from .routers import api
 from fastapi.middleware.cors import CORSMiddleware
@@ -22,7 +21,6 @@ def create_rest_app():
         allow_headers=["*"],
     )
 
-
     app.include_router(api.router)
     return app
 
@@ -34,7 +32,7 @@ class Server(object):
     def __init__(self, *args, **kwargs):
         server_config = uvicorn.Config(
             app=create_rest_app,
-            host=app_config.api_config.host, 
+            host=app_config.api_config.host,
             port=app_config.api_config.port,
             factory=True
         )

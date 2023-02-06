@@ -1,10 +1,10 @@
-from dataclasses import dataclass
 from typing import Any, Optional
 from typing import TypeVar
 from prompt_toolkit.styles.pygments import style_from_pygments_cls
 from pygments.styles import get_style_by_name
 from questionary import Separator
 from questionary.prompts.common import FormattedText
+from pydantic import BaseModel
 
 from prompt_toolkit.formatted_text import (
     FormattedText as PT_FormattedText,
@@ -36,8 +36,7 @@ def text(s: str) -> PT_FormattedText:
     return to_formatted_text(PygmentsTokens([(Token.Text, s)]))
 
 
-@dataclass
-class MenuItem:
+class MenuItem(BaseModel):
     text: str
     obj: Optional[Any] = None
     disabled: Optional[str] = None

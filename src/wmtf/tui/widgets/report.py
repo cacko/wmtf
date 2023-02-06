@@ -89,8 +89,14 @@ class ReportWidget(Box):
         t.start()
 
     def on_mount(self) -> None:
-        self.update_timer = self.set_interval(1 / 60, self.on_timer, pause=True)
-        self.running_timer = self.set_interval(1 / 2, self.on_timer, pause=True)
+        self.update_timer = self.set_interval(
+            interval=1 / 60,
+            callback=self.on_timer,
+            pause=True)
+        self.running_timer = self.set_interval(
+            interval=1 / 2,
+            callback=self.on_timer,
+            pause=True)
         self.load()
 
     def on_timer(self, *args, **kwargs) -> None:
@@ -118,7 +124,10 @@ class ReportWidget(Box):
         if isinstance(self.__report, Status):
             return self.get_panel(self.__report)
         elif isinstance(self.__report, list):
-            return self.get_panel(ReportRenderable(self.__report, self.__running_total))
+            return self.get_panel(ReportRenderable(
+                self.__report,
+                self.__running_total
+            ))
         return self.get_panel(Text("NOT FOUND"))
 
 

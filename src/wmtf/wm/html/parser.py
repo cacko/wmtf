@@ -9,8 +9,6 @@ from corestring import truncate
 from wmtf.wm.models import ClockLocation
 from functools import reduce
 from datetime import timedelta
-from functools import reduce
-import logging
 
 CLOCK_PATTERN = re.compile(r".+\((\w+)\)", re.MULTILINE)
 CLOCK_TIME_PATTERN = re.compile(
@@ -82,7 +80,7 @@ def extract_comment_time(text: str) -> datetime:
     return datetime(year=1981, day=8, month=8)
 
 
-def extract_estimate(text: str|list) -> Optional[timedelta]:
+def extract_estimate(text: str | list) -> Optional[timedelta]:
     try:
         assert isinstance(text, list)
         if ma := ESTIMATE_PATTERN.search(text[0]):
@@ -93,7 +91,7 @@ def extract_estimate(text: str|list) -> Optional[timedelta]:
     return None
 
 
-def extract_estimate_used(text: str|list) -> Optional[float]:
+def extract_estimate_used(text: str | list) -> Optional[float]:
     try:
         assert isinstance(text, list)
         if ma := ESTIMATE_PATTERN.search(text[0]):
@@ -113,13 +111,16 @@ def get_links(s: str) -> Generator[str, None, None]:
 
 def markdown_links(s: str) -> str:
     return reduce(
-        lambda r, url: r.replace(url, f"[{truncate(url, 50)}]({url})"), get_links(s), s
+        lambda r, url: r.replace(url, f"[{truncate(url, 50)}]({url})"),
+        get_links(s),
+        s
     )
 
 
 def console_links(s: str) -> str:
     return reduce(
-        lambda r, url: r.replace(url, f"[link={url}]{truncate(url, 50)}[/link]"),
+        lambda r, url: r.replace(
+            url, f"[link={url}]{truncate(url, 50)}[/link]"),
         get_links(s),
         s,
     )

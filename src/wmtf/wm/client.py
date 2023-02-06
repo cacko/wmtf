@@ -86,7 +86,11 @@ class ClientMeta(type):
     def validate_setup(cls) -> bool:
         return cls().do_login()
 
-    def report(cls, start: Optional[datetime] = None, end: Optional[datetime] = None):
+    def report(
+        cls,
+        start: Optional[datetime] = None,
+        end: Optional[datetime] = None
+    ):
         today = datetime.today()
         if not start:
             start = (today - timedelta(days=today.weekday())).replace(
@@ -219,9 +223,10 @@ class Client(object, metaclass=ClientMeta):
                 return self.__save_response(self.session.get(url, **kw), cmd)
             case _:
                 raise NotImplementedError
-            
+
     def __save_response(self, resp: Response, cmd: Command) -> Response:
         if logging.getLogger().level == logging.DEBUG:
-            with (app_config.cache_dir / f"{cmd.__class__.__name__}.html") as fp:
+            fpth = app_config.cache_dir / f"{cmd.__class__.__name__}.html"
+            with fpth as fp:
                 fp.write_bytes(resp.content)
         return resp

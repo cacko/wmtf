@@ -150,7 +150,8 @@ class Theme(object, metaclass=ThemeMeta):
     def __init__(self) -> None:
         self.__system = self.DEFAULT_COLORS[self.__theme]
         self.__colors = Colors(
-            **{k.replace("-", "_"): v for k, v in self.__system.generate().items()}
+            **{k.replace("-", "_"): v
+               for k, v in self.__system.generate().items()}
         )
 
     def get_system(self) -> ColorSystem:
@@ -160,7 +161,8 @@ class Theme(object, metaclass=ThemeMeta):
         self.__theme = value
         self.__system = self.DEFAULT_COLORS[self.__theme]
         self.__colors = Colors(
-            **{k.replace("-", "_"): v for k, v in self.__system.generate().items()}
+            **{k.replace("-", "_"): v
+               for k, v in self.__system.generate().items()}
         )
 
     def get_colors(self) -> Colors:

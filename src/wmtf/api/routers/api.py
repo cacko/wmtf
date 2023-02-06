@@ -1,6 +1,5 @@
 from fastapi import APIRouter, Request, HTTPException
 from wmtf.wm.client import Client
-import logging
 
 router = APIRouter()
 

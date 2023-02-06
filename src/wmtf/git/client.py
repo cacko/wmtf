@@ -10,7 +10,6 @@ import string
 from wmtf.wm.models import TaskInfo
 from enum import StrEnum
 from stringcase import sentencecase
-import logging
 from os import environ
 
 
@@ -27,7 +26,7 @@ class GitCommand(StrEnum):
 
 
 class GitError(BaseGitError):
-    
+
     @classmethod
     def get_cause(cls, exc: BaseGitError):
         match exc:
@@ -35,8 +34,6 @@ class GitError(BaseGitError):
                 return "Invalid git repository"
             case _:
                 return sentencecase(exc.__class__.__name__)
-    
-
 
 
 class GitMeta(type):
@@ -63,7 +60,7 @@ class GitMeta(type):
         return cls().call(GitCommand.MERGE, cls.branchName(task), *args)
 
     def commit(cls, message) -> bool:
-        return cls().call(GitCommand.COMMIT,message)
+        return cls().call(GitCommand.COMMIT, message)
 
     def push(cls):
         return cls().call(GitCommand.PUSH)
@@ -96,10 +93,10 @@ class Git(object, metaclass=GitMeta):
         except BaseGitError as e:
             raise GitError(GitError.get_cause(e)) from e
 
-
     def _branch_name(self, task: TaskInfo, *args) -> str:
         tr = str.maketrans("", "", string.punctuation)
-        return f"{task.id}-{snakecase((task.summary.translate(tr))):.40}".strip()
+        txt = snakecase(task.summary.translate(tr))
+        return f"{task.id}-{txt:.40}".strip()
 
     def _active_branch(self) -> Head:
         return self.repo.active_branch

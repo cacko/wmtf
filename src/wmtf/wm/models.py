@@ -1,10 +1,10 @@
-from dataclasses import dataclass
 from datetime import date, datetime, timedelta
 from enum import Enum
-from typing import Optional, Any
+from typing import Optional
 import arrow
 from wmtf.tui.theme import Theme
 from humanize import naturaldelta
+from pydantic import BaseModel
 import re
 
 RECENT_PATTERN = re.compile(r"RECENT<br>(\d+)(h|m|d)")
@@ -44,14 +44,12 @@ class ClockLocation(Enum):
                 return ClockIcon.OFF
 
 
-@dataclass
-class TimeDelta:
+class TimeDelta(BaseModel):
     number: float
     unit: TimeDeltaUnit
 
 
-@dataclass
-class ReportTask:
+class ReportTask(BaseModel):
     id: int
     clock: ClockLocation
     clock_time: timedelta
@@ -59,19 +57,8 @@ class ReportTask:
     clock_end: datetime
     summary: str
 
-    def dict(self) -> dict[str, Any]:
-        return {
-            "id": self.id,
-            "clock": self.clock.value,
-            "clock_time": self.clock_time.seconds,
-            "clock_start": self.clock_start.isoformat(),
-            "clock_end": self.clock_end.isoformat(),
-            "summary": self.summary,
-        }
 
-
-@dataclass
-class ReportDay:
+class ReportDay(BaseModel):
     day: date
     total_work: timedelta
     tasks: list[ReportTask]
@@ -88,16 +75,8 @@ class ReportDay:
     def is_weekend(self) -> bool:
         return self.day.weekday() in [5, 6]
 
-    def dict(self) -> dict[str, Any]:
-        return {
-            "day": self.day.isoformat(),
-            "total_work": self.total_work.seconds,
-            "tasks": [t.dict() for t in self.tasks],
-        }
 
-
-@dataclass
-class TaskInfo:
+class TaskInfo(BaseModel):
     id: int
     summary: str
     clock_id: int
@@ -106,17 +85,6 @@ class TaskInfo:
     estimate: Optional[timedelta] = None
     estimate_used: Optional[float] = None
     group: Optional[str] = None
-
-    def dict(self) -> dict[str, Any]:
-        return {
-            "id": self.id,
-            "clock_id": self.clock_id,
-            "clock": self.clock.value,
-            "clock_start": self.clock_start.isoformat() if self.clock_start else None,
-            "estimate": self.estimate.seconds if self.estimate else None,
-            "estimate_user": self.estimate_used if self.estimate_used else None,
-            "summary": self.summary,
-        }
 
     @property
     def isActive(self):
@@ -135,8 +103,7 @@ class TaskInfo:
         return self.summary
 
 
-@dataclass
-class TaskComment:
+class TaskComment(BaseModel):
     author: str
     comment: str
     timestamp: datetime
@@ -145,16 +112,8 @@ class TaskComment:
     def timestamp_display(self):
         return arrow.get(self.timestamp).humanize()
 
-    def dict(self) -> dict[str, Any]:
-        return {
-            "author": self.author,
-            "comment": self.comment,
-            "timestamp": self.timestamp.isoformat(),
-        }
 
-
-@dataclass
-class Task:
+class Task(BaseModel):
     id: int
     summary: str
     description: str
@@ -166,20 +125,6 @@ class Task:
     comments: Optional[list[TaskComment]] = None
     estimate: Optional[timedelta] = None
     estimate_used: Optional[float] = None
-
-    def dict(self) -> dict[str, Any]:
-        return {
-            "id": self.id,
-            "description": self.description,
-            "assignee": self.assignee,
-            "group": self.group,
-            "priority": self.priority,
-            "value": self.value,
-            "created": self.created.isoformat(),
-            "comments": [c.dict() for c in self.comments] if self.comments else [],
-            "estimate": self.estimate.seconds if self.estimate else None,
-            "estimate_used": self.estimate_used if self.estimate_used else None,
-        }
 
     @property
     def created(self) -> datetime:

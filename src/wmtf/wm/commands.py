@@ -68,27 +68,27 @@ class CommandMeta(type):
 
     @property
     def clock(cls) -> "Clock":
-        return Clock(**cls.config.get(Commands.CLOCK.value))  # type: ignore
+        return Clock(**cls.config.get(Commands.CLOCK.value))
 
     @property
     def login(cls) -> "Login":
-        return Login(**cls.config.get(Commands.LOGIN.value))  # type: ignore
+        return Login(**cls.config.get(Commands.LOGIN.value))
 
     @property
     def tasks(cls) -> "Tasks":
-        return Tasks(**cls.config.get(Commands.TASKS.value))  # type: ignore
+        return Tasks(**cls.config.get(Commands.TASKS.value))
 
     @property
     def task(cls) -> "Task":
-        return Task(**cls.config.get(Commands.TASK.value))  # type: ignore
+        return Task(**cls.config.get(Commands.TASK.value))
 
     @property
     def report(cls) -> "Report":
-        return Report(**cls.config.get(Commands.REPORT.value))  # type: ignore
+        return Report(**cls.config.get(Commands.REPORT.value))
 
     @property
     def report_id(cls) -> "ReportId":
-        return ReportId(**cls.config.get(Commands.REPORT_ID.value))  # type: ignore
+        return ReportId(**cls.config.get(Commands.REPORT_ID.value))
 
 
 @dataclass(config=ConfigDict(extra=Extra.ignore))

@@ -2,6 +2,9 @@ name: wmtf
 channels:
   - conda-forge
 dependencies:
+  - _libgcc_mutex=0.1
+  - _openmp_mutex=4.5
+  - autopep8=2.0.1
   - black=22.12.0
   - blinker=1.5
   - brotlipy=0.7.0
@@ -25,11 +28,18 @@ dependencies:
   - jeepney=0.8.0
   - jira=3.4.1
   - keyring=23.13.1
+  - ld_impl_linux-64=2.40
   - libcxx=14.0.6
+  - libcxxabi=14.0.6
   - libffi=3.4.2
+  - libgcc-ng=12.2.0
   - libglib=2.74.1
+  - libgomp=12.2.0
   - libiconv=1.17
+  - libnsl=2.0.0
   - libsqlite=3.40.0
+  - libstdcxx-ng=12.2.0
+  - libuuid=2.32.1
   - libxml2=2.10.3
   - libxslt=1.1.37
   - libzlib=1.2.13
@@ -62,6 +72,7 @@ dependencies:
   - requests=2.28.2
   - requests-oauthlib=1.3.1
   - requests-toolbelt=0.10.1
+  - secretstorage=3.3.3
   - semver=2.13.0
   - setuptools=66.0.0
   - sqlite=3.40.0
@@ -86,7 +97,6 @@ dependencies:
       - attrs==22.2.0
       - beautifulsoup4==4.11.1
       - better-exceptions==0.3.3
-      - bottle==0.12.23
       - bs4==0.0.1
       - commonmark==0.9.1
       - corelog==0.0.8
@@ -106,7 +116,6 @@ dependencies:
       - httpcore==0.16.3
       - httptools==0.5.0
       - httpx==0.23.3
-      - huggingface-hub==0.11.1
       - humanfriendly==10.0
       - humanize==4.4.0
       - importlib-metadata==4.13.0
@@ -123,7 +132,6 @@ dependencies:
       - multidict==6.0.4
       - nanoid==2.0.0
       - numpy==1.24.1
-      - orjson==3.8.5
       - pandas==1.5.2
       - progressor==1.0.14
       - prompt-toolkit==3.0.33
@@ -157,4 +165,4 @@ dependencies:
       - wcwidth==0.2.5
       - websockets==10.4
       - yarl==1.8.2
-prefix: /Volumes/Devo/miniforge3/envs/wmtf
+prefix: /home/users/alex.spasov/miniforge3/envs/wmtf
