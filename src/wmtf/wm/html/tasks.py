@@ -14,6 +14,7 @@ from wmtf.wm.html.parser import (
     extract_comment_time,
     extract_estimate,
     extract_estimate_used,
+    to_int
 )
 
 BOLD_TAGS = re.compile(r'<\/?b>')
@@ -70,7 +71,6 @@ class Task(Parser):
         )[2]
         df.columns = df.iloc[0]
         task_row = df.iloc[1]
-
         return TaskItem(
             id=self.id,
             summary=task_row["Summary"],
@@ -78,7 +78,7 @@ class Task(Parser):
             assignee=task_row["Assignee"],
             comments=self.__get_comments(),
             create=task_row["Create"],
-            priority=task_row["Priority"],
+            priority=to_int(task_row["Priority"]),
             value=task_row["Bus. Value"],
             group=task_row["Group"].strip('-'),
             estimate=extract_estimate([task_row["Work"]]),

@@ -4,6 +4,7 @@ from wmtf.wm.html.parser import markdown_links
 from rich.console import RenderResult, Console, ConsoleOptions
 from rich.text import Text
 
+
 class Task:
     def __init__(
         self,

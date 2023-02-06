@@ -60,7 +60,8 @@ class Menu(object, metaclass=MenuMeta):
                     style=style,
                     **self._options
                 ).ask()
-                res = next(filter(lambda x: x.value == choice, self._items), None)
+                res = next(filter(lambda x: x.value ==
+                           choice, self._items), None)
                 if res:
                     return res
                 raise KeyboardInterrupt
