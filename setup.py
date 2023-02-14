@@ -47,8 +47,8 @@ setup(
         "tzlocal>=4.2",
         "click>=8.1.3",
         "jira==3.4.1",
-        "pydantic==1.10.2",
-        "pyyaml==6.0",
+        "pydantic>=1.10.2",
+        "pyyaml>=6.0",
         "requests>=2.28.1",
         "requests-oauthlib>=1.3.1",
         "requests-toolbelt>=0.10.0",
@@ -69,7 +69,8 @@ setup(
         "gitpython>=3.1.30",
         "aiohttp>=3.8.3",
         "msgpack>=1.0.4",
-        "app_version>=1.0.1"
+        "app_version>=1.0.1",
+        "typing_extensions>=4.4.0"
     ],
     setup_requires=["wheel"],
     python_requires=">=3.10",
