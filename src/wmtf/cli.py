@@ -256,7 +256,7 @@ def run():
         pass
 
 
-def select_task(title: str, only_ids: Optional[list[str]] = None):
+def select_task(title: str, only_ids: Optional[list[int]] = None):
     try:
         click.clear()
         banner(txt=title, color="blue")
@@ -284,7 +284,7 @@ def cli_branch(ctx: click.Context):
                 if questionary.confirm(f'Create "{branch_name}"?'):
                     res = Git.checkout(branch_name)
                     output(res.name)
-                    quit()
+                    ctx.invoke(quit)
             except GitError as e:
                 error(e)
         case Command():
@@ -325,9 +325,9 @@ def cli_commit(ctx: click.Context, dry_run, commit_type):
                     return
                 r = Git.mergeTask(task, "--squash")
                 output(r)
-                r = Git.commit(msg)
+                _ = Git.commit(msg)
             except GitError as e:
-                error(e)
+                return error(e)
         case Command():
             ctx.invoke(task)
 
