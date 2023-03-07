@@ -43,7 +43,7 @@ setup(
         "python-dateutil>=2.8.2",
         "pytz-deprecation-shim>=0.1.0.post0",
         "questionary>=1.10.0",
-        "textual>=0.11.0",
+        "textual>=0.13.0",
         "tzlocal>=4.2",
         "click>=8.1.3",
         "jira==3.4.1",
@@ -70,7 +70,8 @@ setup(
         "aiohttp>=3.8.3",
         "msgpack>=1.0.4",
         "app_version>=1.0.1",
-        "typing_extensions>=4.4.0"
+        "typing_extensions>=4.4.0",
+        "websocket-client>=1.5.1"
     ],
     setup_requires=["wheel"],
     python_requires=">=3.10",
