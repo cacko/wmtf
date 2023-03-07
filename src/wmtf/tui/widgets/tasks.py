@@ -8,7 +8,6 @@ from textual.message import Message, MessageTarget
 from textual.keys import Keys
 from wmtf.tui.widgets.types import Box, Focusable
 from wmtf.config import app_config
-from textual import log
 
 
 class TasksWidget(Box):
@@ -26,13 +25,6 @@ class TasksWidget(Box):
 
     def on_mount(self) -> None:
         self.reload()
-        self.update_timer = self.set_interval(
-            interval=20,
-            callback=self.on_poll,
-            pause=True
-        )
-        self.update(self.render())
-        self.update_timer.resume()
 
     def reload(self):
         tasks = Client.tasks()
@@ -42,18 +34,6 @@ class TasksWidget(Box):
             selected=self.task_list.selected if self.task_list else None,
         )
         self.update(self.render())
-
-    def on_poll(self):
-        new_tasks = TaskList(
-            Client.tasks(),
-            max_len=self.max_renderables_len,
-            selected=self.task_list.selected if self.task_list else None,
-        )
-        current_tasl = self.task_list
-        log.info(new_tasks)
-        log.info(current_tasl)
-
-        # self.update(self.render())
 
     def render(self):
         return self.get_panel(self.task_list)
