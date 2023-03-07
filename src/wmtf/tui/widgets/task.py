@@ -7,11 +7,10 @@ from textual import events
 from typing import Optional
 from rich.text import Text
 from wmtf.tui.widgets.types import Box, Focusable, VisibilityMixin
-from wmtf.wm import MaintenanceError
 
 
 class TaskWidget(Box):
-    task: Optional[TaskModel] = None
+    taskModel: Optional[TaskModel] = None
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -22,12 +21,13 @@ class TaskWidget(Box):
 
     def load(self, id: int):
         self.update("Loading...")
-        self.task = Client.task(id)
+        self.taskModel = Client.task(id)
         self.update(self.render())
 
     def render(self):
         return self.get_panel(
-            TaskRenderable(self.task) if self.task else Text("Not found")
+            TaskRenderable(self.taskModel) if self.taskModel else Text(
+                "Not found")
         )
 
 

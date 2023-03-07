@@ -121,6 +121,6 @@ class Tui(App):
         self.widget_alert.unhide()
 
     def watch_dark(self, dark: bool) -> None:
-        Theme.system = "dark" if dark else "light"
+        Theme.system = "dark" if dark else "light"  # type: ignore
         super().watch_dark(dark)
         self.refresh()

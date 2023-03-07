@@ -7,8 +7,6 @@ from textual.widget import Widget
 from rich.box import DOUBLE, SQUARE
 from textual.reactive import reactive
 from typing import Optional
-from textual import events
-from textual.widget import Widget
 
 
 class VisibilityMixin:
@@ -35,7 +33,11 @@ class Box(Static):
     def padding(self) -> int:
         return 1
 
-    def get_panel(self, content: Optional[RenderableType] = None, expand: bool = True):
+    def get_panel(
+        self,
+        content: Optional[RenderableType] = None,
+        expand: bool = True
+    ):
         if content:
             return Panel(
                 content,
@@ -69,11 +71,12 @@ class Focusable(Widget, can_focus=True):
         classes: str | None = None
     ) -> None:
         super().__init__(*children, name=name, id=id, classes=classes)
-        __class__.__instances.append(self)
+        Focusable.__instances.append(self)
 
     @classmethod
     def next(cls) -> "Focusable":
-        visible = list(filter(lambda x: not x.has_class("hidden"), cls.__instances))
+        visible = list(
+            filter(lambda x: not x.has_class("hidden"), cls.__instances))
         idx = cls.__idx + 1
         if idx >= len(visible):
             idx = 0

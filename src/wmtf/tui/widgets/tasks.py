@@ -1,5 +1,3 @@
-import logging
-import sys
 from wmtf.tui.renderables.task_list import TaskList
 from wmtf.wm.client import Client
 from wmtf.wm.models import TaskInfo, ClockLocation
@@ -11,6 +9,7 @@ from textual.keys import Keys
 from wmtf.tui.widgets.types import Box, Focusable
 from wmtf.config import app_config
 from textual import log
+
 
 class TasksWidget(Box):
 
@@ -43,7 +42,7 @@ class TasksWidget(Box):
             selected=self.task_list.selected if self.task_list else None,
         )
         self.update(self.render())
-        
+
     def on_poll(self):
         new_tasks = TaskList(
             Client.tasks(),
@@ -53,7 +52,7 @@ class TasksWidget(Box):
         current_tasl = self.task_list
         log.info(new_tasks)
         log.info(current_tasl)
-        
+
         # self.update(self.render())
 
     def render(self):

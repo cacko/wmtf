@@ -26,7 +26,8 @@ class AppLocationWidget(Static):
     def render(self):
         location = ClockLocation(self.location)
         renderable = Text()
-        renderable.append(app_config.wm_config.username, Theme.colors.accent_lighten_1)
+        renderable.append(app_config.wm_config.username,
+                          Theme.colors.accent_lighten_1)
         renderable.append(
             f" {location.icon.value} {self.location.upper()} ",
             Theme.colors.primary_background_lighten_3,

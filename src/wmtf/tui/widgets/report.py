@@ -91,15 +91,15 @@ class ReportWidget(Box):
     def on_mount(self) -> None:
         self.update_timer = self.set_interval(
             interval=1 / 60,
-            callback=self.on_timer,
+            callback=self.timer_callback,
             pause=True)
         self.running_timer = self.set_interval(
             interval=1 / 2,
-            callback=self.on_timer,
+            callback=self.timer_callback,
             pause=True)
         self.load()
 
-    def on_timer(self, *args, **kwargs) -> None:
+    def timer_callback(self, *args, **kwargs) -> None:
         if isinstance(self.__report, list) and self.__running_time:
             self.__running_total = str(self.__running_time)
             self.update(self.render())
