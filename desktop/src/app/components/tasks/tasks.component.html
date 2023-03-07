@@ -1,5 +1,5 @@
 <mat-selection-list #shoes [multiple]="false">
-  <mat-list-option *ngFor="let task of items" [value]="task">
+  <mat-list-option *ngFor="let task of items" [value]="task" (click)="openTask(task)">
     {{task.summary}}
   </mat-list-option>
 </mat-selection-list>

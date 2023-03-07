@@ -256,7 +256,7 @@ def run():
         pass
 
 
-def select_task(title: str, only_ids: Optional[list[str]] = None):
+def select_task(title: str, only_ids: list[int] = []):
     try:
         click.clear()
         banner(txt=title, color="blue")
@@ -325,7 +325,7 @@ def cli_commit(ctx: click.Context, dry_run, commit_type):
                     return
                 r = Git.mergeTask(task, "--squash")
                 output(r)
-                r = Git.commit(msg)
+                Git.commit(msg)
             except GitError as e:
                 error(e)
         case Command():

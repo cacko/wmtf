@@ -19,6 +19,15 @@ tasks:
       - git commit -am "$(curl -s https://commit.cacko.net/index.txt)" || true
       - git push || true
 
+  logs:
+    cmds:
+      - mamba run --live-stream -n {{.PROJECT}} textual console {{.CLI_ARGS}}
+
+  debug:
+    dir: src/
+    cmds:
+      - mamba run --live-stream -n {{.PROJECT}} textual run --dev wmtf.tui.app:Tui
+
   export:
     desc: export env
     cmds:

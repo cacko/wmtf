@@ -26,4 +26,8 @@ export class TasksComponent implements OnInit {
     });
   }
 
+  openTask(task: TaskInfo) {
+    console.log(task);
+  }
+
 }

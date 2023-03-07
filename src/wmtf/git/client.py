@@ -11,6 +11,7 @@ from wmtf.wm.models import TaskInfo
 from enum import StrEnum
 from stringcase import sentencecase
 from os import environ
+from typing import Optional
 
 
 class GitCommand(StrEnum):
@@ -37,7 +38,7 @@ class GitError(BaseGitError):
 
 
 class GitMeta(type):
-    _instance: "Git" = None
+    _instance: Optional["Git"] = None
 
     def __call__(cls, *args, **kwds):
         if not cls._instance:
@@ -54,7 +55,7 @@ class GitMeta(type):
         return cls().call(GitCommand.DIFFS)
 
     def patch(cls) -> str:
-        return "".join([x.diff.decode() for x in cls.diffs()])
+        return "".join([x.diff.decode() for x in cls.diffs()])  # type: ignore
 
     def mergeTask(cls, task: TaskInfo, *args) -> str:
         return cls().call(GitCommand.MERGE, cls.branchName(task), *args)
@@ -77,7 +78,6 @@ class GitMeta(type):
 
 
 class Git(object, metaclass=GitMeta):
-    repo: Repo = None
 
     def __init__(self) -> None:
         try:

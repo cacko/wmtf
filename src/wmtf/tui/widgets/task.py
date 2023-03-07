@@ -9,6 +9,7 @@ from rich.text import Text
 from wmtf.tui.widgets.types import Box, Focusable, VisibilityMixin
 from wmtf.wm import MaintenanceError
 
+
 class TaskWidget(Box):
     task: Optional[TaskModel] = None
 
