@@ -32,6 +32,7 @@ class ZSONCommand(StrEnum):
     TASK = "task"
     REPORT = "report"
     CLOCK = "clock"
+    CLOCK_OFF = "clock_off"
     USER = "user"
 
 

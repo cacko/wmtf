@@ -193,8 +193,8 @@ class Client(object, metaclass=ClientMeta):
         data["itemId"] = item_id
         res = self.__call(cmd, data=data)
         content = res.content
-        parser = ReportParser(content)
-        return parser.parse()
+        r_parser = ReportParser(html=content)
+        return r_parser.parse()
 
     def __populate(self, data: dict[str, str], **kwds) -> CommandData:
         values = {**self.config.dict(), **kwds}
