@@ -97,7 +97,8 @@ def extract_estimate_used(text: str | list) -> Optional[float]:
         if ma := ESTIMATE_PATTERN.search(text[0]):
             return float(ma.group("estimate_used"))
     except AssertionError:
-        return None
+        pass
+    return None
 
 
 def get_links(s: str) -> Generator[str, None, None]:

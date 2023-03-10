@@ -64,6 +64,7 @@ class CommandMeta(type):
         if not cls._config:
             cp = wm_resources
             cls._config = load(cp.read_text(), Loader=Loader)
+        assert cls._config
         return cls._config
 
     @property

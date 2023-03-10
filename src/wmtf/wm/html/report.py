@@ -153,7 +153,7 @@ class HtmlReportDay(object, metaclass=HtmlReportMeta):
         return ReportDay(day=self.date, total_work=self.__work, tasks=self.tasks)
 
     def do_process(self, row: PageElement):
-        if not __class__.can_parse(row):
+        if not HtmlReportDay.can_parse(row):
             return
         match row:
             case element.Tag():

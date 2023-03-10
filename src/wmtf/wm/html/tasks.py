@@ -99,3 +99,4 @@ class Task(Parser):
             ]
         except IndexError:
             pass
+        return None

@@ -256,7 +256,7 @@ def run():
         pass
 
 
-def select_task(title: str, only_ids: list[int] = []):
+def select_task(title: str, only_ids: Optional[list[int]] = None):
     try:
         click.clear()
         banner(txt=title, color="blue")

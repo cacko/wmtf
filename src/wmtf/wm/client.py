@@ -175,8 +175,8 @@ class Client(object, metaclass=ClientMeta):
         return parser.parse()
 
     def do_report(self, start: datetime, end: datetime) -> list[ReportDay]:
-        cmd = Command.report_id
-        res = self.__call(cmd)
+        cmd_id = Command.report_id
+        res = self.__call(cmd_id)
         content = res.content
         parser = ReportIdParser(content)
         item_id = parser.parse()
