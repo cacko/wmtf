@@ -24,10 +24,10 @@ def get_tasks():
 @router.get("/api/task/{task_id}", tags=["api"])
 def get_task(task_id: int):
     try:
-        task = Client.task(id)
+        task = Client.task(task_id)
         return task.dict()
     except Exception:
-        raise HTTPException(404, f"Task {id} not found")
+        raise HTTPException(404, f"Task {task_id} not found")
 
 
 @router.post("/api/clock", tags=["api"])

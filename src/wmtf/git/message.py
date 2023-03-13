@@ -1,11 +1,12 @@
 import requests
 import string
 from wmtf.wm.models import TaskInfo
+from typing import Optional
 
 
 class MessageMeta(type):
 
-    _instance: "Message" = None
+    _instance: Optional["Message"] = None
 
     def __call__(cls, *args, **kwds):
         if not cls._instance:

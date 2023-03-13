@@ -13,7 +13,7 @@ class LeftHeader(Heading):
     ) -> RenderResult:
         text = self.text
         text.justify = "left"
-        if self.level == 1:
+        if self.tag == "h1":
             # Draw a border around h1s
             yield Panel(
                 text,
@@ -23,7 +23,7 @@ class LeftHeader(Heading):
             )
         else:
             # Styled text for h2 and beyond
-            if self.level == 2:
+            if self.tag == "h2":
                 yield Text("")
             yield text
 
