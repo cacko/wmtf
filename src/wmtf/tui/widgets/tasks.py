@@ -76,7 +76,7 @@ class Tasks(Focusable):
     class Selected(Message):
         def __init__(self, sender: MessageTarget, task: TaskInfo) -> None:
             self.task = task
-            super().__init__(sender)
+            super().__init__()
 
     @property
     def wdg(self) -> TasksWidget:
@@ -103,4 +103,4 @@ class Tasks(Focusable):
                 self.wdg.next()
             case Keys.Enter:
                 if selected := self.wdg.load():
-                    self.emit_no_wait(self.Selected(self, selected))
+                    self.post_message(self.Selected(self, selected))
