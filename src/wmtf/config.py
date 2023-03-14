@@ -81,18 +81,18 @@ class app_config(object, metaclass=app_config_meta):
     _config: Optional[dict] = None
 
     def __init__(self) -> None:
-        if not __class__.cache_dir.exists():
-            __class__.cache_dir.mkdir(parents=True, exist_ok=True)
-        if not __class__.data_dir.exists():
-            __class__.data_dir.mkdir(parents=True, exist_ok=True)
-        if not __class__.app_config.exists():
+        if not app_config.cache_dir.exists():
+            app_config.cache_dir.mkdir(parents=True, exist_ok=True)
+        if not app_config.data_dir.exists():
+            app_config.data_dir.mkdir(parents=True, exist_ok=True)
+        if not app_config.app_config.exists():
             self.init()
-        self._config = load(__class__.app_config.read_text(), Loader=Loader)
+        self._config = load(app_config.app_config.read_text(), Loader=Loader)
         if not self._config.get("wm", {}).get("location", ""):
             self.auto_location()
 
     def init(self):
-        with open(__class__.app_config, "w") as fp:
+        with open(app_config.app_config, "w") as fp:
             data = {
                 "wm": WMConfig().dict(),
                 "jira": JiraConfig().dict(),
@@ -105,7 +105,7 @@ class app_config(object, metaclass=app_config_meta):
         return self._config.get(var, *args, *kwargs)
 
     def __save(self):
-        with open(__class__.app_config, "w") as fp:
+        with open(app_config.app_config, "w") as fp:
             dump(self._config, fp)
 
     def auto_location(self):
