@@ -291,6 +291,12 @@ def cli_branch(ctx: click.Context):
             ctx.invoke(task)
 
 
+@cli.command("clean", short_help="Clean issue branches")
+@click.pass_context
+def cli_clean_branch(ctx: click.Context):
+    print(Git.branches())
+
+
 @cli.command("commit", short_help="Merge a branch")
 @click.option("-d", "--dry-run", default=False, is_flag=True)
 @click.pass_context

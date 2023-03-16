@@ -13,6 +13,7 @@ export class TasksComponent implements OnInit {
 
   items: TaskInfo[] = [];
   selected: TaskInfo[] = null;
+  displayedColumns = ['index', 'title', 'clock', 'estimate'];
 
   constructor(
     private api: ApiService
@@ -21,6 +22,7 @@ export class TasksComponent implements OnInit {
   ngOnInit(): void {
     this.api.fetch(ApiType.TASKS).then((tasks: TaskInfo[]) => {
       this.items = tasks;
+      console.debug(tasks)
     }).catch(err => {
 
     });

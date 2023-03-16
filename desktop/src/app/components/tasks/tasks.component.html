@@ -1,5 +1,32 @@
-<mat-selection-list #shoes [multiple]="false">
-  <mat-list-option *ngFor="let task of items" [value]="task" (click)="openTask(task)">
-    {{task.summary}}
-  </mat-list-option>
-</mat-selection-list>
+  <table mat-table [dataSource]="items">
+
+    <!-- Position Column -->
+    <ng-container matColumnDef="index">
+      <th mat-header-cell *matHeaderCellDef> No. </th>
+      <td mat-cell *matCellDef="let task"> {{task.id}} </td>
+    </ng-container>
+
+
+    <!-- Weight Column -->
+    <ng-container matColumnDef="clock">
+      <th mat-header-cell *matHeaderCellDef> Weight </th>
+      <td mat-cell *matCellDef="let task"> {{task.clock}} </td>
+    </ng-container>
+
+    <!-- Name Column -->
+    <ng-container matColumnDef="title">
+      <th mat-header-cell *matHeaderCellDef> Task </th>
+      <td mat-cell *matCellDef="let task"> {{task.summary}} </td>
+    </ng-container>
+
+
+    <!-- Symbol Column -->
+    <ng-container matColumnDef="estimate">
+      <th mat-header-cell *matHeaderCellDef> Estimate </th>
+      <td mat-cell *matCellDef="let task"> {{task.estimate}} </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+  </table>
+
