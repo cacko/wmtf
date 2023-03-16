@@ -1,5 +1,7 @@
 # pyright: reportPrivateUsage=false
 
+import logging
+from requests import delete
 from stringcase import snakecase
 from git import Diff, Repo, Head
 from git.exc import (
@@ -24,6 +26,7 @@ class GitCommand(StrEnum):
     PUSH = "_push"
     PULL = "_pull"
     BRANCHES = "_branches"
+    DELETE = "_delete"
 
 
 class GitError(BaseGitError):
@@ -53,6 +56,9 @@ class GitMeta(type):
 
     def diffs(cls) -> list[Diff]:
         return cls().call(GitCommand.DIFFS)
+    
+    def delete(cls, branch_name):
+        return cls().call(GitCommand.DELETE, branch_name)
 
     def patch(cls) -> str:
         return "".join([x.diff.decode() for x in cls.diffs()])  # type: ignore
@@ -108,7 +114,11 @@ class Git(object, metaclass=GitMeta):
             return head.checkout()
         head = self.repo.create_head(name)
         return head.checkout()
-
+    
+    def _delete(self, name: str):
+        repo = self.repo
+        repo.delete_head(name, force=True)
+            
     def _pull(self):
         return self.repo.git.pull()
 
