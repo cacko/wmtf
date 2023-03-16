@@ -36,7 +36,6 @@ import { ReportComponent } from './components/report/report.component';
 import { TaskComponent } from './components/task/task.component';
 import { MatListModule } from '@angular/material/list';
 import { MatTableModule } from '@angular/material/table';
-import { MatRippleModule } from '@angular/material/core';
 // AoT requires an exported function for factories
 const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader =>
   new TranslateHttpLoader(http, './assets/i18n/', '.json');
@@ -52,7 +51,6 @@ const MaterialModules = [
   MatGridListModule,
   MatListModule,
   MatTableModule,
-  MatRippleModule
 ];
 
 @NgModule({
