@@ -8,8 +8,6 @@ from textual.message import Message, MessageTarget
 from textual.keys import Keys
 from wmtf.tui.widgets.types import Box, Focusable
 from wmtf.config import app_config
-from textual.containers import Horizontal
-from textual.widgets import RadioButton, RadioSet
 
 
 class TasksWidget(Box):
@@ -29,30 +27,16 @@ class TasksWidget(Box):
         self.reload()
 
     def reload(self):
-        # tasks = Client.tasks()
-        # self.task_list = TaskList(
-        #     tasks,
-        #     max_len=self.max_renderables_len,
-        #     selected=self.task_list.selected if self.task_list else None,
-        # )
-        with Horizontal():
-            with RadioSet():
-                yield RadioButton("Battlestar Galactica")
-                yield RadioButton("Dune 1984")
-                yield RadioButton("Dune 2021")
-                yield RadioButton("Serenity", value=True)
-                yield RadioButton("Star Trek: The Motion Picture")
-                yield RadioButton("Star Wars: A New Hope")
-                yield RadioButton("The Last Starfighter")
-                yield RadioButton(
-                    "Total Recall :backhand_index_pointing_right: :red_circle:",
-                    id="focus_me",
-                )
-                yield RadioButton("Wing Commander")
-        # self.update(self.render())
+        tasks = Client.tasks()
+        self.task_list = TaskList(
+            tasks,
+            max_len=self.max_renderables_len,
+            selected=self.task_list.selected if self.task_list else None,
+        )
+        self.update(self.render())
 
-    # def render(self):
-    #     return self.get_panel(self.task_list)
+    def render(self):
+        return self.get_panel(self.task_list)
 
     def next(self):
         if self.task_list:
@@ -101,20 +85,7 @@ class Tasks(Focusable):
         return self.__wdg
 
     def compose(self) -> ComposeResult:
-        with Horizontal():
-            with RadioSet():
-                yield RadioButton("Battlestar Galactica")
-                yield RadioButton("Dune 1984")
-                yield RadioButton("Dune 2021")
-                yield RadioButton("Serenity", value=True)
-                yield RadioButton("Star Trek: The Motion Picture")
-                yield RadioButton("Star Wars: A New Hope")
-                yield RadioButton("The Last Starfighter")
-                yield RadioButton(
-                    "Total Recall :backhand_index_pointing_right: :red_circle:",
-                    id="focus_me",
-                )
-                yield RadioButton("Wing Commander")
+        yield self.wdg
 
     def clock(self) -> bool:
         return self.wdg.clock()

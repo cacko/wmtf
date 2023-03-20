@@ -294,7 +294,7 @@ def cli_branch(ctx: click.Context):
 @cli.command("clean", short_help="Clean issue branches")
 @click.pass_context
 def cli_clean_branch(ctx: click.Context):
-    matcher = re.compile(f"^\d+\-")
+    matcher = re.compile(r"^\d+\-")
     for branch_name in Git.branches():
         if not matcher.match(branch_name):
             continue
