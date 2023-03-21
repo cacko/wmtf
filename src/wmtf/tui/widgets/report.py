@@ -1,9 +1,11 @@
+from wmtf.api.commands import ReportRequest
 from wmtf.wm.client import Client
 from wmtf.wm.models import ReportDay
 from textual.app import ComposeResult
 from textual.reactive import reactive
 from wmtf.tui.renderables.report import Days as ReportRenderable
-from corethread import StoppableThread
+from wmtf.api.client import WSClient
+from wmtf.tui import TUI_WS_ID
 from rich.status import Status
 from rich.text import Text
 from wmtf.tui.widgets.types import Focusable, Box, VisibilityMixin
@@ -32,16 +34,6 @@ class RunningTime(object):
         self.__running_time += now - self.__last_checked
         self.__last_checked = now
         return str(self.__running_time).split(".")[0]
-
-
-class ReportService(StoppableThread):
-    def __init__(self, callback, *args, **kwargs):
-        self.__callback = callback
-        super().__init__(*args, **kwargs)
-
-    def run(self) -> None:
-        days = Client.report()
-        self.__callback(days)
 
 
 class ReportWidget(Box):
@@ -85,8 +77,11 @@ class ReportWidget(Box):
         self.__report = Status("Loading", spinner="dots12")
         self.__report.start()
         self.start_timer(TIMER_EVENT.LOADING)
-        t = ReportService(self.update_report)
-        t.start()
+        WSClient.send(
+            TUI_WS_ID,
+            ReportRequest(),
+            self.update_report
+        )
 
     def on_mount(self) -> None:
         self.update_timer = self.set_interval(

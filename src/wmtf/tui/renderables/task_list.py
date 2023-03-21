@@ -19,7 +19,8 @@ class TaskList(RichCast):
     ) -> None:
         self.list = wrapped if wrapped else []
         self.max_len = (
-            len(self.list) if max_len < 0 or max_len > len(self.list) else max_len
+            len(self.list) if max_len < 0 or max_len > len(
+                self.list) else max_len
         )
         self.start_rendering = 0
         self.end_rendering = self.max_len
@@ -49,7 +50,9 @@ class TaskList(RichCast):
                 content.append("  ")
                 content.append(string_index, Theme.colors.accent_lighten_2)
                 content.append(" ")
-                content.append(string_item, Theme.colors.accent_lighten_1 if item.isActive else None)
+                content.append(
+                    string_item,
+                    Theme.colors.accent_lighten_1 if item.isActive else None)
             content.append("\n")
         return content
 
@@ -75,7 +78,7 @@ class TaskList(RichCast):
         return str(self.renderables())
 
     def renderables(self) -> List[TaskInfo]:
-        return self.list[self.start_rendering : self.end_rendering]
+        return self.list[self.start_rendering: self.end_rendering]
 
     def reset(self) -> None:
         self.__pointer = -1

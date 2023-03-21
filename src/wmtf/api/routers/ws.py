@@ -1,39 +1,37 @@
-from operator import methodcaller
 from fastapi import (
     APIRouter,
     WebSocket,
     WebSocketDisconnect,
 )
 import logging
-from pydantic import BaseModel, Extra, Field
-from typing import Optional
-from pathlib import Path
-from PIL import Image
 import asyncio
-from corestring import string_hash
-import time
-from datetime import datetime
-from fastapi.concurrency import run_in_threadpool
 from asyncio.queues import Queue, QueueEmpty
-from enum import StrEnum
+import json
+from wmtf.api.commands import (
+    ActiveTaskRequest,
+    ActiveTaskResponse,
+    ClockOffRequest,
+    ClockOffResponse,
+    ClockRequest,
+    ClockResponse,
+    PingMessage,
+    PongMessage,
+    ReportRequest,
+    ReportResponse,
+    TaskRequest,
+    TaskResponse,
+    TasksResponse,
+    WSCommand,
+    WSRequest,
+    WSResponse,
+    WSType
+)
+from wmtf.wm.client import Client
 
 N_WORKERS = 4
 
 
-class ZSONType(StrEnum):
-    PING = "ping"
-    PONG = "pong"
-    REQUEST = "request"
-    RESPONSE = "response"
-
-
-class ZSONCommand(StrEnum):
-    TASKS = "tasks"
-    TASK = "task"
-    REPORT = "report"
-    CLOCK = "clock"
-    CLOCK_OFF = "clock_off"
-    USER = "user"
+router = APIRouter()
 
 
 class UnknownClientException(Exception):
@@ -56,38 +54,9 @@ class ConnectionMeta(type):
             pass
 
 
-class WSException(Exception):
-    pass
-
-
-class PingMessage(BaseModel, extra=Extra.ignore):
-    ztype: ZSONType = Field(default=ZSONType.PING)
-    id: Optional[str] = None
-    client: Optional[str] = None
-
-
-class PongMessage(BaseModel, extra=Extra.ignore):
-    ztype: ZSONType = Field(default=ZSONType.PONG)
-    id: str
-
-
-class Response(BaseModel):
-    ztype: str = Field(default=ZSONType.RESPONSE)
-    id: str
-
-
-class Request(BaseModel):
-    ztype: str = Field(default=ZSONType.REQUEST)
-    id: str
-
-
-router = APIRouter()
-
-
 class Connection(object, metaclass=ConnectionMeta):
     websocket: WebSocket
     __clientId: str
-    __user: Optional[AuthUser] = None
 
     def __init__(self, websocket: WebSocket, client_id: str) -> None:
         self.websocket = websocket
@@ -97,99 +66,99 @@ class Connection(object, metaclass=ConnectionMeta):
         await self.websocket.accept()
         __class__.connections[self.__clientId] = self
 
-    async def handle_login(self, request: ZSONRequest):
-        assert request.query
-        await run_in_threadpool(self.auth, token=request.query)
-        cmds = ZSONResponse(
-            method=CoreMethods.LOGIN,
-            commands=CommandExec.definitions,
-            client=self.__clientId,
-            id=request.id,
-        )
-        await self.send_async(cmds)
+    async def handle_login(self, request: WSRequest):
+        pass
+        # assert request.query
+        # await run_in_threadpool(self.auth, token=request.query)
+        # cmds = ZSONResponse(
+        #     method=CoreMethods.LOGIN,
+        #     commands=CommandExec.definitions,
+        #     client=self.__clientId,
+        #     id=request.id,
+        # )
+        # await self.send_async(cmds)
 
-    async def send_error(self, request: ZSONRequest):
-        empty = EmptyResult()
-        await self.send_async(
-            ZSONResponse(
-                ztype=ZSONType.RESPONSE,
-                id=request.id,
-                client=self.__clientId,
-                group=self.__clientId,
-                error=empty.error_message,
-            )
-        )
+    async def send_error(self, request: WSRequest):
+        pass
+        # empty = EmptyResult()
+        # await self.send_async(
+        #     ZSONResponse(
+        #         ztype=WSType.RESPONSE,
+        #         id=request.id,
+        #         client=self.__clientId,
+        #         group=self.__clientId,
+        #         error=empty.error_message,
+        #     )
+        # )
 
-    async def handle_command(self, request: ZSONRequest):
+    async def send(self, response: WSResponse):
+        json_response = response.json()
+        data = json.loads(json_response)
+        await self.websocket.send_json(data)
+
+    async def handle_command(self, request: WSRequest):
         try:
             logging.debug(f"handle command start {request}")
-            assert request.query
-            command, query = CommandExec.parse(request.query)
-            logging.debug(command)
-            context = Context(
-                client=self.__clientId,
-                query=query,
-                group=self.__clientId,
-                id=request.id,
-                source=request.source,
-            )
-            assert isinstance(command, CommandExec)
-            with perftime(f"Command {command.method.value}"):
-                response = await run_in_threadpool(command.handler, context=context)
-                await context.send_async(response)
+            match request.command:
+                case WSCommand.TASKS:
+                    await self.send(TasksResponse(
+                        command=request.command,
+                        id=request.id,
+                        result=Client.tasks()
+                    ))
+                case WSCommand.TASK:
+                    request = TaskRequest.parse_obj(request)
+                    await self.send(TaskResponse(
+                        command=request.command,
+                        id=request.id,
+                        result=Client.task(task_id=request.task_id)
+                    ))
+
+                case WSCommand.ACTIVE_TASK:
+                    request = ActiveTaskRequest.parse_obj(request)
+                    await self.send(ActiveTaskResponse(
+                        command=request.command,
+                        id=request.id,
+                        result=Client.active_task
+                    ))
+
+                case WSCommand.CLOCK:
+                    request = ClockRequest.parse_obj(request)
+                    await self.send(ClockResponse(
+                        command=request.command,
+                        id=request.id,
+                        result=Client.clock(
+                            clock_id=request.clock_id,
+                            location=request.location
+                        )
+                    ))
+
+                case WSCommand.CLOCK_OFF:
+                    request = ClockOffRequest.parse_obj(request)
+                    await self.send(ClockOffResponse(
+                        command=request.command,
+                        id=request.id,
+                        result=Client.clock_off(
+                            clock_id=request.clock_id,
+                        )
+                    ))
+
+                case WSCommand.REPORT:
+                    request = ReportRequest.parse_obj(request)
+                    await self.send(ReportResponse(
+                        command=request.command,
+                        id=request.id,
+                        result=Client.report(
+                            start=request.start,
+                            end=request.end
+                        )
+                    ))
         except AssertionError as e:
             logging.error(e)
             await self.send_error(request=request)
         except Exception as e:
             logging.exception(e)
             raise WebSocketDisconnect()
-
-    def auth(self, token: str):
-        self.__user = Auth().verify_token(token)
-
-    def send(self, response: ZSONResponse):
-        if not self.__user:
-            raise WSException("user is not authenticated")
-        asyncio.run(self.send_async(response))
-
-    async def send_async(self, response: ZSONResponse):
-        if not self.__user:
-            raise WSException("user is not authenticated")
-        attachment = None
-        if response.attachment:
-            assert response.attachment.contentType
-            assert response.attachment.path
-            attachment = await run_in_threadpool(
-                WSAttachment.upload,
-                contentType=response.attachment.contentType,
-                url=response.attachment.path,
-            )
-        logging.debug(response)
-        assert response.id
-        resp = Response(
-            ztype=ZSONType.RESPONSE,
-            id=response.id,
-            message=response.message,
-            method=response.method,
-            plain=response.plain,
-            attachment=attachment,
-            error=response.error,
-            new_id=response.new_id,
-            commands=response.commands,
-            icon=response.icon,
-            headline=response.headline,
-            start_time=response.start_time,
-            status=response.status
-        )
-        match response.method:
-            case ZMethod.FOOTY_SUBSCRIPTION_UPDATE:
-                path = f"subscriptions/{response.id.split(':')[0]}/events"
-                await run_in_threadpool(
-                    FirestoreClient().put,
-                    path=path, data=resp.dict()
-                )
-            case _:
-                await self.websocket.send_json(resp.dict())
 
 
 class ConnectionManager:
@@ -198,20 +167,16 @@ class ConnectionManager:
         await connection.accept()
 
     def disconnect(self, client_id):
-        WSConnection.remove(client_id)
+        Connection.remove(client_id)
 
     async def process_command(self, data, client_id):
         try:
-            msg = ZSONRequest(**data)
-            assert isinstance(msg, ZSONRequest)
+            msg = WSRequest(**data)
+            assert isinstance(msg, WSRequest)
             logging.debug(f"process command {msg}")
-            assert msg.query
             connection = Connection.client(clientId=client_id)
-            assert isinstance(connection, WSConnection)
-            match msg.method:
-                case CoreMethods.LOGIN:
-                    await connection.handle_login(request=msg)
-                    logging.debug("process commmand after login")
+            assert isinstance(connection, Connection)
+            match msg.command:
                 case _:
                     await connection.handle_command(request=msg)
                     logging.debug("process commmand after handle")
@@ -239,10 +204,12 @@ async def websocket_endpoint(websocket: WebSocket, client_id: str):
                 data = queue.get_nowait()
                 logging.debug(f"WORKER #{n}, {data}")
                 match data.get("ztype"):
-                    case ZSONType.PING.value:
+                    case WSType.PING.value:
                         ping = PingMessage(**data)
                         assert ping.id
-                        await websocket.send_json(PongMessage(id=ping.id).dict())
+                        await websocket.send_json(
+                            PongMessage(id=ping.id).dict()
+                        )
                     case _:
                         await manager.process_command(data, client_id)
                 queue.task_done()
@@ -257,6 +224,8 @@ async def websocket_endpoint(websocket: WebSocket, client_id: str):
     await asyncio.gather(
         read_from_socket(websocket),
         *[
-            asyncio.create_task(get_data_and_send(n)) for n in range(1, N_WORKERS + 1)
+            asyncio.create_task(
+                get_data_and_send(n)
+            ) for n in range(1, N_WORKERS + 1)
         ]
     )

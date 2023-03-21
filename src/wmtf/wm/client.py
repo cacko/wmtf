@@ -90,7 +90,7 @@ class ClientMeta(type):
         cls,
         start: Optional[datetime] = None,
         end: Optional[datetime] = None
-    ):
+    ) -> list[ReportDay]:
         today = datetime.today()
         if not start:
             start = (today - timedelta(days=today.weekday())).replace(

@@ -8,7 +8,10 @@ T = TypeVar("T")
 
 class Days(Generic[T]):
     def __init__(
-        self, wrapped: List[ReportDay], today_total_display: Optional[str] = None
+        self,
+        wrapped: List[ReportDay],
+        today_total_display:
+            Optional[str] = None
     ) -> None:
         self.list = wrapped if wrapped else []
         self.running_total = today_total_display
@@ -23,11 +26,14 @@ class Days(Generic[T]):
                 if day.is_today and self.running_total
                 else day.total_display
             )
-            parts.append(f"## {day.day.strftime('%A %d %b').upper()} / {total_display}")
+            parts.append(
+                f"## {day.day.strftime('%A %d %b').upper()} / {total_display}")
             if not len(day.tasks):
                 parts.append("- Nothing clocked.")
             for task in day.tasks:
                 parts.append(
-                    f"- {task.clock_start.strftime('%H:%M')} - {task.clock_end.strftime('%H:%M')} {task.clock.icon.value} **{task.summary}** "
+                    f"- {task.clock_start.strftime('%H:%M')} "
+                    f"- {task.clock_end.strftime('%H:%M')} "
+                    "{task.clock.icon.value} **{task.summary}** "
                 )
         return Markdown("\n\n".join(parts))

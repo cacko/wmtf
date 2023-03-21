@@ -13,7 +13,7 @@ from wmtf.wm.client import Client
 from wmtf.wm import LoginError, MaintenanceError
 from wmtf.wm.html.parser import ParserError
 from wmtf.wm.models import TaskInfo, ClockLocation
-from wmtf.ui.renderables.report import T, Days as ReportRenderable
+from wmtf.ui.renderables.report import Days as ReportRenderable
 from wmtf.ui.renderables.task import Task as TaskRenderable
 from random import randint
 from typing import Optional
@@ -24,6 +24,7 @@ from wmtf.git import Git, GitError
 from wmtf.git.message import Message
 import sys
 import re
+from wmtf.core import process_with_port, check_socket
 
 
 def banner(txt: str, color: str = "bright_green"):
@@ -73,7 +74,14 @@ def validate_credentials() -> bool:
 @click.pass_context
 def cli(ctx: click.Context):
     if ctx.invoked_subcommand is None:
-        Tui().run()
+        cfg = app_config.api_config
+        if not check_socket(cfg.host, cfg.port):
+            args = sys.orig_argv
+            args.append("api")
+            with process_with_port(args, cfg.host, cfg.port):
+                Tui().run()
+        else:
+            Tui().run()
 
 
 @cli.command("quit")
@@ -238,11 +246,22 @@ def cli_clockoff(ctx: click.Context, location: str, max_delay: Optional[int]):
                 sleep(20)
 
 
-@cli.command("api-serve", short_help="Start api server")
+@cli.command("api", short_help="Start api server")
 @click.pass_context
 def cli_api_server(ctx: click.Context):
-    api_server = Server()
-    api_server.start()
+    try:
+        cfg = app_config.api_config
+        assert not check_socket(cfg.host, cfg.port)
+        api_server = Server()
+        api_server.start()
+    except AssertionError:
+        output("Already Running")
+    except KeyboardInterrupt:
+        output("Bye!")
+    except Exception as e:
+        error(e)
+    finally:
+        api_server.stop()
 
 
 def run():
