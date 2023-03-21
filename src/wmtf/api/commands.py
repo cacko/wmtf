@@ -56,6 +56,7 @@ class TasksResponse(WSResponse):
 
 
 class TaskRequest(WSRequest):
+    command: WSCommand = Field(default=WSCommand.TASK)
     task_id: int
 
 
@@ -64,7 +65,7 @@ class TaskResponse(WSResponse):
 
 
 class ActiveTaskRequest(WSRequest):
-    pass
+    command: WSCommand = Field(default=WSCommand.ACTIVE_TASK)
 
 
 class ActiveTaskResponse(WSResponse):

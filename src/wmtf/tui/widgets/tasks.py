@@ -1,3 +1,5 @@
+from wmtf.api.commands import TasksRequest
+from wmtf.tui import TUI_WS_ID
 from wmtf.tui.renderables.task_list import TaskList
 from wmtf.wm.client import Client
 from wmtf.wm.models import TaskInfo, ClockLocation
@@ -8,16 +10,18 @@ from textual.message import Message, MessageTarget
 from textual.keys import Keys
 from wmtf.tui.widgets.types import Box, Focusable
 from wmtf.config import app_config
+from wmtf.api.client import WSClient
+from rich.text import Text
 
 
 class TasksWidget(Box):
 
     task_list: Optional[TaskList] = None
+    loading = False
 
     @property
     def max_renderables_len(self) -> int:
-        height: int = self.size.height
-        return height - 2
+        return 20
 
     @property
     def title(self):
@@ -27,15 +31,28 @@ class TasksWidget(Box):
         self.reload()
 
     def reload(self):
-        tasks = Client.tasks()
+        self.loading = True
+        self.update(self.render())
+        WSClient.send(
+            TUI_WS_ID,
+            TasksRequest(),
+            self.update_tasks
+        )
+
+    def update_tasks(self, tasks):
         self.task_list = TaskList(
             tasks,
             max_len=self.max_renderables_len,
             selected=self.task_list.selected if self.task_list else None,
         )
+        self.loading = False
         self.update(self.render())
 
     def render(self):
+        if self.loading:
+            return self.get_panel(Text(
+                "Loading")
+            )
         return self.get_panel(self.task_list)
 
     def next(self):

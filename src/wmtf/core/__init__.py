@@ -1,9 +1,14 @@
 import socket
 from contextlib import closing
 from contextlib import contextmanager
-from subprocess import Popen
+from subprocess import Popen, DEVNULL
 from os import environ
 import time
+import os
+import logging
+
+LOG_LEVEL = os.environ.get("WMTF_LOG_LEVEL", "FATAL")
+LOGGING_LEVEL = getattr(logging, LOG_LEVEL)
 
 
 def check_socket(host, port):
@@ -25,7 +30,7 @@ def process_with_port(params, host: str, port: int):
             environ.get('PATH', "."),
         ])
     )
-    proc = Popen(params, env=env)
+    proc = Popen(params, env=env, stdout=DEVNULL)
     try:
         while not check_socket(host, port):
             time.sleep(0.1)

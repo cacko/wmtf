@@ -1,4 +1,5 @@
-from wmtf.wm.client import Client
+from wmtf.api.commands import TaskRequest
+from wmtf.tui import TUI_WS_ID
 from textual.app import ComposeResult
 from wmtf.tui.renderables.task import Task as TaskRenderable
 from wmtf.wm.models import Task as TaskModel
@@ -7,10 +8,12 @@ from textual import events
 from typing import Optional
 from rich.text import Text
 from wmtf.tui.widgets.types import Box, Focusable, VisibilityMixin
+from wmtf.api.client import WSClient
 
 
 class TaskWidget(Box):
     taskModel: Optional[TaskModel] = None
+    loading = False
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -20,11 +23,24 @@ class TaskWidget(Box):
         return "Task"
 
     def load(self, id: int):
-        self.update("Loading...")
-        self.taskModel = Client.task(id)
+        self.loading = True
+        self.update(self.render())
+        WSClient.send(
+            TUI_WS_ID,
+            TaskRequest(task_id=id),
+            self.update_task
+        )
+
+    def update_task(self, task):
+        self.taskModel = task
+        self.loading = False
         self.update(self.render())
 
     def render(self):
+        if self.loading:
+            return self.get_panel(Text(
+                "Loading")
+            )
         return self.get_panel(
             TaskRenderable(self.taskModel) if self.taskModel else Text(
                 "Not found")

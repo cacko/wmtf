@@ -3,6 +3,7 @@ from wmtf.config import app_config
 import uvicorn
 from fastapi import FastAPI
 from .routers import ws
+from wmtf.core import LOGGING_LEVEL
 
 
 def create_rest_app():
@@ -19,6 +20,7 @@ class Server(object):
     def __init__(self, *args, **kwargs):
         server_config = uvicorn.Config(
             app=create_rest_app,
+            log_level=LOGGING_LEVEL,
             host=app_config.api_config.host,
             port=app_config.api_config.port,
             factory=True

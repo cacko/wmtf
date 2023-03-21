@@ -96,3 +96,4 @@ class WSClient(object, metaclass=WSClientMeta):
         request, callback = await self.queue.get()
         self.__callbacks[request.id] = callback
         await self.websocket.send(request.json())
+        self.queue.task_done()

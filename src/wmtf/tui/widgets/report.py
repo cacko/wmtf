@@ -8,11 +8,11 @@ from wmtf.api.client import WSClient
 from wmtf.tui import TUI_WS_ID
 from rich.status import Status
 from rich.text import Text
+from textual.widgets import LoadingIndicator
 from wmtf.tui.widgets.types import Focusable, Box, VisibilityMixin
 from typing import Optional
 from datetime import datetime, timedelta
 from wmtf.tui.widgets import TIMER_LOCK
-from textual import log
 from enum import IntEnum
 
 
@@ -42,13 +42,13 @@ class ReportWidget(Box):
     __running_total = reactive("")
     __running_time: Optional[RunningTime] = None
     __timer_active: Optional[TIMER_EVENT] = None
+    __loading: Optional[LoadingIndicator] = None
 
     @property
     def title(self):
         return "Report"
 
     def start_timer(self, event: TIMER_EVENT):
-        log(f"TIMER_ACTIVE {self.__timer_active}")
         if timer := self.__timer_active:
             match timer:
                 case TIMER_EVENT.RUNNING:
@@ -113,7 +113,6 @@ class ReportWidget(Box):
             if today:
                 self.__running_time = RunningTime(today.total_work)
                 self.start_timer(TIMER_EVENT.RUNNING)
-                log("time started")
 
     def render(self):
         if isinstance(self.__report, Status):

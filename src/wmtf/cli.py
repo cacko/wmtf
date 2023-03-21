@@ -25,6 +25,11 @@ from wmtf.git.message import Message
 import sys
 import re
 from wmtf.core import process_with_port, check_socket
+import signal
+import os
+
+
+PIDS = []
 
 
 def banner(txt: str, color: str = "bright_green"):
@@ -78,8 +83,16 @@ def cli(ctx: click.Context):
         if not check_socket(cfg.host, cfg.port):
             args = sys.orig_argv
             args.append("api")
-            with process_with_port(args, cfg.host, cfg.port):
-                Tui().run()
+            try:
+                with process_with_port(args, cfg.host, cfg.port) as proc:
+                    PIDS.append(proc.pid)
+                    Tui().run()
+                    proc.terminate()
+                    os.kill(proc.pid, signal.SIGKILL)
+                    sys.exit()
+            except Exception:
+                os.kill(proc.pid, signal.SIGKILL)
+                proc.terminate()
         else:
             Tui().run()
 
@@ -262,11 +275,11 @@ def cli_api_server(ctx: click.Context):
         error(e)
     finally:
         api_server.stop()
+    sys.exit(0)
 
 
 def run():
     from wmtf.config import app_config
-
     try:
         if not app_config.is_configured():
             assert validate_credentials()
@@ -366,5 +379,16 @@ def cli_commit(ctx: click.Context, dry_run, commit_type):
             ctx.invoke(task)
 
 
+def handler_stop_signals(signum, frame):
+    logging.warning("Stopping app")
+    for pid in PIDS:
+        os.kill(pid, signal.SIGKILL)
+
+
+signal.signal(signal.SIGINT, handler_stop_signals)
+signal.signal(signal.SIGTERM, handler_stop_signals)
+
 if __name__ == "__main__":
     run()
+    for pid in PIDS:
+        os.kill(pid, signal.SIGKILL)
