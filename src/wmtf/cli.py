@@ -13,7 +13,7 @@ from wmtf.wm.client import Client
 from wmtf.wm import LoginError, MaintenanceError
 from wmtf.wm.html.parser import ParserError
 from wmtf.wm.models import TaskInfo, ClockLocation
-from wmtf.ui.renderables.report import T, Days as ReportRenderable
+from wmtf.ui.renderables.report import Days as ReportRenderable
 from wmtf.ui.renderables.task import Task as TaskRenderable
 from random import randint
 from typing import Optional
@@ -294,7 +294,7 @@ def cli_branch(ctx: click.Context):
 @cli.command("clean", short_help="Clean issue branches")
 @click.pass_context
 def cli_clean_branch(ctx: click.Context):
-    matcher = re.compile(f"^\d+\-")
+    matcher = re.compile(r"^\d+\-")
     for branch_name in Git.branches():
         if not matcher.match(branch_name):
             continue
