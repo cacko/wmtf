@@ -4,12 +4,17 @@ from wmtf.tui.renderables.task import Task as TaskRenderable
 from wmtf.wm.models import Task as TaskModel
 from textual.keys import Keys
 from textual import events
+from textual.widgets import Static
 from typing import Optional
 from rich.text import Text
 from wmtf.tui.widgets.types import Box, Focusable, VisibilityMixin
 
 
-class TaskWidget(Box):
+class TaskBox(Box):
+    pass
+
+
+class TaskWidget(Static):
     taskModel: Optional[TaskModel] = None
 
     def __init__(self, *args, **kwargs):
@@ -25,15 +30,20 @@ class TaskWidget(Box):
         self.update(self.render())
 
     def render(self):
-        return self.get_panel(
-            TaskRenderable(self.taskModel) if self.taskModel else Text(
-                "Not found")
-        )
+        return TaskRenderable(self.taskModel) if self.taskModel else Text(
+            "Not found")
 
 
 class Task(VisibilityMixin, Focusable):
 
     __wdg: Optional[TaskWidget] = None
+    __box: Optional[TaskBox] = None
+
+    @property
+    def box(self) -> TaskBox:
+        if not self.__box:
+            self.__box = TaskBox(self.wdg)
+        return self.__box
 
     @property
     def wdg(self) -> TaskWidget:
@@ -51,7 +61,8 @@ class Task(VisibilityMixin, Focusable):
                 self.scroll_down()
 
     def compose(self) -> ComposeResult:
-        yield self.wdg
+        yield self.box
 
     def load(self, task_id: int):
         self.wdg.load(task_id)
+        self.box.border_title = self.wdg.title

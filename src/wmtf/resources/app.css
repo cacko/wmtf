@@ -68,8 +68,8 @@ Screen {
 }
 
 .border-round {
-    border: round;
+    border: round $accent;
 }
 .border-double {
-    border: double;
+    border: double $accent;
 }
