@@ -1,16 +1,17 @@
-from ast import Load
 from wmtf.wm.client import Client
 from wmtf.wm.models import ReportDay
 from textual.app import ComposeResult
 from textual.reactive import reactive
-from textual.widgets import LoadingIndicator
+from textual.widgets import Static
 from wmtf.tui.renderables.report import Days as ReportRenderable
+from wmtf.tui.renderables.markdown import Markdown
 from corethread import StoppableThread
 from rich.text import Text
 from wmtf.tui.widgets.types import Focusable, Box, VisibilityMixin
 from typing import Optional
 from datetime import datetime, timedelta
 from enum import IntEnum
+from textual.containers import Vertical, Container
 
 
 class TIMER_EVENT(IntEnum):
@@ -43,14 +44,56 @@ class ReportService(StoppableThread):
         self.__callback(days)
 
 
-class ReportWidget(Box):
+class ReportBox(Box):
+    border_title = "Report"
+
+
+class ActiveReportDay(Static):
+    day_total = reactive("")
+    __running_time: Optional[RunningTime] = None
+    day: Optional[ReportDay] = None
+
+    def set_day(self, day: ReportDay):
+        self.day = day
+        self.day_total = day.total_display
+        if Client.active_task:
+            self.__running_time = RunningTime(self.day.total_work)
+            self.update_timer.resume()
+
+    def on_mount(self) -> None:
+        self.update_timer = self.set_interval(
+            interval=1,
+            callback=self.update_info,
+            pause=True
+        )
+        self.update(self.render())
+
+    def update_info(self):
+        self.day_total = f"{self.__running_time}"
+        self.refresh()
+
+    def render(self) -> Markdown | Text:
+        try:
+            parts = []
+            assert self.day
+            parts.append(f"# {self.day.day.strftime('%A %d %b').upper()}")
+            parts.append(f"{self.day_total}")
+            return Markdown(" / ".join(parts))
+        except AssertionError:
+            return Text("")
+
+
+class ReportWidget(Static):
 
     __report: Optional[list[ReportDay]] = None
     __loading: bool = False
+    __active_report_day: Optional[ActiveReportDay] = None
 
     @property
-    def title(self):
-        return "Report"
+    def active_report_day(self) -> ActiveReportDay:
+        if not self.__active_report_day:
+            self.__active_report_day = ActiveReportDay()
+        return self.__active_report_day
 
     def load(self):
         self.__loading = True
@@ -67,34 +110,46 @@ class ReportWidget(Box):
     def update_report(self, report: list[ReportDay]):
         self.__loading = False
         self.__report = report
+        if today := next(
+                filter(lambda d: d.is_today, report), None):
+            self.active_report_day.set_day(today)
         self.update(self.render())
-        # if Client.active_task:
-        #     today = next(filter(lambda x: x.is_today, report), None)
-        #     if today:
-        #         self.__running_time = RunningTime(today.total_work)
 
     def render(self):
         if self.__loading:
-            return self.get_panel(Text("loading"))
+            return Text("loading")
         elif isinstance(self.__report, list):
-            return self.get_panel(ReportRenderable(
+            return ReportRenderable(
                 self.__report,
-            ))
-        return self.get_panel(Text("NOT FOUND"))
+            )
+        return Text("NOT FOUND")
 
 
 class Report(VisibilityMixin, Focusable):
-
-    __wdg: Optional[ReportWidget] = None
+    __box: Optional[Box] = None
+    __wdg_report: Optional[ReportWidget] = None
 
     @property
-    def wdg(self) -> ReportWidget:
-        if not self.__wdg:
-            self.__wdg = ReportWidget(expand=True)
-        return self.__wdg
+    def box(self) -> Box:
+        if not self.__box:
+            self.__box = ReportBox(
+                self.wdg_time,
+                self.wdg_report
+            )
+        return self.__box
+
+    @property
+    def wdg_report(self) -> ReportWidget:
+        if not self.__wdg_report:
+            self.__wdg_report = ReportWidget(expand=True)
+        return self.__wdg_report
+
+    @property
+    def wdg_time(self) -> ActiveReportDay:
+        return self.wdg_report.active_report_day
 
     def compose(self) -> ComposeResult:
-        yield self.wdg
+        yield self.box
 
     def load(self):
-        self.wdg.load()
+        self.wdg_report.load()

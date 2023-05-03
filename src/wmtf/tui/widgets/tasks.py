@@ -6,11 +6,16 @@ from textual import events
 from textual.app import ComposeResult
 from textual.message import Message, MessageTarget
 from textual.keys import Keys
-from wmtf.tui.widgets.types import Box, Focusable
+from wmtf.tui.widgets.types import Box, Focusable, Static
 from wmtf.config import app_config
 
 
-class TasksWidget(Box):
+class TasksBox(Box):
+
+    border_title = "My Tasks"
+
+
+class TasksWidget(Static):
 
     task_list: Optional[TaskList] = None
 
@@ -18,10 +23,6 @@ class TasksWidget(Box):
     def max_renderables_len(self) -> int:
         height: int = self.size.height
         return height - 2
-
-    @property
-    def title(self):
-        return "My Tasks"
 
     def on_mount(self) -> None:
         self.reload()
@@ -36,7 +37,7 @@ class TasksWidget(Box):
         self.update(self.render())
 
     def render(self):
-        return self.get_panel(self.task_list)
+        return self.task_list
 
     def next(self):
         if self.task_list:
@@ -71,6 +72,7 @@ class TasksWidget(Box):
 
 class Tasks(Focusable):
 
+    __box: Optional[TasksBox] = None
     __wdg: Optional[TasksWidget] = None
 
     class Selected(Message):
@@ -79,13 +81,19 @@ class Tasks(Focusable):
             super().__init__()
 
     @property
+    def box(self) -> Box:
+        if not self.__box:
+            self.__box = TasksBox(self.wdg)
+        return self.__box
+
+    @property
     def wdg(self) -> TasksWidget:
         if not self.__wdg:
             self.__wdg = TasksWidget()
         return self.__wdg
 
     def compose(self) -> ComposeResult:
-        yield self.wdg
+        yield self.box
 
     def clock(self) -> bool:
         return self.wdg.clock()

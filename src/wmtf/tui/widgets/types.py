@@ -1,4 +1,5 @@
 from textual.widgets import Static
+from textual.containers import Container
 from rich.panel import Panel
 from rich.align import AlignMethod
 from rich.console import RenderableType
@@ -17,45 +18,31 @@ class VisibilityMixin:
         self.remove_class("hidden")  # type: ignore
 
 
-class Box(Static):
-
-    box = reactive(SQUARE)
-
-    @property
-    def title(self):
-        raise NotImplementedError
-
-    @property
-    def title_align(self) -> AlignMethod:
-        return "left"
-
+class Box(Container):
+    
     @property
     def padding(self) -> int:
         return 1
 
-    def get_panel(
-        self,
-        content: Optional[RenderableType] = None,
-        expand: bool = True
-    ):
-        if content:
-            return Panel(
-                content,
-                title=self.title,
-                title_align=self.title_align,
-                padding=self.padding,
-                box=self.box,
-                expand=expand,
-            )
-        else:
-            return Panel(
-                "Not found",
-                title=self.title,
-                title_align=self.title_align,
-                padding=self.padding,
-                box=self.box,
-                expand=expand,
-            )
+    # def get_box(
+    #     self,
+    #     content: Optional[Widget] = None,
+    #     expand: bool = True
+    # ):
+    #     if content:
+    #         box = Container(
+    #             content,
+    #             classes=self.border,
+    #         )
+    #         box.border_title = self.title
+    #         return box
+    #     else:
+    #         box = Container(
+    #             Static("Not found"),
+    #             classes=self.border,
+    #         )
+    #         box.border_title = self.title
+    #         return box
 
 
 class Focusable(Widget, can_focus=True):
@@ -84,11 +71,11 @@ class Focusable(Widget, can_focus=True):
         return visible[cls.__idx]
 
     @property
-    def wdg(self) -> Box:
+    def box(self) -> Box:
         raise NotImplementedError
 
     def on_focus(self, event: events.Focus) -> None:
-        self.wdg.box = DOUBLE
+        self.box.classes = "border-double"
 
     def on_blur(self, event: events.Blur) -> None:
-        self.wdg.box = SQUARE
+        self.box.classes = "border-round"
