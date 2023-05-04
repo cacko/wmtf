@@ -8,10 +8,11 @@ from textual.widgets import Static
 from typing import Optional
 from rich.text import Text
 from wmtf.tui.widgets.types import Box, Focusable, VisibilityMixin
+from textual.reactive import reactive
 
 
 class TaskBox(Box):
-    pass
+    b_title = reactive("Task")
 
 
 class TaskWidget(Static):
@@ -19,10 +20,6 @@ class TaskWidget(Static):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
-    @property
-    def title(self):
-        return "Task"
 
     def load(self, id: int):
         self.update("Loading...")
@@ -65,4 +62,3 @@ class Task(VisibilityMixin, Focusable):
 
     def load(self, task_id: int):
         self.wdg.load(task_id)
-        self.box.border_title = self.wdg.title

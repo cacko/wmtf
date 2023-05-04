@@ -11,7 +11,6 @@ from wmtf.tui.widgets.types import Focusable, Box, VisibilityMixin
 from typing import Optional
 from datetime import datetime, timedelta
 from enum import IntEnum
-from textual.containers import Vertical, Container
 
 
 class TIMER_EVENT(IntEnum):
@@ -45,7 +44,7 @@ class ReportService(StoppableThread):
 
 
 class ReportBox(Box):
-    border_title = "Report"
+    b_title = reactive("Report")
 
 
 class ActiveReportDay(Static):

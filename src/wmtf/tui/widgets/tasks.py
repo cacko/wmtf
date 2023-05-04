@@ -3,16 +3,18 @@ from wmtf.wm.client import Client
 from wmtf.wm.models import TaskInfo, ClockLocation
 from typing import Optional
 from textual import events
+from textual.reactive import reactive
 from textual.app import ComposeResult
+from textual.widgets import Static
 from textual.message import Message, MessageTarget
 from textual.keys import Keys
-from wmtf.tui.widgets.types import Box, Focusable, Static
+from wmtf.tui.widgets.types import Box, Focusable
 from wmtf.config import app_config
 
 
 class TasksBox(Box):
 
-    border_title = "My Tasks"
+    b_title = reactive("My Tasks")
 
 
 class TasksWidget(Static):

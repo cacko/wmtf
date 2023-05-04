@@ -1,75 +1,75 @@
 Screen {
-    overflow: hidden;
-    layout: vertical;
-    align: center middle;
-    layers: below above;
+  overflow: hidden;
+  layout: vertical;
+  align: center middle;
+  layers: below above;
 }
 
 #heading {
-    layout: horizontal;
-    height: 6;
-    overflow: hidden;
+  layout: horizontal;
+  height: 6;
+  overflow: hidden;
 }
 
-#heading>.box {
-    height: 100%;
-    width: 1fr;
+#heading > .box {
+  height: 100%;
+  width: 1fr;
 }
 
 #status_info {
-    padding: 2 1 0 1;
-    layout: vertical;
-    align: left middle;
+  padding: 2 1 0 1;
+  layout: vertical;
+  align: left middle;
 }
 
-#status_info>.box {
-    height: 1fr;
-    align: left middle;
+#status_info > .box {
+  height: 1fr;
+  align: left middle;
 }
 
 #content {
-    layout: horizontal;
-    padding: 1 1 1 0;
-    height: 90%;
-    overflow: hidden;
+  layout: horizontal;
+  padding: 1 1 1 0;
+  height: 90%;
+  overflow: hidden;
 }
 
-#content>.box {
-    height: 100%;
-    width: 1fr;
-    scrollbar-gutter: stable;
+#content > .box {
+  height: 100%;
+  width: 1fr;
+  scrollbar-gutter: stable;
 }
 
 #content .scroll {
-    overflow-y: auto;
-    scrollbar-size: 1 1;
+  overflow-y: auto;
+  scrollbar-size: 1 1;
 }
 
 #content .hidden {
-    visibility: hidden;
-    width: 0;
+  visibility: hidden;
+  width: 0;
 }
 
 #content .hidden.scroll {
-    overflow: hidden;
+  overflow: hidden;
 }
 
 .description {
-    padding: 1;
+  padding: 1;
 }
 
 #alert {
-    width: 28;
-    height: 8;
-    color: auto;
-    content-align: center middle;
-    background: darkcyan;
-    layer: above;
+  width: 28;
+  height: 8;
+  color: auto;
+  content-align: center middle;
+  background: darkcyan;
+  layer: above;
 }
 
-.border-round {
-    border: round $accent;
+.box-normal {
+  border: round $accent;
 }
-.border-double {
-    border: double $accent;
+.box-focused {
+  border: panel $accent;
 }

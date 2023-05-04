@@ -1,13 +1,8 @@
-from textual.widgets import Static
 from textual.containers import Container
-from rich.panel import Panel
-from rich.align import AlignMethod
 from rich.console import RenderableType
 from textual import events
 from textual.widget import Widget
-from rich.box import DOUBLE, SQUARE
 from textual.reactive import reactive
-from typing import Optional
 
 
 class VisibilityMixin:
@@ -19,30 +14,16 @@ class VisibilityMixin:
 
 
 class Box(Container):
-    
-    @property
-    def padding(self) -> int:
-        return 1
 
-    # def get_box(
-    #     self,
-    #     content: Optional[Widget] = None,
-    #     expand: bool = True
-    # ):
-    #     if content:
-    #         box = Container(
-    #             content,
-    #             classes=self.border,
-    #         )
-    #         box.border_title = self.title
-    #         return box
-    #     else:
-    #         box = Container(
-    #             Static("Not found"),
-    #             classes=self.border,
-    #         )
-    #         box.border_title = self.title
-    #         return box
+    b_title = reactive("")
+    b_padding = reactive(1)
+    b_classes = reactive("box-normal")
+
+    def render(self) -> RenderableType:
+        self.classes = self.b_classes
+        self.border_title = self.b_title
+        self.styles.padding = self.b_padding
+        return super().render()
 
 
 class Focusable(Widget, can_focus=True):
@@ -75,7 +56,7 @@ class Focusable(Widget, can_focus=True):
         raise NotImplementedError
 
     def on_focus(self, event: events.Focus) -> None:
-        self.box.classes = "border-double"
+        self.box.b_classes = "box-focused"
 
     def on_blur(self, event: events.Blur) -> None:
-        self.box.classes = "border-round"
+        self.box.b_classes = "box-normal"
