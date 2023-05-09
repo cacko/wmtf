@@ -30,12 +30,11 @@ Screen {
 #content {
   layout: horizontal;
   padding: 1 1 1 0;
-  height: 90%;
   overflow: hidden;
 }
 
 #content > .box {
-  height: 100%;
+  height: auto;
   width: 1fr;
   scrollbar-gutter: stable;
 }
@@ -70,6 +69,7 @@ Screen {
 .box-normal {
   border: round $accent;
 }
+
 .box-focused {
   border: panel $accent;
 }
