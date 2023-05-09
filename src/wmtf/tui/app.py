@@ -1,6 +1,7 @@
 from textual.app import App, ComposeResult
 from textual.widgets import Header, Footer
 from textual import events
+from textual.timer import Timer
 from textual.containers import Container
 from .widgets.tasks import Tasks as WidgetTasks
 from .widgets.report import Report as WidgetReport
@@ -33,6 +34,8 @@ class Tui(App):
     ]
 
     LOCATIONS = [ClockLocation.HOME.value, ClockLocation.OFFICE.value]
+
+    __updater: Timer
 
     @property
     def widget_task(self) -> WidgetTask:
@@ -82,16 +85,26 @@ class Tui(App):
 
     def on_mount(self, event: events.Mount) -> None:
         Focusable.next().focus()
+        self.__timer = self.set_interval(
+            60*5, self.on_timer,
+            pause=False
+        )
+
+    def on_timer(self):
+        self.widget_tasks.reload()
+        self.widget_report.load()
 
     def action_toggle_views(self) -> None:
         self.widget_task.toggle_class("hidden")
         self.widget_report.toggle_class("hidden")
 
     def action_reload(self) -> None:
+        self.__timer.pause()
         self.widget_tasks.reload()
         self.widget_task.hide()
         self.widget_report.unhide()
         self.widget_report.load()
+        self.__timer.reset()
 
     def action_switch_view(self):
         nxt = Focusable.next()
