@@ -2,7 +2,7 @@ from queue import Queue
 from wmtf.config import app_config
 import uvicorn
 from fastapi import FastAPI
-from .routers import api
+from .routers import api, ws
 from fastapi.middleware.cors import CORSMiddleware
 
 
@@ -22,6 +22,7 @@ def create_rest_app():
     )
 
     app.include_router(api.router)
+    app.include_router(ws.router)
     return app
 
 
