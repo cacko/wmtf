@@ -3,6 +3,7 @@ from textual.widgets import Header, Footer
 from textual import events
 from textual.timer import Timer
 from textual.containers import Container
+from wmtf.tui.widgets import Action, Command
 
 from wmtf.tui.widgets.nav_tabs import NavTabsWidget
 from .widgets.tasks import Tasks as WidgetTasks
@@ -19,6 +20,7 @@ from webbrowser import open_new_tab
 from typing import Any
 from wmtf import RESOURCES_PATH
 from app_version import get_string_version
+from textual.message import Message, MessageTarget
 
 
 class Tui(App):
@@ -37,6 +39,15 @@ class Tui(App):
     LOCATIONS = [ClockLocation.HOME.value, ClockLocation.OFFICE.value]
 
     __updater: Timer
+
+    class Load(Message):
+        def __init__(
+            self,
+            sender: MessageTarget,
+            cmd: Command
+        ) -> None:
+            self.cmd = cmd
+            super().__init__()
 
     @property
     def widget_location(self) -> WidgetAppLocation:
@@ -88,13 +99,16 @@ class Tui(App):
         # self.widget_report.toggle_class("hidden")
 
     def action_reload(self) -> None:
-        # self.__timer.pause()
-        # self.widget_tasks.reload()
-        # self.widget_task.hide()
-        # self.widget_report.unhide()
-        # self.widget_report.load()
-        # self.__timer.reset()
-        pass
+        self.__timer.pause()
+        self.post_message(self.Load(
+            self,
+            Command(action=Action.TASKS)
+        ))
+        self.post_message(self.Load(
+            self,
+            Command(action=Action.REPORT)
+        ))
+        self.__timer.reset()
 
     def action_switch_view(self):
         nxt = Focusable.next()

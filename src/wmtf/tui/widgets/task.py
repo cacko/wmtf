@@ -1,3 +1,4 @@
+from wmtf.tui.widgets import Action
 from wmtf.wm.client import Client
 from textual.app import ComposeResult
 from wmtf.tui.renderables.task import Task as TaskRenderable
@@ -8,6 +9,7 @@ from textual.widgets import Static
 from typing import Optional
 from rich.text import Text
 from wmtf.tui.widgets.types import Focusable, VisibilityMixin
+from wmtf.tui.app import Tui
 
 
 class TaskWidget(Static):
@@ -15,6 +17,10 @@ class TaskWidget(Static):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+    def on_app_load(self, msg: Tui.Load):
+        if msg.cmd == Action.TASKS:
+            self.load()
 
     def load(self, id: int):
         self.update("Loading...")
