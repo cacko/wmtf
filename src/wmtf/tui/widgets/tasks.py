@@ -1,4 +1,5 @@
 from wmtf.tui.renderables.task_list import TaskList
+from wmtf.tui.widgets import Action
 from wmtf.wm.client import Client
 from wmtf.wm.models import TaskInfo, ClockLocation
 from typing import Optional
@@ -20,6 +21,10 @@ class TasksWidget(Static):
         def __init__(self, sender: MessageTarget, res: bool) -> None:
             self.res = res
             super().__init__()
+
+    def on_app_load(self, msg):
+        if msg.cmd.action == Action.TASKS:
+            self.reload()
 
     @property
     def max_renderables_len(self) -> int:
@@ -53,7 +58,6 @@ class TasksWidget(Static):
             self.update(self.render())
 
     def previous(self):
-        
         if self.task_list:
             self.task_list.previous()
             self.update(self.render())
@@ -99,9 +103,6 @@ class Tasks(Focusable, Widget):
 
     def clock(self) -> bool:
         return self.wdg.clock()
-
-    def reload(self):
-        self.wdg.reload()
 
     def on_key(self, event: events.Key) -> None:
         if not self.has_focus:

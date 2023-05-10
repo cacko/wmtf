@@ -1,4 +1,6 @@
 
+import logging
+from wmtf.tui.widgets import Action
 from wmtf.wm.client import Client
 from wmtf.wm.models import ReportDay
 from textual.reactive import reactive
@@ -12,6 +14,7 @@ from typing import Optional
 from datetime import datetime, timedelta
 from enum import IntEnum
 from textual.message import Message, MessageTarget
+import asyncio
 
 
 class TIMER_EVENT(IntEnum):
@@ -94,6 +97,15 @@ class ReportWidget(Static, Focusable):
             self.res = res
             super().__init__()
 
+    async def on_tui_load(self, msg):
+        logging.warning(msg)
+
+        if msg.cmd.action == Action.REPORT:
+            asyncio.create_task(self.load())
+
+    def on_mount(self):
+        self.load()
+
     @property
     def active_report_day(self) -> ActiveReportDay:
         if not self.__active_report_day:
@@ -105,15 +117,13 @@ class ReportWidget(Static, Focusable):
         t = ReportService(self.update_report)
         t.start()
 
-    def on_mount(self) -> None:
-        self.load()
-
     def timer_callback(self, *args, **kwargs) -> None:
         if isinstance(self.__report, list):
             self.update(self.render())
 
     def update_report(self, report: list[ReportDay]):
         self.__report = report
+        logging.warning(self.__report)
         if today := next(
                 filter(lambda d: d.is_today, report), None):
             self.active_report_day.set_day(today)
@@ -121,6 +131,7 @@ class ReportWidget(Static, Focusable):
 
     def render(self):
         if isinstance(self.__report, list):
+            logging.warning(self.__report)
             self.post_message(self.Loading(self, False))
             return ReportRenderable(
                 self.__report,

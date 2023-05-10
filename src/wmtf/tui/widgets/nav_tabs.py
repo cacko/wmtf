@@ -13,6 +13,6 @@ class NavTabsWidget(Focusable):
     def compose(self):
         with TabbedContent(initial="my_tasks"):
             with TabPane("My Tasks", id="my_tasks"):
-                yield Tasks()
+                yield Tasks(classes="shit")
             with TabPane("Users", id="users"):
-                yield Users()
+                yield Users(classes="shit")

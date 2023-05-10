@@ -42,6 +42,7 @@ Screen {
 #content .scroll {
   overflow-y: auto;
   scrollbar-size: 1 1;
+  height: 1fr;
 }
 
 #content .hidden {

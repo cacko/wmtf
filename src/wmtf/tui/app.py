@@ -88,6 +88,7 @@ class Tui(App):
             60*5, self.on_timer,
             pause=False
         )
+        self.action_reload()
 
     def on_timer(self):
         self.widget_tasks.reload()
@@ -95,14 +96,16 @@ class Tui(App):
 
     def action_toggle_views(self) -> None:
         pass
-        # self.widget_task.toggle_class("hidden")
-        # self.widget_report.toggle_class("hidden")
 
     def action_reload(self) -> None:
         self.__timer.pause()
         self.post_message(self.Load(
             self,
             Command(action=Action.TASKS)
+        ))
+        self.post_message(self.Load(
+            self,
+            Command(action=Action.REPORT)
         ))
         self.post_message(self.Load(
             self,
@@ -129,10 +132,10 @@ class Tui(App):
         open_new_tab(link)
 
     def on_tasks_selected(self, message: WidgetTasks.Selected) -> None:
-        # self.widget_task.load(message.task.id)
-        # self.widget_task.unhide()
-        # self.widget_report.hide()
-        pass
+        self.post_message(self.Load(
+            self,
+            Command(action=Action.TASK, id=message.task.id)
+        ))
 
     def on_alert_error(self, message: Any):
         self.widget_alert.message(message)

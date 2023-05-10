@@ -9,7 +9,6 @@ from textual.widgets import Static
 from typing import Optional
 from rich.text import Text
 from wmtf.tui.widgets.types import Focusable, VisibilityMixin
-from wmtf.tui.app import Tui
 
 
 class TaskWidget(Static):
@@ -18,9 +17,9 @@ class TaskWidget(Static):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    def on_app_load(self, msg: Tui.Load):
-        if msg.cmd == Action.TASKS:
-            self.load()
+    def on_app_load(self, msg):
+        if msg.cmd.action == Action.TASK:
+            self.load(msg.cmd.id)
 
     def load(self, id: int):
         self.update("Loading...")
