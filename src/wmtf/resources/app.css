@@ -37,9 +37,6 @@ Screen {
   height: auto;
   width: 1fr;
   scrollbar-gutter: stable;
-  height: 100vh;
-      background: yellow;
-
 }
 
 #content .scroll {

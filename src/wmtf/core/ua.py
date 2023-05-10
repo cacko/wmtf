@@ -21,7 +21,7 @@ class UA(object, metaclass=UAMeta):
 
     def __init__(self):
         software = [SoftwareName.CHROME.value]
-        systems = [OperatingSystem.WINDOWS.value, OperatingSystem.LINUX.value]
+        systems = [OperatingSystem.LINUX.value]
         self.rotator = UserAgent(
             software_names=software, operating_systems=systems, limit=100
         )

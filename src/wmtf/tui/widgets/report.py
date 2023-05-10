@@ -90,9 +90,9 @@ class ReportWidget(Static, Focusable):
             self.res = res
             super().__init__()
 
-    def on_content_load(self, msg):
-        if msg.cmd.action == Action.REPORT:
-            self.load()
+    # def on_content_load(self, msg):
+    #     if msg.cmd.action == Action.REPORT:
+    #         self.load()
 
     def on_mount(self):
         self.load()
@@ -117,7 +117,7 @@ class ReportWidget(Static, Focusable):
         if today := next(
                 filter(lambda d: d.is_today, report), None):
             self.active_report_day.set_day(today)
-        self.update(self.render())
+        self.update(Text("shit"))
 
     def render(self):
         if isinstance(self.__report, list):

@@ -18,7 +18,7 @@ from webbrowser import open_new_tab
 from typing import Any
 from wmtf import RESOURCES_PATH
 from app_version import get_string_version
-
+from wmtf.wm.client import Client
 
 class Tui(App):
 
@@ -69,13 +69,12 @@ class Tui(App):
             id="heading",
         )
         with Horizontal(id="content"):
-            with VerticalScroll(classes="box scroll"):
-                yield NavTabsWidget(classes="box scroll")
-            with VerticalScroll(classes="box scroll"):
-                yield ContentWidget(classes="box scroll")
+            yield NavTabsWidget(classes="box scroll")
+            yield ContentWidget(classes="box scroll")
         yield Footer()
 
     def on_mount(self, event: events.Mount) -> None:
+        Client.do_login()
         Focusable.next().focus()
         self.__timer = self.set_interval(
             60*5, self.on_timer,
