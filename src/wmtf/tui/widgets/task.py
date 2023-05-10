@@ -7,12 +7,7 @@ from textual import events
 from textual.widgets import Static
 from typing import Optional
 from rich.text import Text
-from wmtf.tui.widgets.types import Box, Focusable, VisibilityMixin
-from textual.reactive import reactive
-
-
-class TaskBox(Box):
-    b_title = reactive("Task")
+from wmtf.tui.widgets.types import Focusable, VisibilityMixin
 
 
 class TaskWidget(Static):
@@ -33,21 +28,6 @@ class TaskWidget(Static):
 
 class Task(VisibilityMixin, Focusable):
 
-    __wdg: Optional[TaskWidget] = None
-    __box: Optional[TaskBox] = None
-
-    @property
-    def box(self) -> TaskBox:
-        if not self.__box:
-            self.__box = TaskBox(self.wdg)
-        return self.__box
-
-    @property
-    def wdg(self) -> TaskWidget:
-        if not self.__wdg:
-            self.__wdg = TaskWidget()
-        return self.__wdg
-
     def on_key(self, event: events.Key) -> None:
         if not self.has_focus:
             return
@@ -58,7 +38,4 @@ class Task(VisibilityMixin, Focusable):
                 self.scroll_down()
 
     def compose(self) -> ComposeResult:
-        yield self.box
-
-    def load(self, task_id: int):
-        self.wdg.load(task_id)
+        yield TaskWidget()

@@ -1,16 +1,17 @@
+
 from wmtf.wm.client import Client
 from wmtf.wm.models import ReportDay
-from textual.app import ComposeResult
 from textual.reactive import reactive
 from textual.widgets import Static
 from wmtf.tui.renderables.report import Days as ReportRenderable
 from wmtf.tui.renderables.markdown import Markdown
 from corethread import StoppableThread
 from rich.text import Text
-from wmtf.tui.widgets.types import Focusable, Box, VisibilityMixin
+from wmtf.tui.widgets.types import Focusable, Box
 from typing import Optional
 from datetime import datetime, timedelta
 from enum import IntEnum
+from textual.message import Message, MessageTarget
 
 
 class TIMER_EVENT(IntEnum):
@@ -82,11 +83,16 @@ class ActiveReportDay(Static):
             return Text("")
 
 
-class ReportWidget(Static):
+class ReportWidget(Static, Focusable):
 
     __report: Optional[list[ReportDay]] = None
     __loading: bool = False
     __active_report_day: Optional[ActiveReportDay] = None
+
+    class Loading(Message):
+        def __init__(self, sender: MessageTarget, res: bool) -> None:
+            self.res = res
+            super().__init__()
 
     @property
     def active_report_day(self) -> ActiveReportDay:
@@ -95,7 +101,7 @@ class ReportWidget(Static):
         return self.__active_report_day
 
     def load(self):
-        self.__loading = True
+        self.post_message(self.Loading(self, True))
         t = ReportService(self.update_report)
         t.start()
 
@@ -107,7 +113,6 @@ class ReportWidget(Static):
             self.update(self.render())
 
     def update_report(self, report: list[ReportDay]):
-        self.__loading = False
         self.__report = report
         if today := next(
                 filter(lambda d: d.is_today, report), None):
@@ -115,40 +120,9 @@ class ReportWidget(Static):
         self.update(self.render())
 
     def render(self):
-        if self.__loading:
-            return Text("loading")
-        elif isinstance(self.__report, list):
+        if isinstance(self.__report, list):
+            self.post_message(self.Loading(self, False))
             return ReportRenderable(
                 self.__report,
             )
-        return Text("NOT FOUND")
-
-
-class Report(VisibilityMixin, Focusable):
-    __box: Optional[Box] = None
-    __wdg_report: Optional[ReportWidget] = None
-
-    @property
-    def box(self) -> Box:
-        if not self.__box:
-            self.__box = ReportBox(
-                self.wdg_time,
-                self.wdg_report
-            )
-        return self.__box
-
-    @property
-    def wdg_report(self) -> ReportWidget:
-        if not self.__wdg_report:
-            self.__wdg_report = ReportWidget(expand=True)
-        return self.__wdg_report
-
-    @property
-    def wdg_time(self) -> ActiveReportDay:
-        return self.wdg_report.active_report_day
-
-    def compose(self) -> ComposeResult:
-        yield self.box
-
-    def load(self):
-        self.wdg_report.load()
+        return ""

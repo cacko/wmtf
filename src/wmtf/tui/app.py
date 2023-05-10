@@ -3,9 +3,10 @@ from textual.widgets import Header, Footer
 from textual import events
 from textual.timer import Timer
 from textual.containers import Container
+
+from wmtf.tui.widgets.nav_tabs import NavTabsWidget
 from .widgets.tasks import Tasks as WidgetTasks
-from .widgets.report import Report as WidgetReport
-from .widgets.task import Task as WidgetTask
+from .widgets.content import Content as ContentWidget
 from .widgets.app_name import AppName as WidgetAppName
 from .widgets.app_location import AppLocation as WidgetAppLocation
 from .widgets.active_task import ActiveTask as WidgetActiveTask
@@ -38,18 +39,6 @@ class Tui(App):
     __updater: Timer
 
     @property
-    def widget_task(self) -> WidgetTask:
-        return self.query_one(WidgetTask)
-
-    @property
-    def widget_tasks(self) -> WidgetTasks:
-        return self.query_one(WidgetTasks)
-
-    @property
-    def widget_report(self) -> WidgetReport:
-        return self.query_one(WidgetReport)
-
-    @property
     def widget_location(self) -> WidgetAppLocation:
         return self.query_one(WidgetAppLocation)
 
@@ -76,9 +65,8 @@ class Tui(App):
             id="heading",
         )
         yield Container(
-            WidgetTasks(id="tasks", classes="box scroll"),
-            WidgetReport(id="report", classes="box scroll"),
-            WidgetTask(id="task", classes="box hidden scroll"),
+            NavTabsWidget(classes="box scroll"),
+            ContentWidget(classes="box scroll"),
             id="content",
         )
         yield Footer()
@@ -95,16 +83,18 @@ class Tui(App):
         self.widget_report.load()
 
     def action_toggle_views(self) -> None:
-        self.widget_task.toggle_class("hidden")
-        self.widget_report.toggle_class("hidden")
+        pass
+        # self.widget_task.toggle_class("hidden")
+        # self.widget_report.toggle_class("hidden")
 
     def action_reload(self) -> None:
-        self.__timer.pause()
-        self.widget_tasks.reload()
-        self.widget_task.hide()
-        self.widget_report.unhide()
-        self.widget_report.load()
-        self.__timer.reset()
+        # self.__timer.pause()
+        # self.widget_tasks.reload()
+        # self.widget_task.hide()
+        # self.widget_report.unhide()
+        # self.widget_report.load()
+        # self.__timer.reset()
+        pass
 
     def action_switch_view(self):
         nxt = Focusable.next()
@@ -125,9 +115,10 @@ class Tui(App):
         open_new_tab(link)
 
     def on_tasks_selected(self, message: WidgetTasks.Selected) -> None:
-        self.widget_task.load(message.task.id)
-        self.widget_task.unhide()
-        self.widget_report.hide()
+        # self.widget_task.load(message.task.id)
+        # self.widget_task.unhide()
+        # self.widget_report.hide()
+        pass
 
     def on_alert_error(self, message: Any):
         self.widget_alert.message(message)

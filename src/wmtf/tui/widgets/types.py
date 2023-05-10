@@ -1,8 +1,7 @@
-from textual.containers import Container
 from rich.console import RenderableType
 from textual import events
 from textual.widget import Widget
-from textual.reactive import reactive
+from textual.widgets import TabbedContent
 
 
 class VisibilityMixin:
@@ -13,16 +12,9 @@ class VisibilityMixin:
         self.remove_class("hidden")  # type: ignore
 
 
-class Box(Container):
-
-    b_title = reactive("")
-    b_padding = reactive(1)
-    b_classes = reactive("box-normal")
+class Box(TabbedContent):
 
     def render(self) -> RenderableType:
-        self.classes = self.b_classes
-        self.border_title = self.b_title
-        self.styles.padding = self.b_padding
         return super().render()
 
 
@@ -36,9 +28,10 @@ class Focusable(Widget, can_focus=True):
         *children: Widget,
         name: str | None = None,
         id: str | None = None,
-        classes: str | None = None
+        classes: str | None = None,
+        **kwads
     ) -> None:
-        super().__init__(*children, name=name, id=id, classes=classes)
+        super().__init__(*children, name=name, id=id, classes=classes, **kwads)
         Focusable.__instances.append(self)
 
     @classmethod
@@ -51,12 +44,8 @@ class Focusable(Widget, can_focus=True):
         cls.__idx = idx
         return visible[cls.__idx]
 
-    @property
-    def box(self) -> Box:
-        raise NotImplementedError
-
     def on_focus(self, event: events.Focus) -> None:
-        self.box.b_classes = "box-focused"
+        self.add_class("on-focus")
 
     def on_blur(self, event: events.Blur) -> None:
-        self.box.b_classes = "box-normal"
+        self.remove_class("on-focus")

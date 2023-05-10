@@ -3,23 +3,23 @@ from wmtf.wm.client import Client
 from wmtf.wm.models import TaskInfo, ClockLocation
 from typing import Optional
 from textual import events
-from textual.reactive import reactive
 from textual.app import ComposeResult
 from textual.widgets import Static
 from textual.message import Message, MessageTarget
 from textual.keys import Keys
-from wmtf.tui.widgets.types import Box, Focusable
+from textual.widget import Widget
+from wmtf.tui.widgets.types import Focusable
 from wmtf.config import app_config
-
-
-class TasksBox(Box):
-
-    b_title = reactive("My Tasks")
 
 
 class TasksWidget(Static):
 
     task_list: Optional[TaskList] = None
+
+    class Loading(Message):
+        def __init__(self, sender: MessageTarget, res: bool) -> None:
+            self.res = res
+            super().__init__()
 
     @property
     def max_renderables_len(self) -> int:
@@ -30,16 +30,22 @@ class TasksWidget(Static):
         self.reload()
 
     def reload(self):
+        self.post_message(self.Loading(self, True))
         tasks = Client.tasks()
         self.task_list = TaskList(
             tasks,
             max_len=self.max_renderables_len,
             selected=self.task_list.selected if self.task_list else None,
         )
+        self.post_message(self.Loading(self, False))
         self.update(self.render())
 
     def render(self):
-        return self.task_list
+        try:
+            assert self.task_list
+            return self.task_list
+        except AssertionError:
+            return ""
 
     def next(self):
         if self.task_list:
@@ -47,6 +53,7 @@ class TasksWidget(Static):
             self.update(self.render())
 
     def previous(self):
+        
         if self.task_list:
             self.task_list.previous()
             self.update(self.render())
@@ -72,9 +79,8 @@ class TasksWidget(Static):
         return False
 
 
-class Tasks(Focusable):
+class Tasks(Focusable, Widget):
 
-    __box: Optional[TasksBox] = None
     __wdg: Optional[TasksWidget] = None
 
     class Selected(Message):
@@ -83,19 +89,13 @@ class Tasks(Focusable):
             super().__init__()
 
     @property
-    def box(self) -> Box:
-        if not self.__box:
-            self.__box = TasksBox(self.wdg)
-        return self.__box
-
-    @property
     def wdg(self) -> TasksWidget:
         if not self.__wdg:
             self.__wdg = TasksWidget()
         return self.__wdg
 
     def compose(self) -> ComposeResult:
-        yield self.box
+        yield self.wdg
 
     def clock(self) -> bool:
         return self.wdg.clock()
