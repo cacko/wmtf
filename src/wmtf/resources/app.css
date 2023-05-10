@@ -37,12 +37,16 @@ Screen {
   height: auto;
   width: 1fr;
   scrollbar-gutter: stable;
+  height: 100vh;
+      background: yellow;
+
 }
 
 #content .scroll {
   overflow-y: auto;
   scrollbar-size: 1 1;
   height: 1fr;
+  width: 1fr;
 }
 
 #content .hidden {
@@ -73,4 +77,8 @@ Screen {
 
 .box-focused {
   border: panel $accent;
+}
+
+.shit {
+
 }

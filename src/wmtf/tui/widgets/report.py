@@ -1,5 +1,4 @@
 
-import logging
 from wmtf.tui.widgets import Action
 from wmtf.wm.client import Client
 from wmtf.wm.models import ReportDay
@@ -9,12 +8,11 @@ from wmtf.tui.renderables.report import Days as ReportRenderable
 from wmtf.tui.renderables.markdown import Markdown
 from corethread import StoppableThread
 from rich.text import Text
-from wmtf.tui.widgets.types import Focusable, Box
+from wmtf.tui.widgets.types import Focusable
 from typing import Optional
 from datetime import datetime, timedelta
 from enum import IntEnum
 from textual.message import Message, MessageTarget
-import asyncio
 
 
 class TIMER_EVENT(IntEnum):
@@ -45,10 +43,6 @@ class ReportService(StoppableThread):
     def run(self) -> None:
         days = Client.report()
         self.__callback(days)
-
-
-class ReportBox(Box):
-    b_title = reactive("Report")
 
 
 class ActiveReportDay(Static):
@@ -89,7 +83,6 @@ class ActiveReportDay(Static):
 class ReportWidget(Static, Focusable):
 
     __report: Optional[list[ReportDay]] = None
-    __loading: bool = False
     __active_report_day: Optional[ActiveReportDay] = None
 
     class Loading(Message):
@@ -97,11 +90,9 @@ class ReportWidget(Static, Focusable):
             self.res = res
             super().__init__()
 
-    async def on_tui_load(self, msg):
-        logging.warning(msg)
-
+    def on_content_load(self, msg):
         if msg.cmd.action == Action.REPORT:
-            asyncio.create_task(self.load())
+            self.load()
 
     def on_mount(self):
         self.load()
@@ -123,7 +114,6 @@ class ReportWidget(Static, Focusable):
 
     def update_report(self, report: list[ReportDay]):
         self.__report = report
-        logging.warning(self.__report)
         if today := next(
                 filter(lambda d: d.is_today, report), None):
             self.active_report_day.set_day(today)
@@ -131,7 +121,6 @@ class ReportWidget(Static, Focusable):
 
     def render(self):
         if isinstance(self.__report, list):
-            logging.warning(self.__report)
             self.post_message(self.Loading(self, False))
             return ReportRenderable(
                 self.__report,

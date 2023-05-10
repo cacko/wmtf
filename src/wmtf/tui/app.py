@@ -1,10 +1,8 @@
 from textual.app import App, ComposeResult
 from textual.widgets import Header, Footer
 from textual import events
-from textual.timer import Timer
-from textual.containers import Container
+from textual.containers import Container, Horizontal, VerticalScroll
 from wmtf.tui.widgets import Action, Command
-
 from wmtf.tui.widgets.nav_tabs import NavTabsWidget
 from .widgets.tasks import Tasks as WidgetTasks
 from .widgets.content import Content as ContentWidget
@@ -20,7 +18,6 @@ from webbrowser import open_new_tab
 from typing import Any
 from wmtf import RESOURCES_PATH
 from app_version import get_string_version
-from textual.message import Message, MessageTarget
 
 
 class Tui(App):
@@ -31,23 +28,12 @@ class Tui(App):
         ("c", "clock", "Clock On/Off"),
         ("l", "toggle_location", "Location"),
         ("v", "toggle_views", "Views"),
-        ("r", "reload", "Refresh"),
+        ("r", "blowme", "Refresh"),
         ("t", "toggle_dark", "Theme"),
         ("q", "quit", "Quit"),
     ]
 
     LOCATIONS = [ClockLocation.HOME.value, ClockLocation.OFFICE.value]
-
-    __updater: Timer
-
-    class Load(Message):
-        def __init__(
-            self,
-            sender: MessageTarget,
-            cmd: Command
-        ) -> None:
-            self.cmd = cmd
-            super().__init__()
 
     @property
     def widget_location(self) -> WidgetAppLocation:
@@ -57,13 +43,20 @@ class Tui(App):
     def widget_alert(self) -> WidgetAlert:
         return self.query_one(WidgetAlert)
 
+    @property
+    def content_widget(self) -> ContentWidget:
+        return self.query_one(ContentWidget)
+
+    @property
+    def navtabs_widget(self) -> NavTabsWidget:
+        return self.query_one(NavTabsWidget)
+
     def get_css_variables(self) -> dict[str, str]:
         return Theme.system.generate()
 
     def compose(self) -> ComposeResult:
         self._bindings.bind("tab", "switch_view", show=False, priority=True)
         self.title = f"Work Manager v{get_string_version('wmtf')}"
-        # yield WidgetAlert(id="alert", classes="hidden")
         yield Header(show_clock=True)
         yield Container(
             WidgetAppName(id="app_name", classes="box"),
@@ -75,11 +68,11 @@ class Tui(App):
             ),
             id="heading",
         )
-        yield Container(
-            NavTabsWidget(classes="box scroll"),
-            ContentWidget(classes="box scroll"),
-            id="content",
-        )
+        with Horizontal(id="content"):
+            with VerticalScroll(classes="box scroll"):
+                yield NavTabsWidget(classes="box scroll")
+            with VerticalScroll(classes="box scroll"):
+                yield ContentWidget(classes="box scroll")
         yield Footer()
 
     def on_mount(self, event: events.Mount) -> None:
@@ -88,29 +81,20 @@ class Tui(App):
             60*5, self.on_timer,
             pause=False
         )
-        self.action_reload()
+        self.action_blowme()
 
     def on_timer(self):
-        self.widget_tasks.reload()
-        self.widget_report.load()
+        # self.widget_tasks.reload()
+        # self.widget_report.load()
+        pass
 
     def action_toggle_views(self) -> None:
         pass
 
-    def action_reload(self) -> None:
+    def action_blowme(self) -> None:
         self.__timer.pause()
-        self.post_message(self.Load(
-            self,
-            Command(action=Action.TASKS)
-        ))
-        self.post_message(self.Load(
-            self,
-            Command(action=Action.REPORT)
-        ))
-        self.post_message(self.Load(
-            self,
-            Command(action=Action.REPORT)
-        ))
+        self.content_widget.reload()
+        self.navtabs_widget.reload()
         self.__timer.reset()
 
     def action_switch_view(self):
@@ -132,7 +116,7 @@ class Tui(App):
         open_new_tab(link)
 
     def on_tasks_selected(self, message: WidgetTasks.Selected) -> None:
-        self.post_message(self.Load(
+        self.post_message(ContentWidget.Load(
             self,
             Command(action=Action.TASK, id=message.task.id)
         ))

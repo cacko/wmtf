@@ -6,6 +6,6 @@ __name__ = "wmtf"
 
 RESOURCES_PATH = Path(__file__).parent / "resources"
 
-corelog.register(os.environ.get("WMTF_LOG_LEVEL", "FATAL"))
+corelog.register(os.environ.get("WMTF_LOG_LEVEL", "DEBUG"))
 
 __name__ = "wmtf"

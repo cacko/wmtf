@@ -2,15 +2,14 @@ from wmtf.tui.renderables.task_list import TaskList
 from wmtf.tui.widgets import Action
 from wmtf.wm.client import Client
 from wmtf.wm.models import TaskInfo, ClockLocation
-from typing import Optional
-from textual import events
 from textual.app import ComposeResult
 from textual.widgets import Static
 from textual.message import Message, MessageTarget
-from textual.keys import Keys
 from textual.widget import Widget
 from wmtf.tui.widgets.types import Focusable
 from wmtf.config import app_config
+from typing import ClassVar, Optional
+from textual.binding import Binding, BindingType
 
 
 class TasksWidget(Static):
@@ -22,7 +21,7 @@ class TasksWidget(Static):
             self.res = res
             super().__init__()
 
-    def on_app_load(self, msg):
+    def on_nav_tabs_widget_load(self, msg):
         if msg.cmd.action == Action.TASKS:
             self.reload()
 
@@ -42,7 +41,7 @@ class TasksWidget(Static):
             max_len=self.max_renderables_len,
             selected=self.task_list.selected if self.task_list else None,
         )
-        self.post_message(self.Loading(self, False))
+        # self.post_message(self.Loading(self, False))
         self.update(self.render())
 
     def render(self):
@@ -71,11 +70,11 @@ class TasksWidget(Static):
             assert selected.group
             return selected
         except AssertionError:
-            return False
+            return ""
 
     def clock(self) -> bool:
         if not self.task_list:
-            return False
+            return ""
         if selected := self.task_list.selected:
             return Client.clock(
                 selected.clock_id, ClockLocation(app_config.wm_config.location)
@@ -87,10 +86,19 @@ class Tasks(Focusable, Widget):
 
     __wdg: Optional[TasksWidget] = None
 
+    BINDINGS: ClassVar[list[BindingType]] = [
+        Binding("enter", "select_cursor", "Select", show=False),
+        Binding("up", "cursor_up", "Cursor Up", show=False),
+        Binding("down", "cursor_down", "Cursor Down", show=False),
+    ]
+
     class Selected(Message):
         def __init__(self, sender: MessageTarget, task: TaskInfo) -> None:
             self.task = task
             super().__init__()
+
+    def reload(self):
+        self.wdg.reload()
 
     @property
     def wdg(self) -> TasksWidget:
@@ -102,16 +110,15 @@ class Tasks(Focusable, Widget):
         yield self.wdg
 
     def clock(self) -> bool:
-        return self.wdg.clock()
+        # return self.wdg.clock()
+        return ""
 
-    def on_key(self, event: events.Key) -> None:
-        if not self.has_focus:
-            return
-        match event.key:
-            case Keys.Up:
-                self.wdg.previous()
-            case Keys.Down:
-                self.wdg.next()
-            case Keys.Enter:
-                if selected := self.wdg.load():
-                    self.post_message(self.Selected(self, selected))
+    def action_select_cursor(self) -> None:
+        if selected := self.wdg.load():
+            self.post_message(self.Selected(self, selected))
+
+    def action_cursor_down(self) -> None:
+        self.wdg.previous()
+
+    def action_cursor_up(self) -> None:
+        self.wdg.next()

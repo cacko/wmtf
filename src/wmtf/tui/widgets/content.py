@@ -8,7 +8,6 @@ from .spinner import SpinnerWidget
 from .task import Task as WidgetTask
 from .report import ReportWidget, ActiveReportDay
 from textual.containers import VerticalScroll
-import asyncio
 
 
 class Content(Focusable):
@@ -20,22 +19,26 @@ class Content(Focusable):
             self.__spinner_widget = SpinnerWidget()
         return self.__spinner_widget
 
-    async def on_report_widget_loading(self, message: ReportWidget.Loading):
+    def reload(self):
+        self.report.load()
+
+    def on_report_widget_loading(self, message: ReportWidget.Loading):
         if message.res:
-            asyncio.create_task(self.wdg_loading.start()
-                     asyncio.create_task       self.wdg_loading.unhide())
+            self.wdg_loading.start()
+            self.wdg_loading.unhide()
 
         else:
-            asyncio.create_task(self.wdg_loading.stop())
-            asyncio.create_task(self.wdg_loading.hide())
+            self.wdg_loading.stop()
+            self.wdg_loading.hide()
 
     def compose(self) -> ComposeResult:
+        self.report = ReportWidget(classes="scroll")
         with TabbedContent(initial="report", classes="scroll"):
             with TabPane("Report", id="report"):
                 yield VerticalScroll(
                     self.wdg_loading,
                     ActiveReportDay(),
-                    ReportWidget(classes="scroll")
+                    self.report
                 )
 
             with TabPane("Task", id="task"):
