@@ -20,7 +20,7 @@ import {
   WSCommand,
   Payload,
 } from '../entity/websockets.entity';
-
+import { NgxSpinnerService } from 'ngx-spinner';
 import { User } from '../entity/user.entity';
 
 @Injectable({
@@ -38,8 +38,6 @@ export class ApiService {
   private requestSubject = new Subject<WSRequest>();
   requests = this.requestSubject.asObservable();
 
-  private loaderSubject = new Subject<WSLoading>();
-  loading = this.loaderSubject.asObservable();
 
   private wsConnectedSubject = new Subject<boolean>();
   private wsConnected = this.wsConnectedSubject.asObservable();
@@ -56,7 +54,10 @@ export class ApiService {
   private deviceId: string;
   private __user?: User;
 
-  constructor(private logger: NGXLogger) {
+  constructor(
+    private logger: NGXLogger,
+    private spinnerService: NgxSpinnerService
+  ) {
     let id = localStorage.getItem('device_id');
     if (!id) {
       id = uuidv4();
@@ -70,10 +71,10 @@ export class ApiService {
   }
 
   public showLoader(): void {
-    this.loaderSubject.next(WSLoading.BLOCKING_ON);
+    this.spinnerService.show()
   }
   public hideLoader(): void {
-    this.loaderSubject.next(WSLoading.BLOCKING_OFF);
+    this.spinnerService.hide();
   }
 
   get URL(): string {
@@ -100,7 +101,11 @@ export class ApiService {
   }
 
   public connect() {
-    this.create(this.URL);
+    if (this.ws?.readyState === WebSocket.OPEN) {
+      this.wsConnectedSubject.next(true);
+    } else {
+      this.create(this.URL);
+    }
   }
 
   public disconnect() {
@@ -119,12 +124,7 @@ export class ApiService {
   }
 
   public send(data: any) {
-    if (this.ws?.readyState !== WebSocket.OPEN) {
-      this.connect();
-      this.wsConnected
-        .pipe(first())
-        .subscribe((connected) => connected && this.send(data));
-    } else {
+    if (this.ws?.readyState === WebSocket.OPEN) {
       this.out?.next(data);
     }
   }
@@ -160,17 +160,20 @@ export class ApiService {
 
   public login(user: User) {
     this.USER = user;
-    this.send({
-      ztype: WSType.LOGIN,
-      id: uuidv4(),
-      client: this.DEVICE_ID,
-      data: {
-        cmd: WSCommand.LOGIN,
+    this.wsConnected.pipe(first()).subscribe(() => {
+      this.send({
+        ztype: WSType.LOGIN,
+        id: uuidv4(),
+        client: this.DEVICE_ID,
         data: {
-          token: user.accessToken,
+          cmd: WSCommand.LOGIN,
+          data: {
+            token: user.accessToken,
+          },
         },
-      },
+      });
     });
+    this.connect();
   }
 
   private startReconnector() {
@@ -213,13 +216,11 @@ export class ApiService {
         case WSType.LOGIN:
           this.logger.debug('IN', data);
           this.connectedSubject.next(true);
-          this.hideLoader();
           this.startPing();
           break;
         case WSType.RESPONSE:
           this.responseSubject.next(data);
       }
-      this.loaderSubject.next(WSLoading.MESSAGE_OFF);
     };
     this.ws.onerror = (err) => {
       this.ws?.close();
@@ -234,10 +235,8 @@ export class ApiService {
         this.logger.error(err);
       },
       complete: () => {
-        this.loaderSubject.next(WSLoading.MESSAGE_OFF);
       },
       next: (data: Object) => {
-        this.loaderSubject.next(WSLoading.MESSAGE_ON);
         if (this.ws?.readyState === WebSocket.OPEN) {
           this.logger.debug(data, 'out');
           this.ws.send(JSON.stringify(data));

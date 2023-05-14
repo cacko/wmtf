@@ -5956,6 +5956,13 @@ ngx-moment@^6.0.2:
   dependencies:
     tslib "^2.3.0"
 
+ngx-spinner@^15.0.1:
+  version "15.0.1"
+  resolved "https://registry.yarnpkg.com/ngx-spinner/-/ngx-spinner-15.0.1.tgz#3256b01dd3e1906852528d8a531206c6cbb38772"
+  integrity sha512-7DjETmBpuXTwI68ad1xMKpwt4Cyz1eyu8E7AJcFiKa+8JAnbo0k1qfvWur0aemncRNxDxHoyl6jw42MsnE/B+g==
+  dependencies:
+    tslib "^2.3.0"
+
 nice-napi@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/nice-napi/-/nice-napi-1.0.2.tgz#dc0ab5a1eac20ce548802fc5686eaa6bc654927b"

@@ -19,12 +19,12 @@ export class AppComponent implements OnInit {
       this.connected = res;
       this.router.navigateByUrl('/dashboard');
     });
-    this.ws.loading.subscribe((res) => {
-      setTimeout(() => {
-        [WSLoading.BLOCKING_OFF, WSLoading.BLOCKING_ON].includes(res) &&
-          (this.loading = WSLoading.BLOCKING_ON === res);
-      });
-    });
+    // this.ws.loading.subscribe((res) => {
+    //   setTimeout(() => {
+    //     [WSLoading.BLOCKING_OFF, WSLoading.BLOCKING_ON].includes(res) &&
+    //       (this.loading = WSLoading.BLOCKING_ON === res);
+    //   });
+    // });
   }
   ngOnInit(): void {}
 }

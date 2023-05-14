@@ -1,4 +1,5 @@
 import sys
+from typing import Any
 from fastapi import (
     APIRouter,
     WebSocket,
@@ -15,6 +16,7 @@ from wmtf.firebase.auth import Auth
 from .models import (
     Connection,
     EmptyResult,
+    ErrorResult,
     Payload,
     Request,
     Response,
@@ -53,7 +55,6 @@ class WSConnection(object, metaclass=Connection):
 
     async def send(self, resp: Response | EmptyResult):
         try:
-            logging.debug(resp.dict())
             assert self.websocket.client_state == WebSocketState.CONNECTED
             await self.websocket.send_text(resp.json())
         except Exception as e:
@@ -95,7 +96,7 @@ class ConnectionManager:
                 id=request.id,
                 data=Payload(cmd=command)
             )
-            payload = {}
+            payload: dict[str, Any] = {}
             match command:
                 case Commands.LOGIN:
                     self.login(data)
@@ -117,11 +118,9 @@ class ConnectionManager:
             await connection.send(response)
         except AssertionError as e:
             logging.exception(e)
-            sys.exit(1)
-            # await connection.send(ErrorResult())
+            await connection.send(ErrorResult())
         except Exception as e:
             logging.exception(e)
-            sys.exit(1)
 
 
 manager = ConnectionManager()
@@ -161,7 +160,6 @@ async def websocket_endpoint(websocket: WebSocket, client_id: str):
             except WebSocketDisconnect as e:
                 logging.exception(e)
                 manager.disconnect(client_id)
-                break
             except Exception as e:
                 logging.exception(e)
 

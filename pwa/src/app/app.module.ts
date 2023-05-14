@@ -1,4 +1,4 @@
-import { NgModule, isDevMode } from '@angular/core';
+import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { environment } from '../environments/environment';
 import { BrowserModule } from '@angular/platform-browser';
 import { LoggerModule, NgxLoggerLevel } from 'ngx-logger';
@@ -36,6 +36,7 @@ import { MomentModule } from 'ngx-moment';
 import { AvatarComponent } from './components/avatar/avatar.component';
 import { HttpClientModule } from '@angular/common/http';
 import { AvatarModule } from 'ngx-avatars';
+import { NgxSpinnerModule } from 'ngx-spinner';
 
 const MaterialModules = [
   MatSelectModule,
@@ -75,9 +76,10 @@ const MaterialModules = [
     ...MaterialModules,
     MomentModule.forRoot({
       relativeTimeThresholdOptions: {
-        's': 59
-      }
+        s: 59,
+      },
     }),
+    NgxSpinnerModule,
     AvatarModule,
     HttpClientModule,
     BrowserAnimationsModule,
@@ -96,6 +98,7 @@ const MaterialModules = [
       useValue: { appVerificationDisabledForTesting: true },
     },
   ],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
   bootstrap: [AppComponent],
 })
 export class AppModule {}
