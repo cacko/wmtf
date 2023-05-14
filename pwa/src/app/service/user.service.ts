@@ -14,10 +14,9 @@ export class UserService {
   private userSubject = new Subject<User | null>();
   user = this.userSubject.asObservable();
 
-  constructor(
-    ws: ApiService,
-    router: Router
-    ) {
-
+  constructor(private ws: ApiService, router: Router) {
+    this.ws.connected.subscribe((user) => {
+      this.userSubject.next(user);
+    });
   }
 }

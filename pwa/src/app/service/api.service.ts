@@ -38,11 +38,10 @@ export class ApiService {
   private requestSubject = new Subject<WSRequest>();
   requests = this.requestSubject.asObservable();
 
-
   private wsConnectedSubject = new Subject<boolean>();
   private wsConnected = this.wsConnectedSubject.asObservable();
 
-  private connectedSubject = new Subject<boolean>();
+  private connectedSubject = new Subject<User>();
   connected = this.connectedSubject.asObservable();
 
   errorSubject = new Subject<string>();
@@ -71,7 +70,7 @@ export class ApiService {
   }
 
   public showLoader(): void {
-    this.spinnerService.show()
+    this.spinnerService.show();
   }
   public hideLoader(): void {
     this.spinnerService.hide();
@@ -158,22 +157,15 @@ export class ApiService {
     this.pinger?.unsubscribe();
   }
 
-  public login(user: User) {
-    this.USER = user;
-    this.wsConnected.pipe(first()).subscribe(() => {
-      this.send({
-        ztype: WSType.LOGIN,
-        id: uuidv4(),
-        client: this.DEVICE_ID,
-        data: {
-          cmd: WSCommand.LOGIN,
-          data: {
-            token: user.accessToken,
-          },
-        },
-      });
+  public login() {
+    this.send({
+      ztype: WSType.LOGIN,
+      id: uuidv4(),
+      client: this.DEVICE_ID,
+      data: {
+        cmd: WSCommand.LOGIN,
+      },
     });
-    this.connect();
   }
 
   private startReconnector() {
@@ -202,8 +194,9 @@ export class ApiService {
     this.ws = new WebSocket(url);
     this.ws.onopen = () => {
       this.wsConnectedSubject.next(true);
-      // this.stopReconnector();
+      this.stopReconnector();
       this.reconnectAfter = WSConnection.RECONNECT_START;
+      this.login();
     };
     this.ws.onmessage = (msg) => {
       this.reconnectAfter = WSConnection.RECONNECT_START;
@@ -215,7 +208,7 @@ export class ApiService {
           break;
         case WSType.LOGIN:
           this.logger.debug('IN', data);
-          this.connectedSubject.next(true);
+          this.connectedSubject.next(data.data.data?.result as User);
           this.startPing();
           break;
         case WSType.RESPONSE:
@@ -234,8 +227,7 @@ export class ApiService {
       error: (err: any) => {
         this.logger.error(err);
       },
-      complete: () => {
-      },
+      complete: () => {},
       next: (data: Object) => {
         if (this.ws?.readyState === WebSocket.OPEN) {
           this.logger.debug(data, 'out');
