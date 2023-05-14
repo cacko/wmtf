@@ -1,3 +1,4 @@
+import { User as FireUser } from '@angular/fire/auth';
 
 export enum Gender {
   MALE = 'male',
@@ -18,6 +19,7 @@ export interface AppUserEntity {
   photoURL: string | null;
 }
 
-export interface User  {
+export interface User extends FireUser {
   isAdmin?: boolean;
+  accessToken?: string;
 }

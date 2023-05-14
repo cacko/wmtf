@@ -133,3 +133,4 @@ __debug/
 .dbg
 /cache
 .envrc
+wmtf*adminsdk*.json

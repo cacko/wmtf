@@ -1,4 +1,49 @@
-/* You can add global styles to this file, and also import other style files */
+@use "@angular/material" as mat;
+@include mat.core();
+$theme-primary: mat.define-palette(mat.$grey-palette, 700);
+$theme-accent: mat.define-palette(mat.$grey-palette, 100, 200, 300);
+$theme-warn: mat.define-palette(mat.$amber-palette);
+$custom-typography: mat.define-typography-config($font-family: "Righteous",
+  );
 
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+$theme: mat.define-dark-theme((color: (primary: $theme-primary,
+        accent: $theme-accent,
+        warn: $theme-warn,
+      ),
+      typography: $custom-typography,
+    ));
+@include mat.all-component-colors($theme);
+@include mat.all-component-typographies($theme);
+@include mat.typography-hierarchy($custom-typography);
+
+html {
+  box-sizing: border-box;
+}
+
+*,
+*:before,
+*:after {
+  box-sizing: inherit;
+}
+
+html,
+body {
+  height: 100%;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+app-root {
+  flex: 1;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  margin: 0;
+}

@@ -1,6 +1,6 @@
 export enum WSConnection {
   WS_URL = 'ws://127.0.0.1:44331/ws',
-  RECONNECT_START = 2000
+  RECONNECT_START = 2000,
 }
 
 export enum WSCommand {
@@ -26,9 +26,13 @@ export enum WSLoading {
   MESSAGE_ON = 'message_on',
 }
 
+export interface PayloadData {
+  result: any;
+}
+
 export interface Payload {
   cmd: WSCommand;
-  data?: any;
+  data?: PayloadData;
 }
 
 export interface WSRequest {
@@ -42,7 +46,8 @@ export interface WSResponse {
   ztype: WSType;
   id: string;
   error?: string;
-  data?: Payload;
+  data: Payload;
+  client?: string;
 }
 
 export interface WSPing {

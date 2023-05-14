@@ -1,0 +1,8 @@
+:host {
+  transition: all ease-in-out 0.3s;
+  display: flex;
+  &:hover {
+      cursor: pointer;
+      filter: drop-shadow(0 0 0.15rem var(--font-color));
+  }
+}

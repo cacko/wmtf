@@ -18,6 +18,7 @@ import {
   WSType,
   WSLoading,
   WSCommand,
+  Payload,
 } from '../entity/websockets.entity';
 
 import { User } from '../entity/user.entity';
@@ -39,6 +40,9 @@ export class ApiService {
 
   private loaderSubject = new Subject<WSLoading>();
   loading = this.loaderSubject.asObservable();
+
+  private wsConnectedSubject = new Subject<boolean>();
+  private wsConnected = this.wsConnectedSubject.asObservable();
 
   private connectedSubject = new Subject<boolean>();
   connected = this.connectedSubject.asObservable();
@@ -103,10 +107,21 @@ export class ApiService {
     this.ws?.close();
   }
 
+  public request(payload: Payload) {
+    const rq: WSRequest = {
+      ztype: WSType.REQUEST,
+      client: this.DEVICE_ID,
+      id: uuidv4(),
+      data: payload,
+    };
+    this.logger.debug(rq);
+    this.send(rq);
+  }
+
   public send(data: any) {
     if (this.ws?.readyState !== WebSocket.OPEN) {
       this.connect();
-      this.connected
+      this.wsConnected
         .pipe(first())
         .subscribe((connected) => connected && this.send(data));
     } else {
@@ -143,15 +158,19 @@ export class ApiService {
     this.pinger?.unsubscribe();
   }
 
-  public login() {
-    (async () => {
-      this.send({
-        ztype: WSType.REQUEST,
-        id: uuidv4(),
-        client: this.DEVICE_ID,
-        data: {cmd: WSCommand.LOGIN}
-      });
-    })();
+  public login(user: User) {
+    this.USER = user;
+    this.send({
+      ztype: WSType.LOGIN,
+      id: uuidv4(),
+      client: this.DEVICE_ID,
+      data: {
+        cmd: WSCommand.LOGIN,
+        data: {
+          token: user.accessToken,
+        },
+      },
+    });
   }
 
   private startReconnector() {
@@ -178,31 +197,41 @@ export class ApiService {
       this.pinger?.unsubscribe();
     } catch (err) {}
     this.ws = new WebSocket(url);
-    this.ws.onopen = () => this.login();
+    this.ws.onopen = () => {
+      this.wsConnectedSubject.next(true);
+      this.stopReconnector();
+      this.reconnectAfter = WSConnection.RECONNECT_START;
+    };
     this.ws.onmessage = (msg) => {
       this.reconnectAfter = WSConnection.RECONNECT_START;
-      const json = JSON.parse(msg.data) as WSResponse;
-      if (json.ztype == WSType.PONG) {
-        this.logger.debug('PONG', json);
-      } else {
-        this.logger.debug('IN', json);
-        this.responseSubject.next(json);
-        this.startPing();
+      const data = JSON.parse(msg.data) as WSResponse;
+      this.logger.info(data, 'onmessage');
+      switch (data.ztype) {
+        case WSType.PONG:
+          this.logger.debug('PONG', data);
+          break;
+        case WSType.LOGIN:
+          this.logger.debug('IN', data);
+          this.connectedSubject.next(true);
+          this.hideLoader();
+          this.startPing();
+          break;
+        case WSType.RESPONSE:
+          this.responseSubject.next(data);
       }
       this.loaderSubject.next(WSLoading.MESSAGE_OFF);
     };
     this.ws.onerror = (err) => {
       this.ws?.close();
-      this.reconnectAfter = WSConnection.RECONNECT_START;
     };
     this.ws.onclose = () => {
       this.pinger?.unsubscribe();
-      this.connectedSubject.next(false);
+      this.wsConnectedSubject.next(false);
       this.startReconnector();
     };
     this.out = {
       error: (err: any) => {
-        this.logger.debug(err);
+        this.logger.error(err);
       },
       complete: () => {
         this.loaderSubject.next(WSLoading.MESSAGE_OFF);
@@ -210,11 +239,7 @@ export class ApiService {
       next: (data: Object) => {
         this.loaderSubject.next(WSLoading.MESSAGE_ON);
         if (this.ws?.readyState === WebSocket.OPEN) {
-          const payload = data as WSRequest;
-          // every([
-          //   Object.assign({ ztype: '' }, payload).ztype != WSType.PING,
-          //   Object.assign({ ztype: '' }, payload).data.cmd != WSCommand.LOGIN,
-          // ]) && this.requestSubject.next(payload);
+          this.logger.debug(data, 'out');
           this.ws.send(JSON.stringify(data));
         }
       },

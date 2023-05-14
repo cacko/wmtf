@@ -1,0 +1,53 @@
+@use 'src/mixins' as mx;
+
+[content] {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  @include mx.color-modifiers($prefix: 'level');
+  padding: 1rem;
+  border-radius: 1rem;
+  justify-content: center;
+  align-items: center;
+
+  >div {
+    text-align: center;
+
+    &[summary] {
+      overflow: hidden;
+      -webkit-line-clamp: 1;
+      -webkit-box-orient: vertical;
+      display: -webkit-box;
+      z-index: 10;
+    }
+  }
+
+  [overlay] {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 1rem;
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+
+  [progress] {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    border-radius: 1rem;
+    background-color: rgba(0, 0, 0, 0.2);
+  }
+
+  &:hover {
+    cursor: pointer;
+
+    [overlay] {
+      display: block;
+    }
+  }
+}

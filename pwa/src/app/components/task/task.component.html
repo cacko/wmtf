@@ -1,1 +1,5 @@
-<p>task works!</p>
+<div content [attr.level]="level">
+  <div overlay></div>
+  <div progress [ngStyle]="getProgressStyle()"></div>
+  <div summary>{{taskInfo.summary}}</div>
+</div>

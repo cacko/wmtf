@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
+import { TaskInfoEntity } from 'src/app/entity/tasks.entity';
 
 @Component({
   selector: 'app-tasklist',
@@ -7,4 +8,5 @@ import { Component } from '@angular/core';
 })
 export class TasklistComponent {
 
+  @Input() tasks: TaskInfoEntity[] = [];
 }

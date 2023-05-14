@@ -1,0 +1,18 @@
+@use 'sass:map';
+@use 'sass:math';
+@use '@angular/material' as mat;
+$in-norm: mat.define-palette(mat.$blue-palette);
+$over-norm: mat.define-palette(mat.$red-palette);
+$progress: mat.define-palette(mat.$blue-grey-palette);
+
+@mixin color-modifiers($prefix, $attribute: 'background') {
+  @for $i from 100 through 900 {
+    &[#{$prefix}="#{$i}"] {
+      #{$attribute}: linear-gradient(135deg, mat.get-color-from-palette($in-norm, 500) 0%, mat.get-color-from-palette($in-norm, $i) 100%);
+    }
+
+    &[#{$prefix}="-#{$i}"] {
+      #{$attribute}: linear-gradient(135deg, mat.get-color-from-palette($over-norm, 500) 0%, mat.get-color-from-palette($over-norm, math.abs($i)) 100%);
+    }
+  }
+}

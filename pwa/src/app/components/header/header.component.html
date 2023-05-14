@@ -1,1 +1,5 @@
-<p>header works!</p>
+<mat-toolbar *ngIf="user" [attr.level]="level">
+  <app-avatar [user]="user"></app-avatar>
+  <div>{{user.displayName}}</div>
+  <div progress [ngStyle]="getProgressStyle()"></div>
+</mat-toolbar>

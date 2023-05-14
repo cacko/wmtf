@@ -1,4 +1,4 @@
-from enum import Enum
+from enum import StrEnum
 from typing import Any, Optional
 
 from pydantic import BaseModel, ConfigDict, Extra, Field
@@ -8,7 +8,7 @@ from yaml import Loader, load
 from wmtf.resources import wm as wm_resources
 
 
-class Commands(Enum):
+class Commands(StrEnum):
     CLOCK = "clock"
     LOGIN = "login"
     REPORT = "report"
@@ -17,7 +17,7 @@ class Commands(Enum):
     TASK = "task"
 
 
-class Method(Enum):
+class Method(StrEnum):
     POST = "post"
     GET = "get"
 

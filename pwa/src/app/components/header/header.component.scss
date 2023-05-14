@@ -1,0 +1,17 @@
+@use 'src/mixins' as mx;
+
+:host {
+  mat-toolbar {
+    border-radius: 1rem;
+    position: relative;
+    @include mx.color-modifiers($prefix: 'level');
+    [progress] {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      border-radius: 1rem;
+      background-color: rgba(0, 0, 0, 0.2);
+    }
+  }
+}

@@ -6,6 +6,8 @@ import requests
 from emoji import emojize
 from random import choice
 from wmtf.wm.commands import Commands
+from pydantic.json import timedelta_isoformat
+from datetime import timedelta
 
 
 def error_message():
@@ -22,6 +24,7 @@ class PackatType(StrEnum):
     PONG = "pong"
     REQUEST = "request"
     RESPONSE = "response"
+    LOGIN = "login"
 
 
 NOT_FOUND = [
@@ -61,45 +64,57 @@ class Connection(type):
             pass
 
 
-class PingMessage(BaseModel, extra=Extra.ignore):
+class WSModel(BaseModel):
+
+    class Config:
+        json_encoders = {
+            timedelta: timedelta_isoformat
+        }
+        extra = Extra.ignore
+
+
+class PingMessage(WSModel):
     ztype: PackatType = Field(default=PackatType.PING)
     id: Optional[str] = None
     client: Optional[str] = None
 
 
-class PongMessage(BaseModel, extra=Extra.ignore):
+class PongMessage(WSModel):
     ztype: PackatType = Field(default=PackatType.PONG)
+    client: Optional[str] = None
     id: str
 
 
-class Payload(BaseModel):
+class Payload(WSModel):
     cmd: Commands
     data: Optional[dict[str, Any]] = Field(default={})
 
 
-class Response(BaseModel):
-    ztype: str = Field(default=PackatType.RESPONSE)
+class Response(WSModel):
+    ztype: Optional[str] = Field(default=PackatType.RESPONSE)
     id: str
     data: Payload
+    client: Optional[str] = None
     error: Optional[str] = None
 
 
-class Request(BaseModel):
-    ztype: str = Field(default=PackatType.REQUEST)
+class Request(WSModel):
+    ztype: Optional[str] = Field(default=PackatType.REQUEST)
     id: str
+    client: Optional[str] = None
     data: Payload
 
 
 class EmptyResult(Response):
-    
+
     def __init__(self, **data):
         super().__init__(**data)
         emo = emojize(choice(NOT_FOUND_ICONS))
         self.error = f"{emo} {error_message()}"
 
 
-class ErrorResult(EmptyResult):
-    
+class ErrorResult(Response):
+
     def __init__(self, **data):
         super().__init__(**data)
         emo = emojize(choice(NOT_FOUND_ICONS))

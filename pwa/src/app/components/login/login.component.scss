@@ -1,0 +1,14 @@
+:host {
+  padding: 10vw 10vw 30vw 10vw;
+  display: flex;
+  height: 100%;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  >div {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+}

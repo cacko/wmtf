@@ -1,5 +1,5 @@
 from datetime import date, datetime, timedelta
-from enum import Enum
+from enum import StrEnum
 from typing import Optional
 import arrow
 from wmtf.tui.theme import Theme
@@ -16,19 +16,19 @@ def extract_recent(text: str) -> Optional[tuple[int, str]]:
     return None
 
 
-class TimeDeltaUnit(Enum):
+class TimeDeltaUnit(StrEnum):
     DAYS = "d"
     HOURS = "h"
     MINUTES = "m"
 
 
-class ClockIcon(Enum):
+class ClockIcon(StrEnum):
     HOME = "🏠"
     OFFICE = "🏢"
     OFF = ""
 
 
-class ClockLocation(Enum):
+class ClockLocation(StrEnum):
     HOME = "home"
     OFFICE = "office"
     OFF = "off"

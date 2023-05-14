@@ -81,8 +81,8 @@ class Task(Parser):
             priority=to_int(task_row["Priority"]),
             value=task_row["Bus. Value"],
             group=task_row["Group"].strip('-'),
-            estimate=extract_estimate([task_row["Work"]]),
-            estimate_used=extract_estimate_used([task_row["Work"]]),
+            estimate=extract_estimate((task_row["Work"],)),
+            estimate_used=extract_estimate_used((task_row["Work"],)),
         )
 
     def __get_comments(self) -> Optional[list[TaskComment]]:

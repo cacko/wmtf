@@ -80,9 +80,9 @@ def extract_comment_time(text: str) -> datetime:
     return datetime(year=1981, day=8, month=8)
 
 
-def extract_estimate(text: str | list) -> Optional[timedelta]:
+def extract_estimate(text: str | tuple) -> Optional[timedelta]:
     try:
-        assert isinstance(text, list)
+        assert isinstance(text, tuple)
         if ma := ESTIMATE_PATTERN.search(text[0]):
             return timedelta(hours=float(ma.group("estimate")))
     except AssertionError:
@@ -91,9 +91,9 @@ def extract_estimate(text: str | list) -> Optional[timedelta]:
     return None
 
 
-def extract_estimate_used(text: str | list) -> Optional[float]:
+def extract_estimate_used(text: str | tuple) -> Optional[float]:
     try:
-        assert isinstance(text, list)
+        assert isinstance(text, tuple)
         if ma := ESTIMATE_PATTERN.search(text[0]):
             return float(ma.group("estimate_used"))
     except AssertionError:
