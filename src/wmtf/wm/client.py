@@ -124,7 +124,7 @@ class Client(object, metaclass=ClientMeta):
             self.__session.close()
 
     def do_login(self):
-        return True
+        # return True
         cmd = Command.login
         res = self.__call(cmd, data=self.__populate(asdict(cmd.data)))
         parser = LoginParser(res.content)
@@ -156,9 +156,9 @@ class Client(object, metaclass=ClientMeta):
     def do_tasks(self) -> list[TaskInfo]:
         cmd = Command.tasks
         query = self.__populate(cmd.query)
-        # res = self.__call(cmd, params=query)
-        # content = res.content
-        content = self.__fake_response(cmd, params=query)
+        res = self.__call(cmd, params=query)
+        content = res.content
+        # content = self.__fake_response(cmd, params=query)
         parser = TaskListParser(content)
         tasks = parser.parse()
         if tasks:
@@ -171,32 +171,32 @@ class Client(object, metaclass=ClientMeta):
     def do_task(self, task_id: int) -> Task:
         cmd = Command.task
         query = self.__populate(cmd.query, task_id=task_id)
-        # res = self.__call(cmd, params=query)
-        # content = res.content
-        content = self.__fake_response(cmd, params=query)
+        res = self.__call(cmd, params=query)
+        content = res.content
+        # content = self.__fake_response(cmd, params=query)
         parser = TaskParser(content, id=task_id)
         return parser.parse()
 
     def do_report(self, start: datetime, end: datetime) -> list[ReportDay]:
-        # cmd_id = Command.report_id
-        # res = self.__call(cmd_id)
-        # content = res.content
-        # parser = ReportIdParser(content)
-        # item_id = parser.parse()
+        cmd_id = Command.report_id
+        res = self.__call(cmd_id)
+        content = res.content
+        parser = ReportIdParser(content)
+        item_id = parser.parse()
         cmd = Command.report
-        # data = self.__populate(cmd.data.dict())
-        # data["META_FIELD_YEAR_reportStartDate"] = start
-        # data["META_FIELD_MONTH_reportStartDate"] = start
-        # data["META_FIELD_DAY_reportStartDate"] = start
-        # data["reportStartDate"] = start
-        # data["META_FIELD_YEAR_reportEndDate"] = end
-        # data["META_FIELD_MONTH_reportEndDate"] = end
-        # data["META_FIELD_DAY_reportEndDate"] = end
-        # data["reportEndDate"] = end
-        # data["itemId"] = item_id
-        # res = self.__call(cmd, data=data)
-        # content = res.content
-        content = self.__fake_response(cmd)
+        data = self.__populate(cmd.data.dict())
+        data["META_FIELD_YEAR_reportStartDate"] = start
+        data["META_FIELD_MONTH_reportStartDate"] = start
+        data["META_FIELD_DAY_reportStartDate"] = start
+        data["reportStartDate"] = start
+        data["META_FIELD_YEAR_reportEndDate"] = end
+        data["META_FIELD_MONTH_reportEndDate"] = end
+        data["META_FIELD_DAY_reportEndDate"] = end
+        data["reportEndDate"] = end
+        data["itemId"] = item_id
+        res = self.__call(cmd, data=data)
+        content = res.content
+        # content = self.__fake_response(cmd)
         r_parser = ReportParser(html=content)
         return r_parser.parse()
 
