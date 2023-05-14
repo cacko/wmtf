@@ -5,14 +5,13 @@ from fastapi import FastAPI
 from .routers import api, ws
 from fastapi.middleware.cors import CORSMiddleware
 from wmtf.firebase.service_account import ServiceAccount
-from os import environ
 from pathlib import Path
 
 
 def create_rest_app():
     app = FastAPI()
 
-    ServiceAccount.register(Path(environ.get("WMTF_SERVICE_ACCOUNT", ".")))
+    ServiceAccount.register(Path(app_config.api_config.service_account))
 
     origins = [
         "*",

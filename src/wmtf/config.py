@@ -27,6 +27,7 @@ class ApiConfig(BaseModel, extra=Extra.ignore):
     host: str = Field(default="127.0.0.1")
     port: int = Field(default=44331)
     threadpool_workers: int = Field(default=2)
+    service_account: str
 
 
 class app_config_meta(type):
