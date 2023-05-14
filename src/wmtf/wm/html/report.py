@@ -152,7 +152,11 @@ class HtmlReportDay(object, metaclass=HtmlReportMeta):
         return self.__date is not None
 
     def get_model(self):
-        return ReportDay(day=self.date, total_work=self.__work, tasks=self.tasks)
+        return ReportDay(
+            day=self.date,
+            total_work=self.__work,
+            tasks=self.tasks
+        )
 
     def do_process(self, row: PageElement):
         if not HtmlReportDay.can_parse(row):
