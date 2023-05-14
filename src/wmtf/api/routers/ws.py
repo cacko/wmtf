@@ -4,9 +4,11 @@ from fastapi import (
     WebSocket,
     WebSocketDisconnect,
 )
+from starlette.websockets import WebSocketState
 import logging
 import asyncio
 from asyncio.queues import Queue, QueueEmpty
+from wmtf.config import app_config
 
 from wmtf.firebase.auth import Auth
 
@@ -20,10 +22,8 @@ from .models import (
     PingMessage,
     PongMessage
 )
-
 from wmtf.wm.commands import Commands
 from wmtf.wm.client import Client
-from wmtf.resources.dummy import login_response, tasks_response
 
 N_WORKERS = 4
 DUMMY = True
@@ -54,6 +54,7 @@ class WSConnection(object, metaclass=Connection):
     async def send(self, resp: Response | EmptyResult):
         try:
             logging.debug(resp.dict())
+            assert self.websocket.client_state == WebSocketState.CONNECTED
             await self.websocket.send_text(resp.json())
         except Exception as e:
             logging.exception(e)
@@ -100,26 +101,27 @@ class ConnectionManager:
                     self.login(data)
                     response.ztype = PackatType.LOGIN
                     payload.update(dict(
-                        # result=dict(
-                        #     username=app_config.wm_config.username,
-                        #     location=app_config.wm_config.location
-                        # )
-                        result=login_response
+                        result=dict(
+                            username=app_config.wm_config.username,
+                            location=app_config.wm_config.location
+                        )
                     ))
-                case Commands.TASKS:
-                    payload.update(dict(result=tasks_response))  # type: ignore
                 case _:
                     assert hasattr(Client, command.value)
                     result = getattr(Client, command.value)(**data.data)
-                    logging.info(result)
-                    payload.update(dict(result=result))
+                    if isinstance(result, list):
+                        payload.update(dict(result=[d.dict() for d in result]))
+                    else:
+                        payload.update(dict(result=result))
             response.data.data = payload
             await connection.send(response)
         except AssertionError as e:
             logging.exception(e)
+            sys.exit(1)
             # await connection.send(ErrorResult())
         except Exception as e:
             logging.exception(e)
+            sys.exit(1)
 
 
 manager = ConnectionManager()
@@ -159,11 +161,9 @@ async def websocket_endpoint(websocket: WebSocket, client_id: str):
             except WebSocketDisconnect as e:
                 logging.exception(e)
                 manager.disconnect(client_id)
-                sys.exit(1)
                 break
             except Exception as e:
                 logging.exception(e)
-                sys.exit(1)
 
     await asyncio.gather(
         read_from_socket(websocket),
@@ -171,5 +171,6 @@ async def websocket_endpoint(websocket: WebSocket, client_id: str):
             asyncio.create_task(
                 get_data_and_send(n))
             for n in range(1, N_WORKERS + 1)
-        ]
+        ],
+        return_exceptions=True
     )

@@ -2,4 +2,5 @@
   <div overlay></div>
   <div progress [ngStyle]="getProgressStyle()"></div>
   <div summary>{{taskInfo.summary}}</div>
+  <div estimate>{{taskInfo.estimate?.asSeconds()|amDuration:'seconds'}}</div>
 </div>

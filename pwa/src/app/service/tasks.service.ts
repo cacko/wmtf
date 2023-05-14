@@ -4,7 +4,7 @@ import {
   ResolveFn,
   RouterStateSnapshot,
 } from '@angular/router';
-import { TaskInfoEntity } from '../entity/tasks.entity';
+import { TaskInfoEntity, WTaskInfoEntity } from '../entity/tasks.entity';
 import { ApiService } from './api.service';
 import { WSCommand, WSResponse } from '../entity/websockets.entity';
 import { filter, map } from 'rxjs';
@@ -21,9 +21,10 @@ export class TasksService {
     return this.api.responses.pipe(
       filter((data: WSResponse) => data.data.cmd == WSCommand.TASKS),
       map((data: WSResponse) =>
-        data.data.data?.result.map((t: TaskInfoEntity) =>
+        data.data.data?.result.map((t: WTaskInfoEntity) =>
           Object.assign(t, {
-            estimate: moment.duration(t.estimate || 0).asSeconds(),
+            estimate: moment.duration(t.estimate || 0),
+            clock_start: moment(t.clock_start) || null
           })
         )
       )

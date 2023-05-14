@@ -28,6 +28,7 @@ export class DashboardComponent implements OnInit {
   ngOnInit(): void {
     this.activatedRoute.data.subscribe((data: RouteDataEntity) => {
       this.tasks = data.data as TaskInfoEntity[];
+      this.logger.debug(this.tasks, "Tasks");
       // this.refresher = interval(5000).subscribe(() => {
       //   this.tasksService.getTasks().subscribe((data: TaskInfoEntity[]) => {
       //     this.tasks = shuffle(data);
