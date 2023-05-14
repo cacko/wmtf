@@ -1,9 +1,9 @@
 @use 'sass:map';
 @use 'sass:math';
 @use '@angular/material' as mat;
-$in-norm: mat.define-palette(mat.$indigo-palette);
-$over-norm: mat.define-palette(mat.$red-palette);
-$progress: mat.define-palette(mat.$blue-grey-palette);
+$in-norm: mat.define-palette(mat.$light-green-palette);
+$over-norm: mat.define-palette(mat.$amber-palette);
+$progress: mat.define-palette(mat.$indigo-palette);
 
 @mixin color-modifiers($prefix, $attribute: 'background') {
   @for $i from 100 through 900 {
