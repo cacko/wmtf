@@ -27,7 +27,6 @@ class ApiConfig(BaseModel, extra=Extra.ignore):
     host: str = Field(default="127.0.0.1")
     port: int = Field(default=44331)
     threadpool_workers: int = Field(default=2)
-    service_account: str
 
 
 class app_config_meta(type):
@@ -89,7 +88,7 @@ class app_config(object, metaclass=app_config_meta):
         if not app_config.app_config.exists():
             self.init()
         self._config = load(app_config.app_config.read_text(), Loader=Loader)
-        if not self._config.get("wm", {}).get("location", ""):
+        if not self._config.get("wm", {}).get("location", ""):  # type: ignore
             self.auto_location()
 
     def init(self):

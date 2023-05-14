@@ -4,14 +4,10 @@ import uvicorn
 from fastapi import FastAPI
 from .routers import api, ws
 from fastapi.middleware.cors import CORSMiddleware
-from wmtf.firebase.service_account import ServiceAccount
-from pathlib import Path
 
 
 def create_rest_app():
     app = FastAPI()
-
-    ServiceAccount.register(Path(app_config.api_config.service_account))
 
     origins = [
         "*",

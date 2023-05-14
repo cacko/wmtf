@@ -72,7 +72,6 @@ setup(
         "app_version>=1.0.1",
         "typing_extensions>=4.4.0",
         "websocket-client>=1.5.1",
-        "firebase_admin",
         "websockets>=11.0.3"
     ],
     setup_requires=["wheel"],

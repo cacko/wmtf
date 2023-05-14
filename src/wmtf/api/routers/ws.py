@@ -10,7 +10,6 @@ import asyncio
 from asyncio.queues import Queue, QueueEmpty
 from wmtf.config import app_config
 
-from wmtf.firebase.auth import Auth
 
 from .models import (
     Connection,
@@ -68,17 +67,6 @@ class ConnectionManager:
     def disconnect(self, client_id):
         WSConnection.remove(client_id)
 
-    def login(self, payload: Payload):
-        try:
-            assert payload.data
-            token = payload.data.get("token")
-            assert token
-            assert Auth().verify_token(token=token)
-        except AssertionError as e:
-            logging.exception(e)
-        except Exception:
-            raise WebSocketDisconnect(401, "Invalid auth")
-
     async def process_command(
         self,
         request: Request,
@@ -98,11 +86,10 @@ class ConnectionManager:
             payload: dict[str, Any] = {}
             match command:
                 case Commands.LOGIN:
-                    self.login(data)
                     response.ztype = PackatType.LOGIN
                     payload.update(dict(
                         result=dict(
-                            username=app_config.wm_config.username,
+                            displayName=app_config.wm_config.username,
                             location=app_config.wm_config.location
                         )
                     ))
