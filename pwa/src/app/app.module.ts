@@ -35,8 +35,9 @@ import { TextFieldModule } from '@angular/cdk/text-field';
 import { LoaderComponent } from './components/loader/loader.component';
 import { MomentModule } from 'ngx-moment';
 import { AvatarComponent } from './components/avatar/avatar.component';
-import { AvatarModule } from 'ngx-avatars';
 import { HttpClientModule } from '@angular/common/http';
+import { AvatarModule } from 'ngx-avatars';
+
 const MaterialModules = [
   MatSelectModule,
   MatCardModule,
@@ -67,7 +68,7 @@ const MaterialModules = [
     LoginComponent,
     DashboardComponent,
     LoaderComponent,
-    AvatarComponent
+    AvatarComponent,
   ],
   imports: [
     BrowserModule,

@@ -1,5 +1,4 @@
 import { Component, Input, OnInit } from '@angular/core';
-import * as md5 from 'md5';
 import { User } from 'src/app/entity/user.entity';
 const b64encode = window.btoa;
 
