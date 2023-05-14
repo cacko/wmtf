@@ -14,6 +14,7 @@ from wmtf.wm.html.parser import (
     extract_comment_time,
     extract_estimate,
     extract_estimate_used,
+    extract_task_update,
     to_int
 )
 
@@ -49,6 +50,7 @@ class TaskList(Parser):
                 clock_start=extract_clock_time(r["CLOCK"][0]),
                 estimate=extract_estimate(r["Work"]),
                 estimate_used=extract_estimate_used(r["Work"]),
+                task_updated=extract_task_update(r["Task Update"]),
                 group=r["Group"][0].strip("-"),
             )
             for _, r in dfd.iterrows()

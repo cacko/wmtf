@@ -1,8 +1,11 @@
 @use 'sass:map';
 @use 'sass:math';
 @use '@angular/material' as mat;
+
 $in-norm: mat.define-palette(mat.$light-green-palette);
 $over-norm: mat.define-palette(mat.$amber-palette);
+$accent-norm: mat.define-palette(mat.$purple-palette);
+$accent-over-norm: mat.define-palette(mat.$lime-palette);
 $progress: mat.define-palette(mat.$indigo-palette);
 
 @mixin color-modifiers($prefix, $attribute: 'background') {
@@ -12,6 +15,12 @@ $progress: mat.define-palette(mat.$indigo-palette);
     }
     [#{$prefix}="-#{$i}"] {
       #{$attribute}: linear-gradient(135deg, mat.get-color-from-palette($over-norm, 900) 0%, mat.get-color-from-palette($over-norm, math.abs($i)) 100%);
+    }
+    [#{$prefix}-accent="#{$i}"] {
+      #{$attribute}: linear-gradient(135deg, mat.get-color-from-palette($accent-norm, 900) 0%, mat.get-color-from-palette($accent-norm, $i) 100%);
+    }
+    [#{$prefix}-accent="-#{$i}"] {
+      #{$attribute}: linear-gradient(135deg, mat.get-color-from-palette($accent-over-norm, 900) 0%, mat.get-color-from-palette($accent-over-norm, math.abs($i)) 100%);
     }
   }
 }

@@ -21,6 +21,10 @@ ESTIMATE_PATTERN = re.compile(
     r"(?P<estimate_used>\d+(\.\d+)?)% of (?P<estimate>\d+(\.\d+)?)h"
 )
 
+UPDATED_PATTERN = re.compile(
+    r"((?P<days>\d+)d)?\s?((?P<hours>\d+)h)?\s?((?P<minutes>\d+)m)?"
+)
+
 TAG_RE = re.compile(r"<[^>]+>")
 BAD_CLOSING = re.compile(r"((<\/\w+)(\s+[^>]+)(>))",  re.MULTILINE)
 
@@ -87,7 +91,6 @@ def extract_estimate(text: str | tuple) -> Optional[timedelta]:
             return timedelta(hours=float(ma.group("estimate")))
     except AssertionError:
         return None
-
     return None
 
 
@@ -98,6 +101,17 @@ def extract_estimate_used(text: str | tuple) -> Optional[float]:
             return float(ma.group("estimate_used"))
     except AssertionError:
         pass
+    return None
+
+
+def extract_task_update(text: tuple) -> Optional[timedelta]:
+    try:
+        assert isinstance(text, tuple)
+        if ma := UPDATED_PATTERN.search(text[0]):
+            dd = {k: float(v) if v else 0 for k, v in ma.groupdict().items()}
+            return timedelta(**dd)
+    except AssertionError:
+        return None
     return None
 
 

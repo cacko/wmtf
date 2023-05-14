@@ -84,6 +84,7 @@ class TaskInfo(BaseModel):
     clock_start: Optional[datetime] = None
     estimate: Optional[timedelta] = None
     estimate_used: Optional[float] = None
+    task_updated: Optional[timedelta] = None
     group: Optional[str] = None
 
     @property

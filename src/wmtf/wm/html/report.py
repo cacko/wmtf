@@ -59,7 +59,8 @@ class HtmlReportTask(object, metaclass=HtmlReportMeta):
     __day: date
 
     __WORKTIME_RE = re.compile(r"([\d]{2}:[\d]{2}) hrs")
-    __CLOCK_START_END_RE = re.compile(r"([\d]{2}:[\d]{2}) -> ([\d]{2}:[\d]{2})")
+    __CLOCK_START_END_RE = re.compile(
+        r"([\d]{2}:[\d]{2}) -> ([\d]{2}:[\d]{2})")
     __CLOCK_RE = re.compile(r"\[(home|office)\]", re.IGNORECASE)
 
     def __init__(self, *args, **kwargs):
@@ -99,7 +100,8 @@ class HtmlReportTask(object, metaclass=HtmlReportMeta):
                         self.__description = strip_tags(row.get_text().strip())
                     case "b":
                         if fnt := row.find("font", attrs={"color": "green"}):
-                            self.__clock = ClockLocation(fnt.get_text().strip().lower())
+                            self.__clock = ClockLocation(
+                                fnt.get_text().strip().lower())
             case element.NavigableString():
                 txt = row.get_text().strip()
                 if wtm := self.__WORKTIME_RE.search(txt):
@@ -162,7 +164,8 @@ class HtmlReportDay(object, metaclass=HtmlReportMeta):
                         self.__process_date(row)
                     case "br":
                         if self.__last_tag == "br":
-                            self.__tasks = list(HtmlReportTask.process(self.__rows))
+                            self.__tasks = list(
+                                HtmlReportTask.process(self.__rows))
                             raise StopIteration
                         else:
                             self.__rows.append(row)
