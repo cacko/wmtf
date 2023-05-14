@@ -32,11 +32,11 @@ export class DashboardComponent implements OnInit {
       this.tasks = data.data as TaskInfo[];
       this.logger.debug(this.tasks, 'Tasks');
       this.api.hideLoader();
-      // this.refresher = interval(5000).subscribe(() => {
-      //   this.tasksService.getTasks().subscribe((data: TaskInfoEntity[]) => {
-      //     this.tasks = shuffle(data);
-      //   })
-      // });
+      this.refresher = interval(60*1000*5).subscribe(() => {
+        this.tasksService.getTasks().subscribe((data: TaskInfo[]) => {
+          this.tasks = data;
+        })
+      });
     });
   }
 }
