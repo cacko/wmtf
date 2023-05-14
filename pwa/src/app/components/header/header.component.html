@@ -1,7 +1,7 @@
-<mat-toolbar *ngIf="user" [attr.level-accent]="level">
+<mat-toolbar [attr.level-accent]="level">
   <div user>
     <app-avatar [user]="user"></app-avatar>
-    <div name>{{user.displayName}}</div>
+    <div name>{{user?.displayName}}</div>
   </div>
   <div active_task *ngIf="activeTask">
     <div task_name>{{activeTask.summary}}</div>

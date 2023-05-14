@@ -15,6 +15,7 @@ export class AppComponent implements OnInit {
   connected = false;
   constructor(private ws: ApiService, private router: Router) {
     this.ws.showLoader();
+    this.ws.connect();
     this.ws.connected.subscribe((res) => {
       this.connected = res;
       this.router.navigateByUrl('/dashboard');

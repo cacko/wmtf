@@ -38,10 +38,8 @@ export class HeaderComponent implements OnInit {
     });
     this.api.connected.subscribe(() => {
       this.reportService.getReport().subscribe((data: any) => {
-        console.log(data);
         this.today = this.reportService.today;
         this.activeTask = find(this.today?.tasks, (t) => t.isActive);
-        console.log(this.activeTask);
         this.taskStart = this.activeTask?.clock_start;
       });
     });
