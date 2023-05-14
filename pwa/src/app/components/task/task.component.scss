@@ -1,12 +1,10 @@
-@use 'src/mixins' as mx;
 
 [content] {
   position: relative;
   display: flex;
   flex-direction: column;
   height: 100%;
-  @include mx.color-modifiers($prefix: 'level');
-  padding: 1rem;
+  padding: 1em;
   border-radius: 1rem;
   justify-content: center;
   align-items: center;
@@ -16,10 +14,18 @@
 
     &[summary] {
       overflow: hidden;
+      text-transform: uppercase;
       -webkit-line-clamp: 1;
       -webkit-box-orient: vertical;
       display: -webkit-box;
       z-index: 10;
+
+    }
+    &[info] {
+      width: 100%;
+      height: 2rem;
+      z-index: 10;
+
     }
   }
 

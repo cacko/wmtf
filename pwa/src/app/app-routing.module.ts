@@ -10,7 +10,7 @@ import { LoginComponent } from './components/login/login.component';
 import { tasksResolver } from './service/tasks.service';
 
 const redirectUnauthorizedToLogin = () => redirectUnauthorizedTo(['login']);
-const redirectLoggedInToHome = () => redirectLoggedInTo(['dashboard']);
+const redirectLoggedInToHome = () => redirectLoggedInTo(['']);
 
 const routes: Routes = [
   {

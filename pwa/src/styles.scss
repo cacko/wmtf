@@ -1,4 +1,5 @@
 @use "@angular/material" as mat;
+@use 'src/mixins' as mx;
 @include mat.core();
 $theme-primary: mat.define-palette(mat.$grey-palette, 700);
 $theme-accent: mat.define-palette(mat.$grey-palette, 100, 200, 300);
@@ -50,3 +51,5 @@ body {
 
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+@include mx.color-modifiers($prefix: 'level');

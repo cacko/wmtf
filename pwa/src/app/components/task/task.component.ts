@@ -1,16 +1,32 @@
-import { Component, Input, OnInit } from '@angular/core';
-import { random } from 'lodash-es';
+import {
+  Component,
+  HostBinding,
+  HostListener,
+  Input,
+  OnDestroy,
+  OnInit,
+} from '@angular/core';
+import NgxFMG_ANIMATION from 'src/app/entity/animations';
 import { TaskInfoEntity } from 'src/app/entity/tasks.entity';
 
 @Component({
   selector: 'app-task',
   templateUrl: './task.component.html',
   styleUrls: ['./task.component.scss'],
+  animations: [NgxFMG_ANIMATION.TRIGGER_FADE_OUT],
 })
-export class TaskComponent implements OnInit {
+export class TaskComponent implements OnInit, OnDestroy {
+  private _remove: boolean = false;
   @Input() taskInfo!: TaskInfoEntity;
   level: number | null = null;
 
+  @HostBinding('@TRIGGER_FADE_OUT') get getLeaveDrawer(): boolean {
+    return this._remove;
+  }
+
+  @HostListener('@TRIGGER_FADE_OUT.done') animationIsDone() {
+    // if (this._remove) this.service.removeItem(this);
+  }
 
   ngOnInit(): void {
     const level = this.taskInfo.estimate_used || 0;
@@ -21,10 +37,10 @@ export class TaskComponent implements OnInit {
   }
 
   getProgressStyle() {
-    const est_used = Math.min((this.taskInfo.estimate_used ||0), 100);
+    const est_used = Math.min(this.taskInfo.estimate_used || 0, 100);
     return {
-      width: `${est_used}%`
-    }
+      width: `${est_used}%`,
+    };
   }
 
   private toLevel(
@@ -34,5 +50,9 @@ export class TaskComponent implements OnInit {
     newMin: number = 50
   ): number {
     return ((level - 0) * (newMax - newMin)) / (oldMax - 0) + newMin;
+  }
+
+  ngOnDestroy(): void {
+    throw new Error('Method not implemented.');
   }
 }

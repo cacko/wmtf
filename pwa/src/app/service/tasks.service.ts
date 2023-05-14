@@ -17,14 +17,14 @@ export class TasksService {
   constructor(private api: ApiService) {}
 
   getTasks(): any {
-    this.api.connected.subscribe(() => {
-      this.api.request({ cmd: WSCommand.TASKS });
-    });
+    this.api.request({ cmd: WSCommand.TASKS });
     return this.api.responses.pipe(
       filter((data: WSResponse) => data.data.cmd == WSCommand.TASKS),
       map((data: WSResponse) =>
         data.data.data?.result.map((t: TaskInfoEntity) =>
-          Object.assign(t, { estimate: moment.duration(t.estimate || 0).asSeconds() })
+          Object.assign(t, {
+            estimate: moment.duration(t.estimate || 0).asSeconds(),
+          })
         )
       )
     );

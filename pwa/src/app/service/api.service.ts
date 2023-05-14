@@ -199,7 +199,7 @@ export class ApiService {
     this.ws = new WebSocket(url);
     this.ws.onopen = () => {
       this.wsConnectedSubject.next(true);
-      this.stopReconnector();
+      // this.stopReconnector();
       this.reconnectAfter = WSConnection.RECONNECT_START;
     };
     this.ws.onmessage = (msg) => {
@@ -227,7 +227,7 @@ export class ApiService {
     this.ws.onclose = () => {
       this.pinger?.unsubscribe();
       this.wsConnectedSubject.next(false);
-      this.startReconnector();
+      // this.startReconnector();
     };
     this.out = {
       error: (err: any) => {
