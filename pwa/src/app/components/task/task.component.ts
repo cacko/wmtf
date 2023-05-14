@@ -7,7 +7,7 @@ import {
   OnInit,
 } from '@angular/core';
 import NgxFMG_ANIMATION from 'src/app/entity/animations';
-import { TaskInfoEntity } from 'src/app/entity/tasks.entity';
+import { TaskInfo } from 'src/app/entity/tasks.entity';
 
 @Component({
   selector: 'app-task',
@@ -17,7 +17,7 @@ import { TaskInfoEntity } from 'src/app/entity/tasks.entity';
 })
 export class TaskComponent implements OnInit, OnDestroy {
   private _remove: boolean = false;
-  @Input() taskInfo!: TaskInfoEntity;
+  @Input() taskInfo!: TaskInfo;
   level: number | null = null;
 
   @HostBinding('@TRIGGER_FADE_OUT') get getLeaveDrawer(): boolean {

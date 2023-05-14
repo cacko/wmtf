@@ -1,3 +1,3 @@
 <div grid>
-  <app-task *ngFor="let task of items" [taskInfo]="task"></app-task>
+  <app-task *ngFor="let task of items" [taskInfo]="task" [attr.blink]="task.isActive?1:null"></app-task>
 </div>

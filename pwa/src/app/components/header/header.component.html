@@ -1,5 +1,16 @@
 <mat-toolbar *ngIf="user" [attr.level]="level">
-  <app-avatar [user]="user"></app-avatar>
-  <div>{{user.displayName}}</div>
+  <div user>
+    <app-avatar [user]="user"></app-avatar>
+    <div name>{{user.displayName}}</div>
+  </div>
+  <div active_task *ngIf="activeTask">
+    <div task_name>{{activeTask.summary}}</div>
+    <div task_time>{{taskStart|amTimeAgo:true:fromDate}}</div>
+  </div>
+  <div total_work *ngIf="today">
+    <div hours>{{today.total_work.hours()}}</div>
+    <div minutes>{{today.total_work.minutes()}}</div>
+    <div seconds>{{today.total_work.seconds()}}</div>
+  </div>
   <div progress [ngStyle]="getProgressStyle()"></div>
 </mat-toolbar>

@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { findIndex } from 'lodash-es';
-import { TaskInfoEntity } from 'src/app/entity/tasks.entity';
+import { TaskInfo } from 'src/app/entity/tasks.entity';
 
 @Component({
   selector: 'app-tasklist',
@@ -8,9 +8,9 @@ import { TaskInfoEntity } from 'src/app/entity/tasks.entity';
   styleUrls: ['./tasklist.component.scss'],
 })
 export class TasklistComponent {
-  items: TaskInfoEntity[] = [];
+  items: TaskInfo[] = [];
 
-  @Input() set tasks(items: TaskInfoEntity[]) {
+  @Input() set tasks(items: TaskInfo[]) {
     const newIds = items.map((t) => t.id);
     this.items
       .filter((d) => !newIds.includes(d.id))

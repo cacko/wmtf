@@ -4,11 +4,10 @@ import {
   ResolveFn,
   RouterStateSnapshot,
 } from '@angular/router';
-import { TaskInfoEntity, WTaskInfoEntity } from '../entity/tasks.entity';
+import { WTaskInfoEntity, TaskInfo } from '../entity/tasks.entity';
 import { ApiService } from './api.service';
 import { WSCommand, WSResponse } from '../entity/websockets.entity';
 import { filter, map } from 'rxjs';
-import * as moment from 'moment';
 
 @Injectable({
   providedIn: 'root',
@@ -21,18 +20,13 @@ export class TasksService {
     return this.api.responses.pipe(
       filter((data: WSResponse) => data.data.cmd == WSCommand.TASKS),
       map((data: WSResponse) =>
-        data.data.data?.result.map((t: WTaskInfoEntity) =>
-          Object.assign(t, {
-            estimate: moment.duration(t.estimate || 0),
-            clock_start: moment(t.clock_start) || null
-          })
-        )
+        data.data.data?.result.map((t: WTaskInfoEntity) => (new TaskInfo(t)))
       )
     );
   }
 }
 
-export const tasksResolver: ResolveFn<TaskInfoEntity[]> = (
+export const tasksResolver: ResolveFn<TaskInfo[]> = (
   route: ActivatedRouteSnapshot,
   state: RouterStateSnapshot
 ) => {

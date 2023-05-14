@@ -9,4 +9,21 @@
     grid-auto-flow: dense;
     height: auto !important;
   }
+
+  [blink] {
+    animation: 0.5s linear infinite condemned_blink_effect;
+  }
+
+  @keyframes condemned_blink_effect {
+    0% {
+      filter: brightness(1);
+    }
+    50% {
+      filter: brightness(1.5);
+    }
+    100% {
+      filter: brightness(1.2);
+    }
+  }
+
 }

@@ -74,11 +74,7 @@ const MaterialModules = [
     BrowserModule,
     AppRoutingModule,
     ...MaterialModules,
-    MomentModule.forRoot({
-      relativeTimeThresholdOptions: {
-        s: 59,
-      },
-    }),
+    MomentModule,
     NgxSpinnerModule,
     AvatarModule,
     HttpClientModule,
