@@ -2,7 +2,7 @@ import {app, BrowserWindow, screen} from 'electron';
 import * as path from 'path';
 import * as fs from 'fs';
 
-let win: BrowserWindow = null;
+let win: BrowserWindow;
 const args = process.argv.slice(1),
   serve = args.some(val => val === '--serve');
 
@@ -47,7 +47,6 @@ function createWindow(): BrowserWindow {
     // Dereference the window object, usually you would store window
     // in an array if your app supports multi windows, this is the time
     // when you should delete the corresponding element.
-    win = null;
   });
 
   return win;
@@ -60,11 +59,10 @@ try {
   // Added 400 ms to fix the black background issue while using transparent window. More detais at https://github.com/electron/electron/issues/15947
   app.on('ready', () => {
     setTimeout(createWindow, 400);
-
-    // var python = require('child_process').spawn('wmtf', ['api-serve']);
-    // python.stdout.on('data',function(data){
-    //     console.log("data: ",data.toString('utf8'));
-    // });
+    var python = require('child_process').spawn('/Users/jago/mambaforge/bin/wmtf', ['api-serve']);
+    python.stdout.on('data',function(data: any){
+        console.log("data: ",data.toString('utf8'));
+    });
   });
 
   // Quit when all windows are closed.

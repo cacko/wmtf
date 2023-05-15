@@ -1,5 +1,7 @@
 export enum WSConnection {
   WS_URL = 'ws://127.0.0.1:44331/ws',
+  WS_PORT = 44331,
+  WS_HOST = '127.0.0.1',
   RECONNECT_START = 2000,
 }
 

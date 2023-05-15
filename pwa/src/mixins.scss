@@ -2,10 +2,10 @@
 @use 'sass:math';
 @use '@angular/material' as mat;
 
-$in-norm: mat.define-palette(mat.$light-green-palette);
+$in-norm: mat.define-palette(mat.$light-blue-palette);
 $over-norm: mat.define-palette(mat.$amber-palette);
-$accent-norm: mat.define-palette(mat.$purple-palette);
-$accent-over-norm: mat.define-palette(mat.$lime-palette);
+$accent-norm: mat.define-palette(mat.$blue-palette,);
+$accent-over-norm: mat.define-palette(mat.$red-palette);
 $progress: mat.define-palette(mat.$indigo-palette);
 
 @mixin color-modifiers($prefix, $attribute: 'background') {

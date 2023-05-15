@@ -221,8 +221,9 @@ export class ApiService {
     this.ws.onclose = () => {
       this.pinger?.unsubscribe();
       this.wsConnectedSubject.next(false);
-      // this.startReconnector();
+      this.startReconnector();
     };
+
     this.out = {
       error: (err: any) => {
         this.logger.error(err);
