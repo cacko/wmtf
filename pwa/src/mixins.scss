@@ -6,7 +6,7 @@ $in-norm: mat.define-palette(mat.$light-blue-palette);
 $over-norm: mat.define-palette(mat.$amber-palette);
 $accent-norm: mat.define-palette(mat.$blue-palette,);
 $accent-over-norm: mat.define-palette(mat.$red-palette);
-$progress: mat.define-palette(mat.$indigo-palette);
+$progress: mat.define-palette(mat.$lime-palette);
 
 @mixin color-modifiers($prefix, $attribute: 'background') {
   @for $i from 100 through 900 {

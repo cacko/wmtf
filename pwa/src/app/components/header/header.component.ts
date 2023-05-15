@@ -2,7 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { random, find } from 'lodash-es';
 import * as moment from 'moment';
 import { NGXLogger } from 'ngx-logger';
-import { Subject, interval } from 'rxjs';
+import { Observable, Subject, interval } from 'rxjs';
 import { ReportDay, ReportTask } from 'src/app/entity/report.entity';
 import { TaskInfo } from 'src/app/entity/tasks.entity';
 import { User } from 'src/app/entity/user.entity';
@@ -18,12 +18,12 @@ import { UserService } from 'src/app/service/user.service';
 })
 export class HeaderComponent implements OnInit {
   public user?: User;
-  public level = 500;
   public today?: ReportDay;
   public activeTask: TaskInfo | null = null;
   public taskStart: moment.Moment | null = null;
 
-
+  public level = 0;
+  public progress = 0;
   private todayWorkSubject = new Subject<moment.Duration>();
   todayWork$ = this.todayWorkSubject.asObservable();
 
@@ -39,7 +39,6 @@ export class HeaderComponent implements OnInit {
     this.userService.user.subscribe((user) => {
       if (user) {
         this.user = user;
-        this.level = Math.ceil(this.toLevel(random(0, 100)) / 100) * 100;
       } else {
         delete this.user;
       }
@@ -48,7 +47,11 @@ export class HeaderComponent implements OnInit {
       this.activeTask = task;
       this.taskStart = this.activeTask?.clock_start || null;
       interval(30000).subscribe(() => {
-        this.todayWorkSubject.next(this.today?.total_work || moment.duration({ seconds: 0 }));
+        const today_work = this.today?.total_work || moment.duration({ seconds: 0 });
+        this.todayWorkSubject.next(today_work);
+        this.progress = Math.ceil((today_work.asSeconds() / (8 * 60 * 60)) * 100);
+        this.level = ((this.progress - 0) * (900 - 50)) / (100 - 0) + 50;
+        console.log(this.progress, today_work.asSeconds())
       });
     });
 
@@ -60,9 +63,8 @@ export class HeaderComponent implements OnInit {
   }
 
   getProgressStyle() {
-    const est_used = random(0, 100);
     return {
-      width: `${est_used}%`,
+      width: `${this.progress}%`,
     };
   }
 
@@ -73,12 +75,4 @@ export class HeaderComponent implements OnInit {
     return `${hours}:${minutes}`;
   }
 
-  private toLevel(
-    level: number,
-    oldMax: number = 100,
-    newMax: number = 900,
-    newMin: number = 50
-  ): number {
-    return ((level - 0) * (newMax - newMin)) / (oldMax - 0) + newMin;
-  }
 }

@@ -2,7 +2,7 @@
 @use 'sass:map';
 @use 'sass:math';
 @use '@angular/material' as mat;
-$font-color: mat.define-palette(mat.$blue-grey-palette);
+$font-color: mat.define-palette(mat.$amber-palette);
 :host {
   mat-toolbar {
     border-radius: 1rem;
@@ -29,15 +29,15 @@ $font-color: mat.define-palette(mat.$blue-grey-palette);
 
     [user] {
       display: flex;
-      justify-content: center;
-      align-items: center;
+      justify-content: start;
+      align-items: left;
       column-gap: 0.1rem;
     }
 
     [total_work] {
       display: flex;
-      justify-content: center;
-      align-items: center;
+      justify-content: end;
+      align-items: right;
       column-gap: 0.1rem;
     }
 
