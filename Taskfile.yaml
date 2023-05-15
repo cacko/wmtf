@@ -63,3 +63,9 @@ tasks:
     dir: pwa/
     cmds:
       - ng serve -c
+
+  app-package:
+    desc: make app package
+    dir: pwa/
+    cmds:
+      - yarn electron:build
