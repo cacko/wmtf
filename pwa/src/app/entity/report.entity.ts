@@ -1,6 +1,9 @@
 import { Duration, Moment } from 'moment';
 import { ClockLocation } from './clock.entity';
 import * as moment from 'moment';
+import { TasksService } from '../service/tasks.service';
+import { inject } from '@angular/core';
+import { ApiService } from '../service/api.service';
 
 export interface WReportTask {
   id: number;
@@ -25,18 +28,16 @@ export class ReportTask {
   clock_end!: Moment;
   summary!: string;
 
-  constructor(api_data: WReportTask) {
+  constructor(
+    private api_data: WReportTask
+  ) {
+
     Object.assign(this, api_data, {
       clock_time: moment.duration(api_data.clock_time),
       clock_start: moment(api_data.clock_start) || null,
       clock_end: moment(api_data.clock_end),
     });
   }
-
-  get isActive(): boolean {
-    return [ClockLocation.HOME, ClockLocation.OFFICE].includes(this.clock);
-  }
-
 }
 
 export class ReportDay {

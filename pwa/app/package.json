@@ -8,6 +8,5 @@
     "email": "alex@cacko.net"
   },
   "main": "main.js",
-  "private": true,
-  "dependencies": {}
+  "private": true
 }

@@ -58,4 +58,8 @@ body {
   margin: 0;
 }
 
+.mat-app-background {
+  background: rgba(0,0,0);
+}
+
 @include mx.color-modifiers($prefix: 'level');

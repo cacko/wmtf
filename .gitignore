@@ -135,3 +135,9 @@ __debug/
 /cache
 .envrc
 wmtf*adminsdk*.json
+desktop/**
+.yarn/
+.vscode/
+.angular/
+/desktop
+/.idea

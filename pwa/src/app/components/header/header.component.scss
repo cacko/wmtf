@@ -1,13 +1,22 @@
 @use 'src/mixins' as mx;
-
+@use 'sass:map';
+@use 'sass:math';
+@use '@angular/material' as mat;
+$font-color: mat.define-palette(mat.$blue-grey-palette);
 :host {
   mat-toolbar {
     border-radius: 1rem;
     position: relative;
-    display: flex;
+    display: grid;
     column-gap: 0.3em;
+    grid-template-columns: 0.2fr 0.6fr 0.2fr;
     justify-content: space-between;
     @include mx.color-modifiers($prefix: 'level');
+    font-family: "Rubik Wet Paint";
+    font-stretch: condensed;
+    font-size: 1em;
+    text-transform: uppercase;
+    color: mat.get-color-from-palette($font-color, 100);
 
     [progress] {
       position: absolute;
@@ -36,9 +45,10 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      column-gap: 0.1rem;
+      column-gap: 0.4rem;
       height: 100%;
       padding: 0 1rem;
+      overflow: hidden;
 
       [task_name] {
         font-variant: small-caps;
@@ -47,6 +57,9 @@
       }
 
       [task_time] {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
         font-size: 95%;
       }
     }

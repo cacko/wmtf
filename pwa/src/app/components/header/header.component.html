@@ -5,12 +5,16 @@
   </div>
   <div active_task *ngIf="activeTask">
     <div task_name>{{activeTask.summary}}</div>
-    <div task_time>{{taskStart|amTimeAgo:true:fromDate}}</div>
+    <div task_time>
+      <mat-icon aria-hidden="false" fontIcon="timer"></mat-icon>
+      <div task_time>{{taskStart|amTimeAgo:true:fromDate}}</div>
+    </div>
   </div>
   <div total_work *ngIf="today">
-    <div hours>{{today.total_work.hours()}}</div>
-    <div minutes>{{today.total_work.minutes()}}</div>
-    <div seconds>{{today.total_work.seconds()}}</div>
+    <mat-icon aria-hidden="false">clear_day</mat-icon>
+    <div hours>{{(todayWork$ | async)?.hours()}}:</div>
+    <div minutes>{{(todayWork$ | async)?.minutes()}}:</div>
+    <div seconds>{{(todayWork$ | async)?.seconds()}}</div>
   </div>
   <div progress [ngStyle]="getProgressStyle()"></div>
 </mat-toolbar>

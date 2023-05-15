@@ -16,12 +16,12 @@ import {
   WSResponse,
   WSPing,
   WSType,
-  WSLoading,
   WSCommand,
   Payload,
 } from '../entity/websockets.entity';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { User } from '../entity/user.entity';
+import { TaskInfo } from '../entity/tasks.entity';
 
 @Injectable({
   providedIn: 'root',
@@ -31,6 +31,7 @@ export class ApiService {
   private in: Observable<MessageEvent<any>> | undefined;
 
   private reconnectAfter = 0;
+  activeTask ?: TaskInfo;
 
   private responseSubject = new Subject<WSResponse>();
   responses = this.responseSubject.asObservable();

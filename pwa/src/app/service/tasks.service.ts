@@ -7,13 +7,18 @@ import {
 import { WTaskInfoEntity, TaskInfo } from '../entity/tasks.entity';
 import { ApiService } from './api.service';
 import { WSCommand, WSResponse } from '../entity/websockets.entity';
-import { filter, map } from 'rxjs';
+import { Subject, filter, map, tap } from 'rxjs';
+import { find } from 'lodash-es';
+
 
 @Injectable({
   providedIn: 'root',
 })
 export class TasksService {
-  constructor(private api: ApiService) {}
+  constructor(private api: ApiService) { }
+
+  private activeTaskSubject = new Subject<TaskInfo | null>();
+  activeTask = this.activeTaskSubject.asObservable();
 
   getTasks(): any {
     this.api.request({ cmd: WSCommand.TASKS });
@@ -21,9 +26,14 @@ export class TasksService {
       filter((data: WSResponse) => data.data.cmd == WSCommand.TASKS),
       map((data: WSResponse) =>
         data.data.data?.result.map((t: WTaskInfoEntity) => (new TaskInfo(t)))
-      )
-    );
+      ),
+      tap(
+        (tasks: TaskInfo[]) => {
+          const active = find(tasks, (t) => t.isActive) || null;
+          this.activeTaskSubject.next(active);
+        }));
   }
+
 }
 
 export const tasksResolver: ResolveFn<TaskInfo[]> = (

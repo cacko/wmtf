@@ -241,8 +241,12 @@ def cli_clockoff(ctx: click.Context, location: str, max_delay: Optional[int]):
 @cli.command("api-serve", short_help="Start api server")
 @click.pass_context
 def cli_api_server(ctx: click.Context):
-    api_server = Server()
-    api_server.start()
+    try:
+        api_server = Server()
+        api_server.start()
+    except AssertionError:
+        output("api serve is most likely already running")
+        quit()
 
 
 def run():

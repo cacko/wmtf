@@ -2,10 +2,13 @@ import { Component, Input, OnInit } from '@angular/core';
 import { random, find } from 'lodash-es';
 import * as moment from 'moment';
 import { NGXLogger } from 'ngx-logger';
+import { Subject, interval } from 'rxjs';
 import { ReportDay, ReportTask } from 'src/app/entity/report.entity';
+import { TaskInfo } from 'src/app/entity/tasks.entity';
 import { User } from 'src/app/entity/user.entity';
 import { ApiService } from 'src/app/service/api.service';
 import { ReportService } from 'src/app/service/report.service';
+import { TasksService } from 'src/app/service/tasks.service';
 import { UserService } from 'src/app/service/user.service';
 
 @Component({
@@ -17,15 +20,20 @@ export class HeaderComponent implements OnInit {
   public user?: User;
   public level = 500;
   public today?: ReportDay;
-  public activeTask?: ReportTask;
-  public taskStart?: moment.Moment;
+  public activeTask: TaskInfo | null = null;
+  public taskStart: moment.Moment | null = null;
+
+
+  private todayWorkSubject = new Subject<moment.Duration>();
+  todayWork$ = this.todayWorkSubject.asObservable();
 
   constructor(
     private userService: UserService,
     private logger: NGXLogger,
     private api: ApiService,
-    private reportService: ReportService
-  ) {}
+    private reportService: ReportService,
+    private tasksService: TasksService
+  ) { }
 
   ngOnInit(): void {
     this.userService.user.subscribe((user) => {
@@ -36,11 +44,17 @@ export class HeaderComponent implements OnInit {
         delete this.user;
       }
     });
+    this.tasksService.activeTask.subscribe((task: TaskInfo | null) => {
+      this.activeTask = task;
+      this.taskStart = this.activeTask?.clock_start || null;
+      interval(30000).subscribe(() => {
+        this.todayWorkSubject.next(this.today?.total_work || moment.duration({ seconds: 0 }));
+      });
+    });
+
     this.api.connected.subscribe(() => {
       this.reportService.getReport().subscribe((data: any) => {
         this.today = this.reportService.today;
-        this.activeTask = find(this.today?.tasks, (t) => t.isActive);
-        this.taskStart = this.activeTask?.clock_start;
       });
     });
   }

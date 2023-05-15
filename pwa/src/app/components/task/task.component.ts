@@ -32,8 +32,8 @@ export class TaskComponent implements OnInit, OnDestroy {
     const level = this.taskInfo.estimate_used || 0;
     this.level =
       level < 100
-        ? Math.ceil(this.toLevel(level) / 100) * 100
-        : Math.ceil(this.toLevel(level - 100) / 100) * 100 * -1;
+        ? Math.min(Math.ceil(this.toLevel(level) / 100) * 100, 900)
+        : Math.min(Math.ceil(this.toLevel(level - 100) / 100) * 100, 900) * -1;
   }
 
   getProgressStyle() {

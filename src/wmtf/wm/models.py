@@ -31,7 +31,7 @@ class ClockIcon(StrEnum):
 class ClockLocation(StrEnum):
     HOME = "home"
     OFFICE = "office"
-    OFF = "off"
+    OFF = ""
 
     @property
     def icon(self) -> ClockIcon:

@@ -4,6 +4,7 @@ import uvicorn
 from fastapi import FastAPI
 from .routers import api, ws
 from fastapi.middleware.cors import CORSMiddleware
+from wmtf.core.socket import check_port
 
 
 def create_rest_app():
@@ -31,12 +32,14 @@ class Server(object):
     api: Queue
 
     def __init__(self, *args, **kwargs):
-        server_config = uvicorn.Config(
+        params = dict(
             app=create_rest_app,
             host=app_config.api_config.host,
             port=app_config.api_config.port,
             factory=True
         )
+        assert check_port(params["port"], params["host"]) == False
+        server_config = uvicorn.Config(**params)
         self.__server = uvicorn.Server(server_config)
 
     def start(self):
