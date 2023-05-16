@@ -19,7 +19,10 @@ function createWindow() {
             contextIsolation: false, // false if you want to run e2e test with Spectron
         },
         frame: false,
-        titleBarStyle: "hidden"
+        titleBarStyle: "hidden",
+        movable: true,
+        transparent: true,
+        roundedCorners: true
     });
     if (serve) {
         const debug = require('electron-debug');
@@ -51,12 +54,12 @@ try {
     // Some APIs can only be used after this event occurs.
     // Added 400 ms to fix the black background issue while using transparent window. More detais at https://github.com/electron/electron/issues/15947
     electron_1.app.on('ready', () => {
-        // setTimeout(createWindow, 400);
-        createWindow();
-        // var python = require('child_process').spawn('wmtf', ['api-serve']);
-        // python.stdout.on('data',function(data: any){
-        //     console.log("data: ",data.toString('utf8'));
-        // });
+        setTimeout(createWindow /*  */, 400);
+        // createWindow();
+        var python = require('child_process').spawn('wmtf', ['api-serve']);
+        python.stdout.on('data', function (data) {
+            console.log("data: ", data.toString('utf8'));
+        });
     });
     // Quit when all windows are closed.
     electron_1.app.on('window-all-closed', () => {
