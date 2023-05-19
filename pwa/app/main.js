@@ -19,7 +19,9 @@ function createWindow() {
             contextIsolation: false, // false if you want to run e2e test with Spectron
         },
         frame: false,
-        titleBarStyle: "hidden"
+        movable: true,
+        transparent: true,
+        // titleBarStyle: "hiddenInset"
     });
     if (serve) {
         const debug = require('electron-debug');
