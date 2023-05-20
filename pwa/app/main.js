@@ -18,7 +18,7 @@ function createWindow() {
             allowRunningInsecureContent: (serve),
             contextIsolation: false, // false if you want to run e2e test with Spectron
         },
-        frame: false,
+        // frame: false,
         movable: true,
         transparent: true,
         // titleBarStyle: "hiddenInset"

@@ -3,6 +3,7 @@
 @use 'sass:math';
 @use '@angular/material' as mat;
 $font-color: mat.define-palette(mat.$amber-palette);
+$task-color: mat.define-palette(mat.$blue-palette);
 :host {
   mat-toolbar {
     border-radius: 1rem;
@@ -16,7 +17,7 @@ $font-color: mat.define-palette(mat.$amber-palette);
     font-stretch: condensed;
     font-size: 1.5em;
     text-transform: uppercase;
-    color: mat.get-color-from-palette($font-color, 100);
+    // color: mat.get-color-from-palette($font-color, 100);
 
     [progress] {
       position: absolute;
@@ -52,6 +53,9 @@ $font-color: mat.define-palette(mat.$amber-palette);
       height: 100%;
       padding: 0 1rem;
       overflow: hidden;
+      font-family: "Teko";
+      color: mat.get-color-from-palette($task-color, 100);
+
 
       [task_name] {
         font-variant: small-caps;

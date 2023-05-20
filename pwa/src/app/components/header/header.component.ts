@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { random, find } from 'lodash-es';
+import { random, find, ceil } from 'lodash-es';
 import * as moment from 'moment';
 import { NGXLogger } from 'ngx-logger';
 import { Observable, Subject, interval } from 'rxjs';
@@ -50,8 +50,7 @@ export class HeaderComponent implements OnInit {
         const today_work = this.today?.total_work || moment.duration({ seconds: 0 });
         this.todayWorkSubject.next(today_work);
         this.progress = Math.ceil((today_work.asSeconds() / (8 * 60 * 60)) * 100);
-        this.level = ((this.progress - 0) * (900 - 50)) / (100 - 0) + 50;
-        console.log(this.progress, today_work.asSeconds())
+        this.level = ceil(((this.progress - 0) * (900 - 50)) / (100 - 0) + 50, -2);
       });
     });
 
