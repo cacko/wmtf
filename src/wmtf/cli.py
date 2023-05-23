@@ -24,6 +24,7 @@ from wmtf.git import Git, GitError
 from wmtf.git.message import Message
 import sys
 import re
+import signal
 
 
 def banner(txt: str, color: str = "bright_green"):
@@ -241,12 +242,23 @@ def cli_clockoff(ctx: click.Context, location: str, max_delay: Optional[int]):
 @cli.command("api-serve", short_help="Start api server")
 @click.pass_context
 def cli_api_server(ctx: click.Context):
+    api_server = Server()
+
+    def handler_stop_signals(signum, frame):
+        logging.warning("Stopping app")
+        api_server.stop()
+        quit()
+
+    signal.signal(signal.SIGINT, handler_stop_signals)
+    signal.signal(signal.SIGTERM, handler_stop_signals)
+
     try:
-        api_server = Server()
         api_server.start()
     except AssertionError:
         output("api serve is most likely already running")
-        quit()
+        raise RuntimeError
+    except Exception:
+        raise RuntimeError
 
 
 def run():

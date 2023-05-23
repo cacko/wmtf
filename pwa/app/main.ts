@@ -65,7 +65,6 @@ try {
   // Added 400 ms to fix the black background issue while using transparent window. More detais at https://github.com/electron/electron/issues/15947
   app.on('ready', () => {
     setTimeout(createWindow/*  */, 400);
-    // createWindow();
     var python = require('child_process').spawn('wmtf', ['api-serve']);
     python.stdout.on('data',function(data: any){
         console.log("data: ",data.toString('utf8'));
