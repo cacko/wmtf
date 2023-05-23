@@ -29,7 +29,7 @@ import { TextFieldModule } from '@angular/cdk/text-field';
 import { MomentModule } from 'ngx-moment';
 import { AvatarComponent } from './components/avatar/avatar.component';
 import { HttpClientModule } from '@angular/common/http';
-import { AvatarModule } from 'ngx-avatars';
+import { NgxJdenticonModule } from 'ngx-jdenticon'; // <--- Add
 import { NgxSpinnerModule } from 'ngx-spinner';
 
 const MaterialModules = [
@@ -68,7 +68,7 @@ const MaterialModules = [
     ...MaterialModules,
     MomentModule,
     NgxSpinnerModule,
-    AvatarModule,
+    NgxJdenticonModule,
     HttpClientModule,
     BrowserAnimationsModule,
     LoggerModule.forRoot({

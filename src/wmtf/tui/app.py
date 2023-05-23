@@ -17,7 +17,7 @@ from wmtf.config import app_config
 from webbrowser import open_new_tab
 from typing import Any
 from wmtf import RESOURCES_PATH
-from app_version import get_string_version
+from wmtf.version import __version__
 
 
 class Tui(App):
@@ -62,7 +62,7 @@ class Tui(App):
 
     def compose(self) -> ComposeResult:
         self._bindings.bind("tab", "switch_view", show=False, priority=True)
-        self.title = f"Work Manager v{get_string_version('wmtf')}"
+        self.title = f"Work Manager v{__version__}"
         # yield WidgetAlert(id="alert", classes="hidden")
         yield Header(show_clock=True)
         yield Container(

@@ -1,1 +1,1 @@
-<ngx-avatars [name]="user?.displayName" [size]="size"></ngx-avatars>
+<svg [width]="size" [height]="size" [data-jdenticon-value]="user.displayName" *ngIf="user"></svg>

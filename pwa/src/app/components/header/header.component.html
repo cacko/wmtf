@@ -11,10 +11,9 @@
     </div>
   </div>
   <div total_work *ngIf="today">
-    <mat-icon aria-hidden="false">clear_day</mat-icon>
-    <div hours>{{(todayWork$ | async)?.hours()}}:</div>
-    <div minutes>{{(todayWork$ | async)?.minutes()}}:</div>
-    <div seconds>{{(todayWork$ | async)?.seconds()}}</div>
+    <mat-icon aria-hidden="false">work_history</mat-icon>
+    <div hours>{{(todayWork$ | async)?.hours()}}</div>
+    <div minutes>{{(todayWork$ | async)?.minutes() | number:'2.0-0'}}</div>
   </div>
   <div progress [ngStyle]="getProgressStyle()"></div>
 </mat-toolbar>
