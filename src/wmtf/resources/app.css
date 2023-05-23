@@ -34,9 +34,9 @@ Screen {
 }
 
 #content > .box {
-  height: auto;
+  height: 100%;
   width: 1fr;
-  scrollbar-gutter: stable;
+  scrollbar-gutter: auto;
 }
 
 #content .scroll {

@@ -76,9 +76,9 @@ class Tui(App):
             id="heading",
         )
         yield Container(
-            WidgetTasks(id="tasks", classes="box scroll"),
-            WidgetReport(id="report", classes="box scroll"),
-            WidgetTask(id="task", classes="box hidden scroll"),
+            WidgetTasks(id="tasks", classes="box"),
+            WidgetReport(id="report", classes="box"),
+            WidgetTask(id="task", classes="box hidden"),
             id="content",
         )
         yield Footer()
