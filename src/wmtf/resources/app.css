@@ -67,7 +67,7 @@ Screen {
 }
 
 .box-normal {
-  border: round $accent;
+  border: tall $accent;
 }
 
 .box-focused {

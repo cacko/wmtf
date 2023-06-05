@@ -109,7 +109,7 @@ class Tui(App):
     def action_switch_view(self):
         nxt = Focusable.next()
         if nxt:
-            nxt.focus()
+            nxt.focus(scroll_visible=False)
 
     def action_clock(self):
         if self.widget_task_list.clock():

@@ -1,3 +1,4 @@
+from venv import logger
 from textual.containers import Container
 from rich.console import RenderableType
 from textual import events
@@ -18,6 +19,7 @@ class Box(Container):
     b_title = reactive("")
     b_padding = reactive(1)
     b_classes = reactive("box-normal")
+    can_focus_children = True
 
     def render(self) -> RenderableType:
         self.classes = self.b_classes
@@ -57,6 +59,8 @@ class Focusable(Widget, can_focus=True):
 
     def on_focus(self, event: events.Focus) -> None:
         self.box.b_classes = "box-focused"
+        logger.warn(self.children)
+        self.children[0].focus()
 
     def on_blur(self, event: events.Blur) -> None:
         self.box.b_classes = "box-normal"
