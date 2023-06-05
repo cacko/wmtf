@@ -3,7 +3,7 @@ from textual.widgets import Header, Footer
 from textual import events
 from textual.timer import Timer
 from textual.containers import Container
-from .widgets.tasks import Tasks as WidgetTasks
+from .widgets.task_list import WidgetTaskList as WidgetTaskList
 from .widgets.report import Report as WidgetReport
 from .widgets.task import Task as WidgetTask
 from .widgets.app_name import AppName as WidgetAppName
@@ -42,8 +42,8 @@ class Tui(App):
         return self.query_one(WidgetTask)
 
     @property
-    def widget_tasks(self) -> WidgetTasks:
-        return self.query_one(WidgetTasks)
+    def widget_task_list(self) -> WidgetTaskList:
+        return self.query_one(WidgetTaskList)
 
     @property
     def widget_report(self) -> WidgetReport:
@@ -76,7 +76,7 @@ class Tui(App):
             id="heading",
         )
         yield Container(
-            WidgetTasks(id="tasks", classes="box"),
+            WidgetTaskList(id="tasks", classes="box"),
             WidgetReport(id="report", classes="box"),
             WidgetTask(id="task", classes="box hidden"),
             id="content",
@@ -100,7 +100,7 @@ class Tui(App):
 
     def action_reload(self) -> None:
         self.__timer.pause()
-        self.widget_tasks.reload()
+        self.widget_task_list.reload()
         self.widget_task.hide()
         self.widget_report.unhide()
         self.widget_report.load()
@@ -112,7 +112,7 @@ class Tui(App):
             nxt.focus()
 
     def action_clock(self):
-        if self.widget_tasks.clock():
+        if self.widget_task_list.clock():
             self.action_reload()
 
     def action_toggle_location(self):
@@ -124,7 +124,7 @@ class Tui(App):
     def action_open_browser(self, link: str):
         open_new_tab(link)
 
-    def on_tasks_selected(self, message: WidgetTasks.Selected) -> None:
+    def on_tasks_selected(self, message: WidgetTaskList.Selected) -> None:
         self.widget_task.load(message.task.id)
         self.widget_task.unhide()
         self.widget_report.hide()
