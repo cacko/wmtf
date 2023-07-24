@@ -2,6 +2,8 @@ import re
 from typing import Optional, Generator
 from urllib.parse import parse_qs, urlparse
 from datetime import datetime
+
+from pathlib import Path
 from wmtf.wm import MaintenanceError
 from bs4 import BeautifulSoup, element
 from urlextract import URLExtract
@@ -116,15 +118,18 @@ def extract_task_update(text: tuple) -> Optional[timedelta]:
 
 
 def get_links(s: str) -> Generator[str, None, None]:
+    found = []
     for url in URLExtract().gen_urls(s, with_schema_only=True):
         try:
             assert isinstance(url, str)
+            assert url not in found
+            found.append(url)
             yield url
         except AssertionError:
             pass
 
 
-def markdown_links(s: str) -> str:
+def markdown_links(s: str, action: str = "") -> str:
     return reduce(
         lambda r, url: r.replace(url, f"[{truncate(url, 50)}]({url})"),
         get_links(s),
@@ -142,13 +147,16 @@ def console_links(s: str) -> str:
 
 
 def textual_links(s: str, action) -> str:
-    return reduce(
+    Path("s.txt").write_text("\n".join(list(get_links(s))))
+    r = reduce(
         lambda r, url: r.replace(
             url, f"[@click={action}('{url}')]{truncate(url, 50)}[/]"
         ),
         get_links(s),
         s,
     )
+    Path("d.txt").write_text(r)
+    return r
 
 
 def to_int(s: str) -> int:

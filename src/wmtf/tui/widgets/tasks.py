@@ -1,18 +1,13 @@
-from rich.console import ConsoleRenderable, RenderableType, RichCast
-from textual.events import Mount
+from rich.console import ConsoleRenderable, RichCast
 from wmtf.tui.renderables.task_list import TaskListItem
 from wmtf.wm.client import Client
-from wmtf.wm.models import TaskInfo, ClockLocation
+from wmtf.wm.models import TaskInfo
 from typing import Optional
-from textual import events
 from textual.reactive import reactive
 from textual.app import ComposeResult
-from textual.widgets import Static, ListView, ListItem, Label
+from textual.widgets import Static, ListView, ListItem
 from textual.message import Message, MessageTarget
-from textual.keys import Keys
 from wmtf.tui.widgets.types import Box, Focusable
-from wmtf.config import app_config
-from textual import log
 
 
 class TasksBox(Box):

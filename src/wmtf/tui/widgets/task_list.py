@@ -1,18 +1,14 @@
-from rich.console import ConsoleRenderable, RenderableType, RichCast
-from textual.events import Mount
+from rich.console import ConsoleRenderable, RichCast
 from wmtf.tui.renderables.task_list import TaskListItem
 from wmtf.wm.client import Client
 from wmtf.wm.models import TaskInfo, ClockLocation
 from typing import Optional
-from textual import events
 from textual.reactive import reactive
 from textual.app import ComposeResult
-from textual.widgets import Static, ListView, ListItem, Label
-from textual.message import Message, MessageTarget
-from textual.keys import Keys
+from textual.widgets import Static, ListView, ListItem
+from textual.message import Message
 from wmtf.tui.widgets.types import Box, Focusable
 from wmtf.config import app_config
-from textual import log
 from corethread import StoppableThread
 
 
@@ -38,15 +34,29 @@ class TaskItemWidget(Static):
         self.__task = task
         self.__index = idx
 
+    @property
+    def task_info(self) -> TaskInfo:
+        return self.__task
+
     def render(self) -> ConsoleRenderable | RichCast:
         return TaskListItem(self.__task, self.__index)
 
 
 class TasksList(ListView):
 
+    class Selected(Message):
+
+        task: Optional[TaskInfo] = None
+
+        def __init__(self, task_list: ListView, item: ListItem) -> None:
+            widget = item.get_child_by_type(TaskItemWidget)
+            self.task = widget.task_info
+            super().__init__()
+
     def clock(self) -> bool:
         if not self._nodes:
             return False
+
         if selected := self.Selected.task:
             return Client.clock(
                 selected.clock_id,
@@ -97,11 +107,6 @@ class WidgetTaskList(Focusable):
 
     __box: Optional[TasksBox] = None
     __wdg: Optional[TasksList] = None
-
-    class Selected(Message):
-        def __init__(self, sender: MessageTarget, task: TaskInfo) -> None:
-            self.task = task
-            super().__init__()
 
     @property
     def box(self) -> Box:

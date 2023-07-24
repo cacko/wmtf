@@ -124,7 +124,7 @@ class Tui(App):
     def action_open_browser(self, link: str):
         open_new_tab(link)
 
-    def on_tasks_selected(self, message: WidgetTaskList.Selected) -> None:
+    def on_tasks_list_selected(self, message) -> None:
         self.widget_task.load(message.task.id)
         self.widget_task.unhide()
         self.widget_report.hide()

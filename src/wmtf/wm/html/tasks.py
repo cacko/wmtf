@@ -76,7 +76,7 @@ class Task(Parser):
         return TaskItem(
             id=self.id,
             summary=task_row["Summary"],
-            description=task_row["Desc"].replace("<br>", "\n"),
+            description=task_row["Desc"].replace("<br>", "\n "),
             assignee=task_row["Assignee"],
             comments=self.__get_comments(),
             create=task_row["Create"],
@@ -94,7 +94,7 @@ class Task(Parser):
             return [
                 TaskComment(
                     author=r["Who"],
-                    comment=r["Comment"].replace("<br>", "\n>"),
+                    comment=r["Comment"].replace("<br>", "\n "),
                     timestamp=extract_comment_time(r["Date"]),
                 )
                 for _, r in df.drop([0, 1]).iterrows()
